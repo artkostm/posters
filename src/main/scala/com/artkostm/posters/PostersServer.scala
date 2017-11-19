@@ -12,6 +12,7 @@ import com.twitter.finatra.request.QueryParam
 import org.joda.time.DateTime
 
 class PostersServer extends HttpServer {
+  override val defaultFinatraHttpPort: String = httpConfig.port
   override protected def configureHttp(router: HttpRouter): Unit =
     router
       .exceptionMapper[IllegalArgumentExceptionHandler]
