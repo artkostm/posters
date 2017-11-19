@@ -8,4 +8,4 @@ case class Event(media: Media, name: String, description: Description)
 case class Category(name: String, events: List[Event])
 
 sealed trait Schedule
-case class Day(events: List[Event], date: Date) extends Schedule
+case class Day(events: List[Category], date: Date) extends Schedule

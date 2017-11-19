@@ -1,21 +1,42 @@
 package com.artkostm.posters.scraper
 
+import com.artkostm.ScraperConfig
+import com.artkostm.posters.model._
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser
-import net.ruippeixotog.scalascraper.browser.JsoupBrowser.JsoupElement
 import net.ruippeixotog.scalascraper.dsl.DSL._
 import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
-import net.ruippeixotog.scalascraper.dsl.DSL.Parse._
 import net.ruippeixotog.scalascraper.model._
+import org.joda.time.DateTime
 
-object Scraper extends App {
+class Scraper(config: ScraperConfig) {
+  val format = config.tut.format
   val browser = JsoupBrowser()
 
-  val doc = browser.get("https://afisha.tut.by/day/2017/11/18/")
+  def scheduleFor(day: DateTime): Day = {
+    val doc = browser.get(s"${config.tut.url}${format.print(day)}")
+    val blocks = doc >> elementList(config.tut.blocksSelector)
 
-  val schedule = doc >?> element("#events-content")
+    val categories = for {
+      block <- blocks
+    } yield Category(block >> text(config.tut.blockTitleSelector), extractEvents(block).flatten)
 
-  schedule match {
-    case Some(JsoupElement(text)) => println(text)
-    case None => println("there is no element of such class")
+    Day(categories, day.toDate)
+  }
+
+  private[this] def extractEvents(block: Element): List[Option[Event]] = {
+    block >> elementList(config.tut.eventsSelector) map { event =>
+      for {
+        media <- event >?> element(config.tut.mediaSelector)
+        name <- event >?> element(config.tut.eventNameSelector)
+        txt <- event >?> element(config.tut.descriptionSelector)
+      } yield Event(
+        Media(media.attr(config.tut.hrefAttrSelector),
+          media >> attr(config.tut.srcAttrSelector)(config.tut.imgSelector)),
+        name.text,
+        Description(txt >> text(config.tut.descriptionTextSelector),
+          txt >?> attr(config.tut.hrefAttrSelector)(config.tut.ticketSelector),
+          (txt >?> text(config.tut.freeEventSelector)).isDefined)
+      )
+    }
   }
 }
