@@ -1,5 +1,3 @@
 package com.artkostm.posters
 
-object Main {
-
-}
+object Main extends PostersServer
