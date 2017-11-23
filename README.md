@@ -29,15 +29,18 @@ val setupFuture: Future[Unit] = db.run(setupAction)
 ```
 ******
 For REST
-
+```curl
 POST /posters/categories/
+```
+```json
 {
 	"user_id":"",
 	"category":"",
 	"event_name":"",
 	"date":""
 }
-
+```
+******
 if there is a row with the combination (category, event_name, date)
 then update that row
 otherwise create new row with the information received
