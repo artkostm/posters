@@ -9,4 +9,4 @@ enablePlugins(JavaAppPackaging)
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 resolvers += "Twitter Maven" at "https://maven.twttr.com"
 
-libraryDependencies ++= Dependencies.finatra
+libraryDependencies ++= Dependencies.all

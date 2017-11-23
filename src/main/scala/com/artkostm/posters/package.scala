@@ -3,12 +3,10 @@ package com.artkostm
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
-import org.mapdb.DBMaker
 
 package object posters {
   val DB_NAME = "postersMap"
   lazy val actorSystem = ActorSystem("posters")
-  lazy val db = DBMaker.heapDB().make()
   lazy val config = ConfigFactory.load()
   lazy val scraperConfig = ScraperConfig(TutScraper(
     config.getString("scraper.tut.url"),
