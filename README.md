@@ -35,6 +35,23 @@ Add Postgres driver:
 ```sbt
 libraryDependencies += "org.postgresql" % "postgresql" % "9.4.1208"
 ```
+And add configuration
+```HOCON
+db {
+    url = ${DATABASE_URL}
+}
+```
+After that add configuration
+```scala
+case class DbConfig(url: String, user: String, password: String)
+...
+lazy val db = {
+    val uri = new URI(config.getString("db.url"))
+    val user = uri.getUserInfo().split(":")(0);
+    val password = uri.getUserInfo().split(":")(1);
+    DbConfig(s"jdbc:postgresql://${uri.getHost()}:${uri.getPort()}${uri.getPath()}", user, password)
+}
+```
 ******
 Table model:
 ```scala
@@ -69,8 +86,8 @@ POST /posters/categories/
 }
 ```
 ******
--if there is a row with the combination (category, event_name, date)
---then update that row
--otherwise create new row with the information received
+- if there is a row with the combination (category, event_name, date)
+-- then update that row
+- otherwise create new row with the information received
 ******
 
