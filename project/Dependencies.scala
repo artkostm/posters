@@ -6,8 +6,10 @@ object Dependencies {
     val logback = "1.2.3"
     val scraper = "2.0.0"
     val akka = "2.5.6"
-	val slick = "3.2.1"
-	val slick_pg = "0.15.4"
+    val slick = "3.2.1"
+    val slick_pg = "0.15.4"
+    val hikaricp = "3.2.1"
+    val postgres = "9.4.1208"
   }
 
   val finatra_http = "com.twitter" %% "finatra-http" % versions.finatra
@@ -16,6 +18,10 @@ object Dependencies {
   val akka_actor = "com.typesafe.akka" % "akka-actor_2.12" % versions.akka
   val slick = "com.typesafe.slick" %% "slick" % versions.slick
   val slick_pg = "com.github.tminglei" %% "slick-pg" % versions.slick_pg
+  val hikaricp = "com.typesafe.slick" %% "slick-hikaricp" % versions.hikaricp
+  val postgres = "org.postgresql" % "postgresql" % versions.postgres
 
-  lazy val finatra = Seq(finatra_http, logback, scraper, akka_actor, slick, slick_pg)
+
+  lazy val all = Seq(finatra_http, logback, scraper, akka_actor, slick,
+    slick_pg, "com.h2database" % "h2" % "1.4.187", hikaricp, postgres)
 }
