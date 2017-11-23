@@ -73,6 +73,29 @@ val setupAction: DBIO[Unit] = DBIO.seq(createIfNotExist, deleteOldEvents.delete)
 val setupFuture: Future[Unit] = db.run(setupAction)
 ```
 ******
+Create finatra module to start db creation process:
+```scala
+class Server extends HttpServer {
+  override val modules = Seq(DbStartupModule)
+  ...
+}
+```
+And here is the module itself:
+```scala
+object DbStartupModule extends TwitterModule {
+  override def singletonStartup(injector: Injector) {
+    // initialize JVM-wide resources
+  }
+  override def singletonShutdown(injector: Injector) {
+    // shutdown JVM-wide resources
+  }
+  override def singletonPostWarmupComplete(injector: Injector) {
+    // perform functions that need to happen after we've bound
+    // ports but before the server has started
+  }
+}
+```
+******
 For REST
 ```curl
 POST /posters/categories/
