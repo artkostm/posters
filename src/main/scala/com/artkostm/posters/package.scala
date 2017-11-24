@@ -4,6 +4,7 @@ import java.net.URI
 
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
+import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 
 package object posters {
@@ -29,11 +30,17 @@ package object posters {
   lazy val httpConfig = HttpConfig(
     s":${config.getString("http.port")}"
   )
-  lazy val dbConfig = {
-    val uri = new URI(config.getString("db.url"))
+  lazy val postgresDS = {
+    val uri = new URI(config.getString("postgres.url"))
     val user = uri.getUserInfo().split(":")(0)
     val password = uri.getUserInfo().split(":")(1)
-    DbConfig(s"jdbc:postgresql://${uri.getHost()}:${uri.getPort()}${uri.getPath()}", user, password)
+    val c = new HikariConfig()
+    c.setJdbcUrl(s"jdbc:postgresql://${uri.getHost()}:${uri.getPort()}${uri.getPath()}")
+    c.setUsername(user)
+    c.setPassword(password)
+    c.setMaximumPoolSize(19)
+    c.setConnectionTimeout(120000)
+    new HikariDataSource(c)
   }
 }
 
@@ -46,5 +53,4 @@ case class TutScraper(url: String, format: DateTimeFormatter, blocksSelector: St
                       imgSelector: String)
 case class ScraperConfig(tut: TutScraper)
 case class HttpConfig(port: String)
-case class DbConfig(url: String, user: String, password: String)
 
