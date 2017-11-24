@@ -1,23 +1,28 @@
 package com.artkostm.posters.model
 
-import java.util.Date
-
-import slick.jdbc.H2Profile.api._
+import com.artkostm.posters.repository.DbComponent
+import org.joda.time.DateTime
 import slick.lifted.ProvenShape
 
-class Events(tag: Tag) extends Table[(String, Date, String, String)](tag, "events") {
-  implicit val d2t = DateMapper.DateTime2SqlTimestampMapper
-  def category: Rep[String] = column[String]("category")
-  def date: Rep[Date] = column[Date]("date")
-  def eventName: Rep[String] = column[String]("event_date")
-  def ids: Rep[String] = column[String]("ids")
+trait EventsTable { this: DbComponent =>
+  import driver.api._
+  protected implicit val DateTime2SqlTimestampMapper = MappedColumnType.base[DateTime, java.sql.Timestamp]({
+    date => new java.sql.Timestamp(date.toDate.getTime)
+  }, {
+    sqlTimestamp => new DateTime(sqlTimestamp.getTime())
+  })
 
-  def * : ProvenShape[(String, Date, String, String)] = (category, date, eventName, ids)
-  def pk = primaryKey("pk_events", (category, date, eventName))
+  private[EventsTable] class Events(tag: Tag) extends Table[Assign](tag, "events") {
+    def category: Rep[String] = column[String]("category")
+    def date: Rep[DateTime] = column[DateTime]("date")
+    def eventName: Rep[String] = column[String]("event_date")
+    def ids: Rep[String] = column[String]("ids")
+
+    def * : ProvenShape[Assign] = (category, date, eventName, ids) <> (Assign.tupled, Assign.unapply)
+    def pk = primaryKey("pk_events", (category, date, eventName))
+  }
+
+  protected val eventsTableQuery = TableQuery[Events]
 }
 
-object DateMapper {
-  val DateTime2SqlTimestampMapper = MappedColumnType.base[Date, java.sql.Timestamp](
-    { utilDate => new java.sql.Timestamp(utilDate.getTime) },
-    { sqlTimestamp => new Date(sqlTimestamp.getTime()) })
-}
+case class Assign(category: String, date: DateTime, eventName: String, ids: String)
