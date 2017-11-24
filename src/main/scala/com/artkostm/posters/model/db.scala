@@ -1,5 +1,6 @@
 package com.artkostm.posters.model
 
+
 import com.artkostm.posters.repository.DbComponent
 import org.joda.time.DateTime
 import slick.lifted.ProvenShape
