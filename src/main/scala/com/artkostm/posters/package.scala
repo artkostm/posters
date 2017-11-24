@@ -1,5 +1,7 @@
 package com.artkostm
 
+import java.net.URI
+
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
@@ -27,6 +29,12 @@ package object posters {
   lazy val httpConfig = HttpConfig(
     s":${config.getString("http.port")}"
   )
+  lazy val dbConfig = {
+    val uri = new URI(config.getString("db.url"))
+    val user = uri.getUserInfo().split(":")(0)
+    val password = uri.getUserInfo().split(":")(1)
+    DbConfig(s"jdbc:postgresql://${uri.getHost()}:${uri.getPort()}${uri.getPath()}", user, password)
+  }
 }
 
 case class TutScraper(url: String, format: DateTimeFormatter, blocksSelector: String,
@@ -38,3 +46,5 @@ case class TutScraper(url: String, format: DateTimeFormatter, blocksSelector: St
                       imgSelector: String)
 case class ScraperConfig(tut: TutScraper)
 case class HttpConfig(port: String)
+case class DbConfig(url: String, user: String, password: String)
+
