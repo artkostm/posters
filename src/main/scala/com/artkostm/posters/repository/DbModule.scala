@@ -4,10 +4,10 @@ import com.twitter.inject.{Injector, TwitterModule}
 
 object DbModule extends TwitterModule {
   override def singletonStartup(injector: Injector): Unit = {
-    // initialize JVM-wide resources
+    PostgresEventsRepository.setUp
   }
 
   override def singletonShutdown(injector: Injector): Unit = {
-    // shutdown JVM-wide resources
+    PostgresEventsRepository.db.close()
   }
 }
