@@ -1,5 +1,6 @@
 package com.artkostm.posters.model
 
+
 import com.artkostm.posters.repository.DbComponent
 import org.joda.time.DateTime
 import slick.lifted.ProvenShape
@@ -15,7 +16,7 @@ trait EventsTable { this: DbComponent =>
   private[EventsTable] class Events(tag: Tag) extends Table[Assign](tag, "events") {
     def category: Rep[String] = column[String]("category")
     def date: Rep[DateTime] = column[DateTime]("date")
-    def eventName: Rep[String] = column[String]("event_date")
+    def eventName: Rep[String] = column[String]("event_name")
     def ids: Rep[String] = column[String]("ids")
 
     def * : ProvenShape[Assign] = (category, date, eventName, ids) <> (Assign.tupled, Assign.unapply)
