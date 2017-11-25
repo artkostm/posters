@@ -1,8 +1,10 @@
 package com.artkostm.posters
 
+import com.artkostm.posters.model.Assign
+import com.artkostm.posters.modules.{AkkaModule, DbModule}
+import com.artkostm.posters.repository.H2EventsRepository
 import com.artkostm.posters.scraper.Scraper
-import com.google.inject.Inject
-import com.google.inject.Singleton
+import com.google.inject.{Inject, Module, Singleton}
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.exceptions.ExceptionMapper
 import com.twitter.finatra.http.response.ResponseBuilder
@@ -12,6 +14,8 @@ import com.twitter.finatra.request.QueryParam
 import org.joda.time.DateTime
 
 class PostersServer extends HttpServer {
+  override val defaultFinatraHttpPort: String = ":8080"
+  override protected def modules: Seq[Module] = Seq(DbModule, AkkaModule)
   override protected def configureHttp(router: HttpRouter): Unit =
     router
       .exceptionMapper[IllegalArgumentExceptionHandler]
@@ -20,6 +24,7 @@ class PostersServer extends HttpServer {
 
 class ScheduleController extends Controller {
   val scraper = new Scraper(scraperConfig)
+  implicit val ec = actorSystem.dispatcher
 
   get("/posters/categories/?") { request: CategoryRequest =>
     request match {
@@ -28,6 +33,14 @@ class ScheduleController extends Controller {
       case CategoryRequest(Some(date), None, None) => scraper.scheduleFor(date).events
       case CategoryRequest(_, _, Some(false)) => scraper.scheduleFor(DateTime.now).events.map(_.name)
     }
+  }
+
+  post("/posters/assignee/?") { request: Assign =>
+    H2EventsRepository.save(request)
+  }
+
+  get("/posters/assignee/?") { request: AssigneeRequest =>
+    H2EventsRepository.find(request.category, request.date, request.name)
   }
 }
 
@@ -43,3 +56,6 @@ case class CategoryRequest(@QueryParam date: Option[DateTime],
                            @QueryParam category: Option[String],
                            @QueryParam full: Option[Boolean])
 case class ErrorResponse(code: String, message: String)
+case class AssigneeRequest(@QueryParam date: DateTime,
+                           @QueryParam category: String,
+                           @QueryParam name: String)
