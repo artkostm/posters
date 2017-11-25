@@ -16,7 +16,7 @@ trait EventsRepository extends EventsTable { this: DbComponent =>
       if (!names.contains(eventsTableQuery.baseTableRow.tableName)) eventsTableQuery.schema.create
       else DBIOAction.successful()
     })
-    DBIO.seq(createIfNotExist, eventsTableQuery.filter(event => event.date < DateTime.now).delete)
+    DBIO.seq(createIfNotExist, eventsTableQuery.filter(event => event.date < DateTime.now.minusDays(1)).delete)
   }
 
   def save(assign: Assign): Future[Int] = db.run(eventsTableQuery.insertOrUpdate(assign))
