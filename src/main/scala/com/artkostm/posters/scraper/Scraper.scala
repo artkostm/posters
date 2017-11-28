@@ -26,9 +26,9 @@ class Scraper(config: ScraperConfig) {
   def eventInfo(link: String): Option[EventInfo] = {
     val doc = browser.get(link)
     for {
-      images <- doc >?> elementList("#event-photos a") >> attr("href")
-      description: String = doc >> text("#event-description")
-      comments <- doc >?> elementList("#comments .comments__content")
+      images <- doc >?> elementList(config.tut.eventPhotoSelector) >> attr(config.tut.hrefAttrSelector)
+      description: String = doc >> text(config.tut.eventDescriptionSelector)
+      comments <- doc >?> elementList(config.tut.commentsSelector)
     } yield EventInfo(description, images, extractComments(comments))
   }
 
@@ -49,11 +49,10 @@ class Scraper(config: ScraperConfig) {
     }
   }
   
-  private[this] def extractComments(comments: List[Element]): List[Comment] = {
+  private[this] def extractComments(comments: List[Element]): List[Comment] =
     comments map { comment =>
-      Comment(comment >> text(".head span.author"),
-          comment >> text(".head .date"),
-          comment >> text(".comment_txt"))
+      Comment(comment >> text(config.tut.commentAuthorSelector),
+        comment >> text(config.tut.commentDateSelector),
+        comment >> text(config.tut.commentTextSelector))
     }
-  }
 }
