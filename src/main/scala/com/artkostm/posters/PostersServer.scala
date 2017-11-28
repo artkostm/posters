@@ -32,6 +32,7 @@ class ScheduleController extends Controller {
       case CategoryRequest(Some(date), _, Some(true)) => scraper.scheduleFor(date).events
       case CategoryRequest(Some(date), None, None) => scraper.scheduleFor(date).events
       case CategoryRequest(_, _, Some(false)) => scraper.scheduleFor(DateTime.now).events.map(_.name)
+      case _ => response.badRequest
     }
   }
 
@@ -41,6 +42,10 @@ class ScheduleController extends Controller {
 
   get("/posters/assignee/?") { request: AssigneeRequest =>
     H2EventsRepository.find(request.category, request.date, request.name)
+  }
+  
+  get("/posters/eventinfo/?") { request: EventInfoRequest =>
+    scraper.eventInfo(request.link)
   }
 }
 
@@ -59,3 +64,4 @@ case class ErrorResponse(code: String, message: String)
 case class AssigneeRequest(@QueryParam date: DateTime,
                            @QueryParam category: String,
                            @QueryParam name: String)
+case class EventInfoRequest(@QueryParam link: String)
