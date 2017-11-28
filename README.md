@@ -113,4 +113,15 @@ POST /posters/categories/
 -- then update that row
 - otherwise create new row with the information received
 ******
+For event info scraping:
+```haskell
+media.link -> 
+	#event-description => String
+	.fotorama__img => List[String] (can be empty)
+	#comments => List[Comment] (can be empty)
+		.comments__content => Comment
+			head .author => String
+			head .date => String
+			.comment_txt => String
+```
 ★ ° ☾ ☆ ¸. ¸ 　★　 :.　 . • ○ ° ★　 .　 *　.　.　　¸ .　　 ° 　¸. * ● ¸ .　　　　° ☾ ° 　¸. ● ¸ .　　★　° :.　 . • ° 　 .　 *　:.　.　¸ . ● ¸ 　　　★　　★☾ °★ . 　　　　.　 °☆ 　. ● ¸ .　　　★　° .　 • ○ ° ★　 .　　　　　　　*　.　 ☾ ° 　¸.* ● ¸ 　　　　° ☾ °☆ 　. * ¸.　　　★　★ ° . .　　　　.　☾ °☆ 　. * ● ¸ .　　　★　° :.　 . • ○ °★　 .　 *　.　　　　　　. 　 ° 　. ● .　　　　° ☾ °☆ 　¸.● 　　★　　★ ° ☾ ☆ ¸. ¸ 　★　 :.　 . • ○ ° ★　 .　 *　.　.　　¸ .　　 ° 　¸. * ● ¸ . 　　　° ☾　★ ° . .　　　　.　☾ °☆ 　. * ● ¸ .　　　★　° :.　 . • ○ ° ★　 .　 *　.　　　　　　. 　 ° 　. ● .　　　　° ☾ °☆ 　¸.● .　　★　　★ ° ☾ ☆ ¸. ¸ 　★　 :.　 . • ○ ° ★　 .　 *　.　.　　¸ .　　 ° 　¸. * ● ¸ .　　　　° ☾ ° 　¸. ● ¸ .　　★　° :.　 . • ° 　 .　 *　:.　.　¸ . ● ¸ 　　　★　　★☾ °★ . 　　★ ° . .　　　　.　☾ °☆ 　. * ● ¸ .　　　★　° :.　 . • ○ ° ★　 .　 *　.　　　　　. 　 ° 　. ● .　　　　° ☾ °☆ 　¸.● .　　★　　★ ° ☾ ☆ ¸. ¸ 　★　 :.　 . • ○ ° ★　 .　 *　.　.　　¸ .　　 ° 　¸. * ● ¸ .　　　　° ☾ ° 　¸. ● ¸ .　　★　° :.　 . • ° 　 .　 *　:.　.. °☆ 　. * ● ¸ .　　　★　° :.　 . • ○ ° ★　 .　 *　.　　. 　 ° 　. ● .　　　　° ☾ °☆ 　¸.● .　　★　　★ ° ☾ ☆ ¸. ¸ 　★　 :.　 . • ○ ° ★　 .　 *　.　.　　¸ .　　 ° 　¸. * ● ¸ .　° ☾ ° 　¸. ● ¸ .　★　° :.　 . • ° 　 .　 *　:.　.　¸ . ● ¸ 　　　★　　★☾
