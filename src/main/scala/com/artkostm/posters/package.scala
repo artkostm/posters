@@ -25,7 +25,13 @@ package object posters {
     config.getString("scraper.tut.freeEventSelector"),
     config.getString("scraper.tut.hrefAttrSelector"),
     config.getString("scraper.tut.srcAttrSelector"),
-    config.getString("scraper.tut.imgSelector")
+    config.getString("scraper.tut.imgSelector"),
+    config.getString("scraper.tut.eventPhotoSelector"),
+    config.getString("scraper.tut.eventDescriptionSelector"),
+    config.getString("scraper.tut.commentsSelector"),
+    config.getString("scraper.tut.commentAuthorSelector"),
+    config.getString("scraper.tut.commentDateSelector"),
+    config.getString("scraper.tut.commentTextSelector")
   ))
   lazy val httpConfig = HttpConfig(
     s":${config.getString("http.port")}"
@@ -50,7 +56,10 @@ case class TutScraper(url: String, format: DateTimeFormatter, blocksSelector: St
                       descriptionSelector: String, descriptionTextSelector: String,
                       ticketSelector: String, freeEventSelector: String,
                       hrefAttrSelector: String, srcAttrSelector: String,
-                      imgSelector: String)
+                      imgSelector: String, eventPhotoSelector: String,
+                      eventDescriptionSelector: String, commentsSelector: String,
+                      commentAuthorSelector: String, commentDateSelector: String,
+                      commentTextSelector: String)
 case class ScraperConfig(tut: TutScraper)
 case class HttpConfig(port: String)
 
