@@ -9,3 +9,4 @@ trait DbComponent {
 
   val db: Database
 }
+
