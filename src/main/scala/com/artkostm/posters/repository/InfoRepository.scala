@@ -1,6 +1,6 @@
 package com.artkostm.posters.repository
 
-import com.artkostm.posters.model.InfoTable
+import com.artkostm.posters.model.{Info, InfoTable}
 import slick.dbio.DBIOAction
 import slick.jdbc.meta.MTable
 
@@ -16,5 +16,11 @@ trait InfoRepository extends InfoTable { this: JsonSupportDbComponent =>
       else DBIOAction.successful()
     })
     DBIO.seq(createIfNotExist)
+  }
+
+  def save(info: Info): Future[Int] = db.run(infoTableQuery.insertOrUpdate(info))
+
+  def find(link: String): Future[Option[Info]] = db.run {
+    infoTableQuery.filter(i => i.link === link).result.headOption
   }
 }
