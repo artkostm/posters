@@ -23,7 +23,6 @@ object AkkaModule extends TwitterModule {
 private[modules] class ShutdownActor extends Actor {
   override def receive: Receive = {
     case Stop =>
-      println("Stopping application")
       implicit val executionContext: ExecutionContext = context.system.dispatcher
       context.system.scheduler.scheduleOnce(Duration.Zero)(System.exit(1))
   }
