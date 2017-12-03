@@ -12,18 +12,18 @@ object Dependencies {
     val postgres = "9.4.1208"
   }
 
-  val finatra_http    = "com.twitter"         %%  "finatra-http"    % versions.finatra
-  val logback         = "ch.qos.logback"      %   "logback-classic" % versions.logback
-  val scraper         = "net.ruippeixotog"    %%  "scala-scraper"   % versions.scraper
-  val akka_actor      = "com.typesafe.akka"   %   "akka-actor_2.12" % versions.akka
-  val slick           = "com.typesafe.slick"  %%  "slick"           % versions.slick
-  val slick_pg        = "com.github.tminglei" %%  "slick-pg"        % versions.slick_pg
-  val slick_pg_json4s = "com.github.tminglei" %%  "slick-pg_json4s" % versions.slick_pg
-  val hikaricp        = "com.typesafe.slick"  %%  "slick-hikaricp"  % versions.hikaricp
-  val postgres        = "org.postgresql"      %   "postgresql"      % versions.postgres
-  val akka_streams    = "com.typesafe.akka"   %%  "akka-stream"     % versions.akka
+  val finatra_http    = "com.twitter"         %%  "finatra-http"       % versions.finatra
+  val logback         = "ch.qos.logback"      %   "logback-classic"    % versions.logback
+  val scraper         = "net.ruippeixotog"    %%  "scala-scraper"      % versions.scraper
+  val akka_actor      = "com.typesafe.akka"   %   "akka-actor_2.12"    % versions.akka
+  val slick           = "com.typesafe.slick"  %%  "slick"              % versions.slick
+  val slick_pg        = "com.github.tminglei" %%  "slick-pg"           % versions.slick_pg
+  val slick_pg_play = "com.github.tminglei" %%  "slick-pg_play-json" % versions.slick_pg
+  val hikaricp        = "com.typesafe.slick"  %%  "slick-hikaricp"     % versions.hikaricp
+  val postgres        = "org.postgresql"      %   "postgresql"         % versions.postgres
+  val akka_streams    = "com.typesafe.akka"   %%  "akka-stream"        % versions.akka
 
 
   lazy val all = Seq(finatra_http, logback, scraper, akka_actor, slick,
-    slick_pg, slick_pg_json4s, "com.h2database" % "h2" % "1.4.187", hikaricp, postgres, akka_streams)
+    slick_pg, slick_pg_play, "com.h2database" % "h2" % "1.4.187", hikaricp, postgres, akka_streams)
 }
