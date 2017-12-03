@@ -3,7 +3,7 @@ package com.artkostm.posters
 import com.artkostm.posters.model.Assign
 import com.artkostm.posters.modules.{AkkaModule, DbModule}
 import com.artkostm.posters.repository.H2EventsRepository
-import com.artkostm.posters.scraper.Scraper
+import com.artkostm.posters.scraper.EventsScraper
 import com.google.inject.{Inject, Module, Singleton}
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.exceptions.ExceptionMapper
@@ -23,7 +23,7 @@ class PostersServer extends HttpServer {
 }
 
 class ScheduleController extends Controller {
-  val scraper = new Scraper(scraperConfig)
+  val scraper = new EventsScraper(scraperConfig)
   implicit val ec = actorSystem.dispatcher
 
   get("/posters/categories/?") { request: CategoryRequest =>
