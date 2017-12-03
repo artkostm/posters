@@ -4,10 +4,11 @@ import com.artkostm.posters.model.{Category, EventInfo}
 import com.github.tminglei.slickpg.PgPlayJsonSupport
 import com.github.tminglei.slickpg.array.PgArrayJdbcTypes
 import com.github.tminglei.slickpg.utils.SimpleArrayUtils
+import org.joda.time.DateTime
 import play.api.libs.json.{JsValue, Json}
 import slick.jdbc.PostgresProfile
 
-trait HerokuPostgresProfile extends PostgresProfile
+trait JsonSupportPostgresProfile extends PostgresProfile
                                with PgPlayJsonSupport
                                with PgArrayJdbcTypes {
 
@@ -28,7 +29,10 @@ trait HerokuPostgresProfile extends PostgresProfile
     implicit val eventInfoArrayTypeMapper = new AdvancedArrayJdbcType[EventInfo](pgjson,
       (s) => SimpleArrayUtils.fromString[EventInfo](Json.parse(_).as[EventInfo])(s).orNull,
       (v) => SimpleArrayUtils.mkString[EventInfo](c => Json.stringify(Json.toJson(c)))(v)).to(_.toList)
+    implicit val dateTime2SqlTimestampMapper = MappedColumnType.base[DateTime, java.sql.Timestamp](
+      date => new java.sql.Timestamp(date.toDate.getTime),
+      sqlTimestamp => new DateTime(sqlTimestamp.getTime()))
   }
 }
 
-object HerokuPostgresProfile extends HerokuPostgresProfile
+object JsonSupportPostgresProfile extends JsonSupportPostgresProfile
