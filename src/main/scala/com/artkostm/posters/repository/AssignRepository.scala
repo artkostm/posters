@@ -1,29 +1,31 @@
 package com.artkostm.posters.repository
 
-import com.artkostm.posters.model.{Assign, EventsTable}
+import com.artkostm.posters.model.{Assign, AssignTable}
 import org.joda.time.DateTime
 import slick.dbio.DBIOAction
 import slick.jdbc.meta.MTable
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait EventsRepository extends EventsTable { this: DbComponent =>
+trait AssignRepository extends AssignTable { this: DbComponent =>
   import driver.api._
 
-  def setUp()(implicit ctx: ExecutionContext): Future[Unit] = db.run {
+  def setUpAssign()(implicit ctx: ExecutionContext): Future[Unit] = db.run {
     val createIfNotExist = MTable.getTables.flatMap(v => {
       val names = v.map(_.name.name)
-      if (!names.contains(eventsTableQuery.baseTableRow.tableName)) eventsTableQuery.schema.create
+      if (!names.contains(assigneesTableQuery.baseTableRow.tableName)) assigneesTableQuery.schema.create
       else DBIOAction.successful()
     })
-    DBIO.seq(createIfNotExist, eventsTableQuery.filter(event => event.date < DateTime.now.minusDays(1)).delete)
+    DBIO.seq(createIfNotExist, assigneesTableQuery.filter(event => event.date < DateTime.now.minusDays(1)).delete)
   }
 
-  def save(assign: Assign): Future[Int] = db.run(eventsTableQuery.insertOrUpdate(assign))
+  def save(assign: Assign): Future[Int] = db.run(assigneesTableQuery.insertOrUpdate(assign.copy(date = assign.date.withTimeAtStartOfDay())))
 
-  def all: Future[List[Assign]] = db.run(eventsTableQuery.to[List].result)
+  def all: Future[List[Assign]] = db.run(assigneesTableQuery.to[List].result)
 
   def find(category: String, date: DateTime, eventName: String): Future[Option[Assign]] = db.run {
-    eventsTableQuery.filter(a => a.category === category && a.eventName === eventName && a.date === date).result.headOption
+    assigneesTableQuery.filter(a => a.category === category &&
+      a.eventName === eventName &&
+      a.date === date.withTimeAtStartOfDay()).result.headOption
   }
 }
