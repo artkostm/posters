@@ -2,7 +2,7 @@ package com.artkostm.posters
 
 import com.artkostm.posters.model.Assign
 import com.artkostm.posters.modules.{AkkaModule, DbModule}
-import com.artkostm.posters.repository.H2EventsRepository
+import com.artkostm.posters.repository.H2AssignRepository
 import com.artkostm.posters.scraper.EventsScraper
 import com.google.inject.{Inject, Module, Singleton}
 import com.twitter.finagle.http.{Request, Response}
@@ -37,11 +37,11 @@ class ScheduleController extends Controller {
   }
 
   post("/posters/assignee/?") { request: Assign =>
-    H2EventsRepository.save(request)
+    H2AssignRepository.save(request)
   }
 
   get("/posters/assignee/?") { request: AssigneeRequest =>
-    H2EventsRepository.find(request.category, request.date, request.name)
+    H2AssignRepository.find(request.category, request.date, request.name)
   }
   
   get("/posters/eventinfo/?") { request: EventInfoRequest =>
