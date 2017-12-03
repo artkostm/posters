@@ -8,12 +8,12 @@ import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
 import net.ruippeixotog.scalascraper.model._
 import org.joda.time.DateTime
 
-class Scraper(config: ScraperConfig) {
-  val format = config.tut.format
-  val browser = JsoupBrowser()
+class EventsScraper(config: ScraperConfig) {
+  private val format = config.tut.format
+  private val browser = JsoupBrowser()
 
   def scheduleFor(day: DateTime): Day = {
-    val doc = browser.get(s"${config.tut.url}${format.print(day)}")
+    val doc = loadDocument(day)
     val blocks = doc >> elementList(config.tut.blocksSelector)
 
     val categories = for {
@@ -24,13 +24,16 @@ class Scraper(config: ScraperConfig) {
   }
   
   def eventInfo(link: String): Option[EventInfo] = {
-    val doc = browser.get(link)
+    val doc = loadDocument(link)
     for {
       images <- doc >?> elementList(config.tut.eventPhotoSelector) >> attr(config.tut.hrefAttrSelector)
       description: String = doc >> text(config.tut.eventDescriptionSelector)
       comments <- doc >?> elementList(config.tut.commentsSelector)
     } yield EventInfo(description, images, extractComments(comments))
   }
+
+  def loadDocument(day: DateTime): Document = browser.get(s"${config.tut.url}${format.print(day)}")
+  def loadDocument(link: String): Document = browser.get(link)
 
   private[this] def extractEvents(block: Element): List[Option[Event]] = {
     block >> elementList(config.tut.eventsSelector) map { event =>
