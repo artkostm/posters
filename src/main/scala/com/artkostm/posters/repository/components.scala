@@ -24,7 +24,12 @@ object PostgresPostersRepository extends AssignRepository
                                     with DaysRepository
                                     with InfoRepository
                                     with JsonSupportDbComponent {
-  def setUp()(implicit ec: ExecutionContext): Future[List[Unit]] = Future.sequence(List(setUpAssign(), setUpDays(), setUpInfo()))
+  import driver.api._
+  def setUp()(implicit ec: ExecutionContext): Future[List[Any]] = Future.sequence(List(setUpAssign(), setUpDays(), setUpInfo(),
+    db.run(
+      sqlu"""
+            DELETE FROM info WHERE NOT EXISTS (SELECT COUNT(*) FROM days WHERE categories LIKE '%' || info.link || '%')
+          """)))
 }
 
 object H2AssignRepository extends AssignRepository with H2DbComponent

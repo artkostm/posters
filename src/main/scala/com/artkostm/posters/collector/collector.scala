@@ -44,7 +44,7 @@ object C1 extends App {
 
   println(Json.parse(
     """
-      |{"events":[{"name":"movie","events":[{"media":{"link":"","img":""},"name":"","description":{"desc":"description here","ticket":"50$","isFree":false}}]}],"date":1512316681373}
+      |{"events":[{"name":"movie","events":[{"media":{"link":"http;//lisiy-korch","img":"KARTINKA"},"name":"","description":{"desc":"description here","ticket":"50$","isFree":false}}]}],"date":1512316681373}
     """.stripMargin).as[Day])
 
 //  val scraper = new EventsScraper(scraperConfig)
