@@ -28,7 +28,7 @@ object PostgresPostersRepository extends AssignRepository
   def setUp()(implicit ec: ExecutionContext): Future[List[Any]] = Future.sequence(List(setUpAssign(), setUpDays(), setUpInfo(),
     db.run(
       sqlu"""
-            DELETE FROM info WHERE NOT EXISTS (SELECT COUNT(*) FROM days WHERE categories::jsonb::text LIKE '%' || info.link || '%')
+            DELETE FROM info WHERE NOT EXISTS (SELECT * FROM days WHERE categories::jsonb::text LIKE '%' || info.link || '%')
           """)))
 }
 
