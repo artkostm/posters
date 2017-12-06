@@ -1,10 +1,8 @@
 package com.artkostm.posters
 
-import com.artkostm.posters.collector.EventsCollector
 import com.artkostm.posters.model.Assign
 import com.artkostm.posters.modules.{AkkaModule, DbModule}
 import com.artkostm.posters.repository.{H2AssignRepository, PostgresPostersRepository}
-import com.artkostm.posters.scraper.EventsScraper
 import com.google.inject.{Inject, Module, Singleton}
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.exceptions.ExceptionMapper
@@ -24,19 +22,22 @@ class PostersServer extends HttpServer {
 }
 
 class ScheduleController extends Controller {
-  val scraper = new EventsScraper(scraperConfig)
-  val collector = new EventsCollector(scraper,
-    (0 to 30).map(DateTime.now().plusDays).map(_.withTimeAtStartOfDay()),
-    PostgresPostersRepository)
-  collector.run()
   implicit val ec = actorSystem.dispatcher
 
   get("/posters/categories/?") { request: CategoryRequest =>
     request match {
-      case CategoryRequest(Some(date), Some(category), _) => scraper.scheduleFor(date).events.filter(_.name.equalsIgnoreCase(category))
-      case CategoryRequest(Some(date), _, Some(true)) => scraper.scheduleFor(date).events
-      case CategoryRequest(Some(date), None, None) => scraper.scheduleFor(date).events
-      case CategoryRequest(_, _, Some(false)) => scraper.scheduleFor(DateTime.now).events.map(_.name)
+      case CategoryRequest(Some(date), Some(category), _) => PostgresPostersRepository.find(date).map {
+        case Some(day) => day.categories.filter(_.name.equalsIgnoreCase(category))
+        case None => eventsScraper.scheduleFor(date).events.filter(_.name.equalsIgnoreCase(category))
+      }
+      case CategoryRequest(Some(date), _, Some(true)) => PostgresPostersRepository.find(date).map {
+        case Some(day) => day.categories
+        case None => eventsScraper.scheduleFor(date).events
+      }
+      case CategoryRequest(Some(date), None, None) => PostgresPostersRepository.find(date).map {
+        case Some(day) => day.categories
+        case None => eventsScraper.scheduleFor(date).events
+      }
       case _ => response.badRequest
     }
   }
@@ -54,7 +55,7 @@ class ScheduleController extends Controller {
   }
   
   get("/posters/eventinfo/?") { request: EventInfoRequest =>
-    scraper.eventInfo(request.link)
+    eventsScraper.eventInfo(request.link)
   }
 }
 
