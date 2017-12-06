@@ -1,6 +1,6 @@
 package com.artkostm.posters
 
-import com.artkostm.posters.model.Assign
+import com.artkostm.posters.model.{Assign, EventsDay}
 import com.artkostm.posters.modules.{AkkaModule, DbModule}
 import com.artkostm.posters.repository.PostgresPostersRepository
 import com.google.inject.{Inject, Module, Singleton}
@@ -25,10 +25,13 @@ class ScheduleController extends Controller {
   implicit val ec = actorSystem.dispatcher
 
   get("/posters/categories/?") { request: CategoryRequest =>
+    println(request)
     request match {
       case CategoryRequest(Some(date), Some(category), _) => PostgresPostersRepository.find(date).map {
+        case None | Some(EventsDay(_, List())) =>
+          println("using scraper")
+          eventsScraper.scheduleFor(date).events.filter(_.name.equalsIgnoreCase(category))
         case Some(day) => day.categories.filter(_.name.equalsIgnoreCase(category))
-        case None => eventsScraper.scheduleFor(date).events.filter(_.name.equalsIgnoreCase(category))
       }
       case CategoryRequest(Some(date), _, Some(true)) => PostgresPostersRepository.find(date).map {
         case Some(day) => day.categories
