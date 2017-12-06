@@ -3,8 +3,12 @@ package com.artkostm
 import java.net.URI
 
 import akka.actor.ActorSystem
+import com.artkostm.posters.collector.EventsCollector
+import com.artkostm.posters.repository.PostgresPostersRepository
+import com.artkostm.posters.scraper.EventsScraper
 import com.typesafe.config.ConfigFactory
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
+import org.joda.time.DateTime
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 
 package object posters {
@@ -48,6 +52,10 @@ package object posters {
     c.setConnectionTimeout(120000)
     new HikariDataSource(c)
   }
+  lazy val eventsScraper = new EventsScraper(scraperConfig)
+  lazy val eventsCollector = new EventsCollector(eventsScraper,
+    (0 to 30).map(DateTime.now().plusDays).map(_.withTimeAtStartOfDay()),
+    PostgresPostersRepository)
 }
 
 case class TutScraper(url: String, format: DateTimeFormatter, blocksSelector: String,
