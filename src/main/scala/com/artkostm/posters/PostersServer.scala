@@ -27,7 +27,7 @@ class ScheduleController extends Controller {
   get("/posters/categories/?") { request: CategoryRequest =>
     println(request)
     request match {
-      case CategoryRequest(Some(date), Some(category), _) => PostgresPostersRepository.find(date).map {
+      case CategoryRequest(Some(date), Some(category), _) => PostgresPostersRepository.find(date).map {d => println(d);d }.map {
         case None | Some(EventsDay(_, List())) =>
           println("using scraper")
           eventsScraper.scheduleFor(date).events.filter(_.name.equalsIgnoreCase(category))
