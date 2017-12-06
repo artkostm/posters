@@ -23,7 +23,4 @@ object Category {
 
   implicit val catFmt = Json.format[Category]
   implicit val catWrt = Json.writes[Category]
-
-  implicit val dayFmt = Json.format[Day]
-  implicit val dayWrt = Json.writes[Day]
 }

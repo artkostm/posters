@@ -18,7 +18,7 @@ object Dependencies {
   val akka_actor      = "com.typesafe.akka"   %   "akka-actor_2.12"    % versions.akka
   val slick           = "com.typesafe.slick"  %%  "slick"              % versions.slick
   val slick_pg        = "com.github.tminglei" %%  "slick-pg"           % versions.slick_pg
-  val slick_pg_play = "com.github.tminglei" %%  "slick-pg_play-json" % versions.slick_pg
+  val slick_pg_play   = "com.github.tminglei" %%  "slick-pg_play-json" % versions.slick_pg
   val hikaricp        = "com.typesafe.slick"  %%  "slick-hikaricp"     % versions.hikaricp
   val postgres        = "org.postgresql"      %   "postgresql"         % versions.postgres
   val akka_streams    = "com.typesafe.akka"   %%  "akka-stream"        % versions.akka

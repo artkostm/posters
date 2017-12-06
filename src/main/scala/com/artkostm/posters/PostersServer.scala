@@ -2,7 +2,7 @@ package com.artkostm.posters
 
 import com.artkostm.posters.model.Assign
 import com.artkostm.posters.modules.{AkkaModule, DbModule}
-import com.artkostm.posters.repository.{H2AssignRepository, PostgresPostersRepository}
+import com.artkostm.posters.repository.PostgresPostersRepository
 import com.google.inject.{Inject, Module, Singleton}
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.exceptions.ExceptionMapper
@@ -12,8 +12,10 @@ import com.twitter.finatra.http.routing.HttpRouter
 import com.twitter.finatra.request.QueryParam
 import org.joda.time.DateTime
 
+import scala.concurrent.Future
+
 class PostersServer extends HttpServer {
-  override val defaultFinatraHttpPort: String = ":8080"
+  override val defaultFinatraHttpPort: String = httpConfig.port
   override protected def modules: Seq[Module] = Seq(DbModule, AkkaModule)
   override protected def configureHttp(router: HttpRouter): Unit =
     router
@@ -27,8 +29,8 @@ class ScheduleController extends Controller {
   get("/posters/categories/?") { request: CategoryRequest =>
     request match {
       case CategoryRequest(Some(date), Some(category), _) => PostgresPostersRepository.find(date).map {
-        case Some(day) => day.categories.filter(_.name.equalsIgnoreCase(category))
         case None => eventsScraper.scheduleFor(date).events.filter(_.name.equalsIgnoreCase(category))
+        case Some(day) => day.categories.filter(_.name.equalsIgnoreCase(category))
       }
       case CategoryRequest(Some(date), _, Some(true)) => PostgresPostersRepository.find(date).map {
         case Some(day) => day.categories
@@ -38,16 +40,16 @@ class ScheduleController extends Controller {
         case Some(day) => day.categories
         case None => eventsScraper.scheduleFor(date).events
       }
-      case _ => response.badRequest
+      case _ => Future.successful(response.badRequest)
     }
   }
 
   post("/posters/assignee/?") { request: Assign =>
-    H2AssignRepository.save(request)
+    PostgresPostersRepository.save(request)
   }
 
   get("/posters/assignee/?") { request: AssigneeRequest =>
-    H2AssignRepository.find(request.category, request.date, request.name)
+    PostgresPostersRepository.find(request.category, request.date, request.name)
   }
 
   get("/posters/info/?") { request: EventInfoRequest =>
