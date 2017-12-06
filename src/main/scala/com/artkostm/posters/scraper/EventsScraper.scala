@@ -23,13 +23,13 @@ class EventsScraper(config: ScraperConfig) {
     Day(categories, day.toDate)
   }
   
-  def eventInfo(link: String): Option[EventInfo] = {
+  def eventInfo(link: String): Option[Info] = {
     val doc = loadDocument(link)
     for {
       images <- doc >?> elementList(config.tut.eventPhotoSelector) >> attr(config.tut.hrefAttrSelector)
       description: String = doc >> text(config.tut.eventDescriptionSelector)
       comments <- doc >?> elementList(config.tut.commentsSelector)
-    } yield EventInfo(description, images, extractComments(comments))
+    } yield Info(link, EventInfo(description, images, extractComments(comments)))
   }
 
   def loadDocument(day: DateTime): Document = browser.get(s"${config.tut.url}${format.print(day)}")

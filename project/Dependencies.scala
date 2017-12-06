@@ -25,5 +25,5 @@ object Dependencies {
 
 
   lazy val all = Seq(finatra_http, logback, scraper, akka_actor, slick,
-    slick_pg, slick_pg_play, "com.h2database" % "h2" % "1.4.187", hikaricp, postgres, akka_streams)
+    slick_pg, slick_pg_play, hikaricp, postgres, akka_streams)
 }
