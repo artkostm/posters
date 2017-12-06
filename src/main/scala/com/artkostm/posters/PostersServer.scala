@@ -1,8 +1,9 @@
 package com.artkostm.posters
 
+import com.artkostm.posters.collector.EventsCollector
 import com.artkostm.posters.model.Assign
 import com.artkostm.posters.modules.{AkkaModule, DbModule}
-import com.artkostm.posters.repository.H2AssignRepository
+import com.artkostm.posters.repository.{H2AssignRepository, PostgresPostersRepository}
 import com.artkostm.posters.scraper.EventsScraper
 import com.google.inject.{Inject, Module, Singleton}
 import com.twitter.finagle.http.{Request, Response}
@@ -24,6 +25,10 @@ class PostersServer extends HttpServer {
 
 class ScheduleController extends Controller {
   val scraper = new EventsScraper(scraperConfig)
+  val collector = new EventsCollector(scraper,
+    (0 to 30).map(DateTime.now().plusDays).map(_.withTimeAtStartOfDay()),
+    PostgresPostersRepository)
+  collector.run()
   implicit val ec = actorSystem.dispatcher
 
   get("/posters/categories/?") { request: CategoryRequest =>
