@@ -23,9 +23,7 @@ trait JsonSupportPostgresProfile extends PostgresProfile
     import EventInfo._
     implicit val categoryJsonTypeMapper = MappedJdbcType.base[Category, JsValue](Json.toJson(_), _.as[Category])
     implicit val eventInfoJsonTypeMapper = MappedJdbcType.base[EventInfo, JsValue](Json.toJson(_), _.as[EventInfo])
-    implicit val categoryArrayTypeMapper = new AdvancedArrayJdbcType[Category](pgjson,
-      (s) => {println(s);SimpleArrayUtils.fromString[Category](Json.parse(_).as[Category])(s).orNull},
-      (v) => SimpleArrayUtils.mkString[Category](c => Json.toJson(c).toString)(v)).to(_.toList)
+    implicit val categoryArrayTypeMapper = MappedJdbcType.base[List[Category], JsValue](Json.toJson(_), _.as[List[Category]])
     implicit val eventInfoArrayTypeMapper = new AdvancedArrayJdbcType[EventInfo](pgjson,
       (s) => SimpleArrayUtils.fromString[EventInfo](Json.parse(_).as[EventInfo])(s).orNull,
       (v) => SimpleArrayUtils.mkString[EventInfo](c => Json.toJson(c).toString)(v)).to(_.toList)
