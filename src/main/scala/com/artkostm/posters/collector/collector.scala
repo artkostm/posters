@@ -6,7 +6,7 @@ import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, RunnableGraph, Sink, Sou
 import com.artkostm.posters.model._
 import org.joda.time.DateTime
 import com.artkostm.posters._
-import com.artkostm.posters.repository.{DaysRepository, InfoRepository, JsonSupportDbComponent}
+import com.artkostm.posters.repository.{DaysRepository, InfoRepository}
 import com.artkostm.posters.scraper.EventsScraper
 
 import scala.concurrent.Future
