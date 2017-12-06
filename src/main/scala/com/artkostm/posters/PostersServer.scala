@@ -48,6 +48,10 @@ class ScheduleController extends Controller {
   get("/posters/assignee/?") { request: AssigneeRequest =>
     H2AssignRepository.find(request.category, request.date, request.name)
   }
+
+  get("/posters/info/?") { request: EventInfoRequest =>
+    PostgresPostersRepository.find(request.link)
+  }
   
   get("/posters/eventinfo/?") { request: EventInfoRequest =>
     scraper.eventInfo(request.link)
