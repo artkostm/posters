@@ -9,6 +9,7 @@ object DbModule extends TwitterModule {
 
   override def singletonStartup(injector: Injector): Unit = {
     PostgresPostersRepository.setUp
+    eventsCollector.run()
   }
 
   override def singletonShutdown(injector: Injector): Unit = {
