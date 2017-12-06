@@ -6,7 +6,7 @@ import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, RunnableGraph, Sink, Sou
 import com.artkostm.posters.model._
 import org.joda.time.DateTime
 import com.artkostm.posters._
-import com.artkostm.posters.repository.{DaysRepository, InfoRepository, JsonSupportDbComponent}
+import com.artkostm.posters.repository.{DaysRepository, InfoRepository}
 import com.artkostm.posters.scraper.EventsScraper
 
 import scala.concurrent.Future
@@ -45,15 +45,3 @@ class EventsCollector(scraper: EventsScraper, days: Seq[DateTime],
 
   def run() = g.run()
 }
-
-
-//object lol extends App {
-//  val month = (0 to 30).map(DateTime.now().plusDays).map(_.withTimeAtStartOfDay())
-//  val collector = new EventsCollector(new EventsScraper(scraperConfig), month, new JsonSupportDbComponent with DaysRepository with InfoRepository {
-//    override def save(day: EventsDay): Future[Int] = { println(day); Future.successful(0) }
-//
-//    override def save(info: Info): Future[Int] = { println(info); Future.successful(0) }
-//  })
-//
-//  collector.run()
-//}
