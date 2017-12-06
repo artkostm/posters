@@ -12,6 +12,8 @@ import com.twitter.finatra.http.routing.HttpRouter
 import com.twitter.finatra.request.QueryParam
 import org.joda.time.DateTime
 
+import scala.concurrent.Future
+
 class PostersServer extends HttpServer {
   override val defaultFinatraHttpPort: String = httpConfig.port
   override protected def modules: Seq[Module] = Seq(DbModule, AkkaModule)
@@ -38,7 +40,7 @@ class ScheduleController extends Controller {
         case Some(day) => day.categories
         case None => eventsScraper.scheduleFor(date).events
       }
-      case _ => response.badRequest
+      case _ => Future.successful(response.badRequest)
     }
   }
 
