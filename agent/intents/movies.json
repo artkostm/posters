@@ -1,0 +1,67 @@
+{
+  "id": "7aaec3a8-b258-46d1-b183-031919f81053",
+  "name": "movies",
+  "auto": true,
+  "contexts": [],
+  "responses": [
+    {
+      "resetContexts": false,
+      "affectedContexts": [],
+      "parameters": [
+        {
+          "id": "805101b1-8a81-4e15-8022-0a9cc14edd6f",
+          "required": false,
+          "dataType": "@sys.date",
+          "name": "date",
+          "value": "$date",
+          "prompts": [
+            {
+              "lang": "ru",
+              "value": "На какую дату хотите увидеть список фильмов?"
+            }
+          ],
+          "isList": false
+        },
+        {
+          "id": "dccb4476-4b8f-4e00-9378-cd0699bc195b",
+          "required": false,
+          "dataType": "@sys.date-period",
+          "name": "date-period",
+          "value": "$date-period",
+          "prompts": [
+            {
+              "lang": "ru",
+              "value": "За какой период показать фильмы?"
+            }
+          ],
+          "isList": false
+        },
+        {
+          "id": "e29fc937-2d8f-4b89-875b-73b66a4f955e",
+          "dataType": "@category",
+          "name": "category",
+          "value": "$category",
+          "isList": false
+        }
+      ],
+      "messages": [
+        {
+          "type": 0,
+          "lang": "ru",
+          "speech": [
+            "Я не уверен по поводу наличия фильмов $date",
+            "Я не уверен по поводу наличия фильмов на $date-period"
+          ]
+        }
+      ],
+      "defaultResponsePlatforms": {},
+      "speech": []
+    }
+  ],
+  "priority": 750000,
+  "webhookUsed": false,
+  "webhookForSlotFilling": false,
+  "lastUpdate": 1516184032,
+  "fallbackIntent": false,
+  "events": []
+}
