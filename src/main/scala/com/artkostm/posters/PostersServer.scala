@@ -27,7 +27,7 @@ class PostersServer extends HttpServer {
   override val defaultFinatraHttpPort: String = httpConfig.port
   override protected def disableAdminHttpServer = true
   override protected def jacksonModule = PostersJacksonModule
-  //override protected def modules: Seq[Module] = Seq(DbModule, AkkaModule)
+  override protected def modules: Seq[Module] = Seq(DbModule, AkkaModule)
   override protected def configureHttp(router: HttpRouter): Unit =
     router
       .exceptionMapper[IllegalArgumentExceptionHandler]
