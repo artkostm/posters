@@ -1,5 +1,6 @@
 package com.artkostm.posters.dialog
 
+import com.artkostm.posters.model.Category
 import org.joda.time.DateTime
 
 case class Datetime(date: Option[DateTime], period: Option[String])
@@ -16,9 +17,13 @@ case class Message(`type`: Int, speech: String)
 
 case class Fulfillment(speech: String, messages: List[Message])
 
-case class Result(source: String, resolvedQuery: String, speech: String, action: String, actionIncomplete: Boolean,
+case class Result(source: String, resolvedQuery: String, speech: Option[String], action: String, actionIncomplete: Boolean,
                   parameters: Parameters, contexts: List[Context], metadata: Metadata, fulfillment: Fulfillment, score: Double)
 
 case class Status(code: Int, errorType: String, webhookTimedOut: Boolean)
 
 case class DialogflowRequest(id: String, lang: String, result: Result, status: Status, sessionId: String)
+
+case class ResponseData(categories: List[Category])
+
+case class DialogflowResponse(speech: String, data: ResponseData, source: String)

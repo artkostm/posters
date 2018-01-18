@@ -1,6 +1,6 @@
 package com.artkostm.posters
 
-import com.artkostm.posters.dialog.{DialogflowRequest, FlowKeyData, FlowKeyDataExtractor}
+import com.artkostm.posters.dialog._
 import com.artkostm.posters.model.Assign
 import com.artkostm.posters.modules.{AkkaModule, DbModule}
 import com.artkostm.posters.repository.PostgresPostersRepository
@@ -27,7 +27,7 @@ class PostersServer extends HttpServer {
   override val defaultFinatraHttpPort: String = httpConfig.port
   override protected def disableAdminHttpServer = true
   override protected def jacksonModule = PostersJacksonModule
-  //override protected def modules: Seq[Module] = Seq(DbModule, AkkaModule)
+  override protected def modules: Seq[Module] = Seq(DbModule, AkkaModule)
   override protected def configureHttp(router: HttpRouter): Unit =
     router
       .exceptionMapper[IllegalArgumentExceptionHandler]
@@ -74,17 +74,18 @@ class ScheduleController extends Controller {
   }
 
   post("/posters/webhook/?") { request: DialogflowRequest =>
-    if (FlowKeyDataExtractor.actionIncomplete(request)) {
+    logger.info(request.toString)
+    if (!FlowKeyDataExtractor.actionIncomplete(request)) {
       FlowKeyDataExtractor.extract(request) match {
         case FlowKeyData(category, Some(date), _) =>
           if (FlowKeyDataExtractor.shouldShowAll(request)) PostgresPostersRepository.find(date).map {
-            case Some(day) => day.categories
-            case None => eventsScraper.scheduleFor(date).events
+            case Some(day) => DialogflowResponse("", ResponseData(day.categories), "posters")
+            case None => DialogflowResponse("", ResponseData(eventsScraper.scheduleFor(date).events), "posters")
           } else PostgresPostersRepository.find(date).map {
-            case None => eventsScraper.scheduleFor(date).events.filter(cat => category.contains(cat.name))
-            case Some(day) => day.categories.filter(cat => category.contains(cat.name))
+            case None => DialogflowResponse("", ResponseData(eventsScraper.scheduleFor(date).events.filter(cat => category.contains(cat.name))), "posters")
+            case Some(day) => DialogflowResponse("", ResponseData(day.categories.filter(cat => category.contains(cat.name))), "posters")
           }
-        case FlowKeyData(category, _, Some(period)) => ???
+        case FlowKeyData(category, _, Some(period)) => Future.successful(response.badRequest)
         case _ => Future.successful(response.badRequest)
       }
     } else {
