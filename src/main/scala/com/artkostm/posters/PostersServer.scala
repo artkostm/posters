@@ -1,6 +1,6 @@
 package com.artkostm.posters
 
-import com.artkostm.posters.dialog.DialogflowRequest
+import com.artkostm.posters.dialog.{DialogflowRequest, FlowKeyData, FlowKeyDataExtractor}
 import com.artkostm.posters.model.Assign
 import com.artkostm.posters.modules.{AkkaModule, DbModule}
 import com.artkostm.posters.repository.PostgresPostersRepository
@@ -74,8 +74,22 @@ class ScheduleController extends Controller {
   }
 
   post("/posters/webhook/?") { request: DialogflowRequest =>
-    println(request)
-    //request
+    if (FlowKeyDataExtractor.actionIncomplete(request)) {
+      FlowKeyDataExtractor.extract(request) match {
+        case FlowKeyData(category, Some(date), _) =>
+          if (FlowKeyDataExtractor.shouldShowAll(request)) PostgresPostersRepository.find(date).map {
+            case Some(day) => day.categories
+            case None => eventsScraper.scheduleFor(date).events
+          } else PostgresPostersRepository.find(date).map {
+            case None => eventsScraper.scheduleFor(date).events.filter(cat => category.contains(cat.name))
+            case Some(day) => day.categories.filter(cat => category.contains(cat.name))
+          }
+        case FlowKeyData(category, _, Some(period)) => ???
+        case _ => Future.successful(response.badRequest)
+      }
+    } else {
+      Future.successful(response.badRequest)
+    }
   }
 }
 
