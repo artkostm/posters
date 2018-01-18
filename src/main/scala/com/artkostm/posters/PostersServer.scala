@@ -85,7 +85,7 @@ class ScheduleController extends Controller {
             case None => eventsScraper.scheduleFor(date).events.filter(cat => category.contains(cat.name))
             case Some(day) => day.categories.filter(cat => category.contains(cat.name))
           }
-        case FlowKeyData(category, _, Some(period)) => ???
+        case FlowKeyData(category, _, Some(period)) => Future.successful(response.badRequest)
         case _ => Future.successful(response.badRequest)
       }
     } else {
