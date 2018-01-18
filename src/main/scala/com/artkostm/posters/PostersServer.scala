@@ -74,6 +74,7 @@ class ScheduleController extends Controller {
   }
 
   post("/posters/webhook/?") { request: DialogflowRequest =>
+    logger.info(request.toString)
     if (FlowKeyDataExtractor.actionIncomplete(request)) {
       FlowKeyDataExtractor.extract(request) match {
         case FlowKeyData(category, Some(date), _) =>
