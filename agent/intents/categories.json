@@ -1,0 +1,51 @@
+{
+  "id": "7aaec3a8-b258-46d1-b183-031919f81053",
+  "name": "categories",
+  "auto": true,
+  "contexts": [],
+  "responses": [
+    {
+      "resetContexts": false,
+      "affectedContexts": [],
+      "parameters": [
+        {
+          "id": "e29fc937-2d8f-4b89-875b-73b66a4f955e",
+          "required": true,
+          "dataType": "@category",
+          "name": "category",
+          "value": "$category",
+          "prompts": [
+            {
+              "lang": "ru",
+              "value": "С датой мы определились. Какие события интересны? Или показать все?"
+            }
+          ],
+          "isList": true
+        },
+        {
+          "id": "2debf690-dc60-4a2b-a9b6-e175f41fdc17",
+          "required": true,
+          "dataType": "@datetime",
+          "name": "datetime",
+          "value": "$datetime",
+          "prompts": [
+            {
+              "lang": "ru",
+              "value": "Так тебя интересуют $category! А на какую дату или промежуток времени?"
+            }
+          ],
+          "isList": false
+        }
+      ],
+      "messages": [],
+      "defaultResponsePlatforms": {},
+      "speech": []
+    }
+  ],
+  "priority": 750000,
+  "webhookUsed": true,
+  "webhookForSlotFilling": false,
+  "lastUpdate": 1516184032,
+  "fallbackIntent": false,
+  "events": []
+}
