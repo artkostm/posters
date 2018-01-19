@@ -19,7 +19,7 @@
   },
   "defaultTimezone": "Asia/Istanbul",
   "webhook": {
-    "url": "http://artposters.herokuapp.com/posters/categories",
+    "url": "https://artposters.herokuapp.com/posters/webhook",
     "headers": {
       "": ""
     },
