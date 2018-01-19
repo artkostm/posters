@@ -1,0 +1,10 @@
+[
+  {
+    "value": "@sys.date-period:period",
+    "synonyms": []
+  },
+  {
+    "value": "@sys.date:date",
+    "synonyms": []
+  }
+]
