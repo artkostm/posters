@@ -1,20 +1,22 @@
 package com.artkostm.posters
 
 import com.artkostm.posters.dialog._
-import com.artkostm.posters.model.Assign
-import com.artkostm.posters.modules.{AkkaModule, DbModule}
+import com.artkostm.posters.model._
+import com.artkostm.posters.modules.{AkkaModule, DbModule, PostersSwaggerModule}
 import com.artkostm.posters.repository.PostgresPostersRepository
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.google.inject.{Inject, Module, Singleton}
+import com.jakehschwartz.finatra.swagger.{DocsController, SwaggerController}
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.exceptions.ExceptionMapper
-import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter}
+import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.response.ResponseBuilder
 import com.twitter.finatra.http.{Controller, HttpServer}
 import com.twitter.finatra.http.routing.HttpRouter
 import com.twitter.finatra.json.modules.FinatraJacksonModule
 import com.twitter.finatra.request.QueryParam
+import io.swagger.models.Swagger
 import org.joda.time.DateTime
 
 import scala.concurrent.Future
@@ -27,19 +29,35 @@ class PostersServer extends HttpServer {
   override val defaultFinatraHttpPort: String = httpConfig.port
   override protected def disableAdminHttpServer = true
   override protected def jacksonModule = PostersJacksonModule
-  override protected def modules: Seq[Module] = Seq(DbModule, AkkaModule)
+  override protected def modules: Seq[Module] = Seq(DbModule, AkkaModule, PostersSwaggerModule)
   override protected def configureHttp(router: HttpRouter): Unit =
     router
       .exceptionMapper[IllegalArgumentExceptionHandler]
       .filter[LoggingMDCFilter[Request, Response]]
+      .filter[TraceIdMDCFilter[Request, Response]]
       .filter[CommonFilters]
+      .add[DocsController]
       .add[ScheduleController]
 }
 
-class ScheduleController extends Controller {
+class ScheduleController @Inject()(s: Swagger) extends SwaggerController {
+  override implicit protected val swagger = s
+
   implicit val ec = actorSystem.dispatcher
 
-  get("/posters/categories/?") { request: CategoryRequest =>
+  getWithDoc("/posters/categories/?") { o =>
+    o.summary("Read category information")
+      .description("Read the detail information about the student.")
+      .tag("Student")
+      .routeParam[String]("id", "the student id")
+      .produces("application/json")
+      .responseWith[List[Category]](200, "list of categories", example = Some(
+        List(Category(
+          "CategoryName", List(
+            Event(Media(
+              "event link", "image link"), "event name", Description("event description", Some("ticket link"), true)))))))
+      .responseWith(404, "categories are not found")
+  } { request: CategoryRequest =>
     request match {
       case CategoryRequest(Some(date), Some(category), _) => PostgresPostersRepository.find(date).map {
         case None => eventsScraper.scheduleFor(date).events.filter(_.name.equalsIgnoreCase(category))
