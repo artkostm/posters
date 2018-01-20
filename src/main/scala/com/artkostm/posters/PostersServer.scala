@@ -48,7 +48,7 @@ class ScheduleController @Inject()(s: Swagger) extends SwaggerController {
   getWithDoc("/posters/categories/?") { o =>
     o.summary("Read category information")
       .description("Read the detail information about the student.")
-      .tag("Student")
+      .tag("Category")
       .routeParam[String]("id", "the student id")
       .produces("application/json")
       .responseWith[List[Category]](200, "list of categories", example = Some(
