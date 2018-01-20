@@ -1,5 +1,6 @@
 package com.artkostm.posters
 
+import com.artkostm.posters.controllers.CategoryController
 import com.artkostm.posters.dialog._
 import com.artkostm.posters.model._
 import com.artkostm.posters.modules.{AkkaModule, DbModule, PostersSwaggerModule}
@@ -37,7 +38,7 @@ class PostersServer extends HttpServer {
       .filter[TraceIdMDCFilter[Request, Response]]
       .filter[CommonFilters]
       .add[DocsController]
-      .add[ScheduleController]
+      .add[CategoryController]
 }
 
 class ScheduleController @Inject()(s: Swagger) extends SwaggerController {
@@ -45,53 +46,53 @@ class ScheduleController @Inject()(s: Swagger) extends SwaggerController {
 
   implicit val ec = actorSystem.dispatcher
 
-  getWithDoc("/posters/categories/?") { o =>
-    o.summary("Read category information")
-      .description("Read the detail information about the student.")
-      .tag("Category")
-      .routeParam[String]("id", "the student id")
-      .produces("application/json")
-      .responseWith[List[Category]](200, "list of categories", example = Some(
-        List(Category(
-          "CategoryName", List(
-            Event(Media(
-              "event link", "image link"), "event name", Description("event description", Some("ticket link"), true)))))))
-      .responseWith(404, "categories are not found")
-  } { request: CategoryRequest =>
-    request match {
-      case CategoryRequest(Some(date), Some(category), _) => PostgresPostersRepository.find(date).map {
-        case None => eventsScraper.scheduleFor(date).events.filter(_.name.equalsIgnoreCase(category))
-        case Some(day) => day.categories.filter(_.name.equalsIgnoreCase(category))
-      }
-      case CategoryRequest(Some(date), _, Some(true)) => PostgresPostersRepository.find(date).map {
-        case Some(day) => day.categories
-        case None => eventsScraper.scheduleFor(date).events
-      }
-      case CategoryRequest(Some(date), None, None) => PostgresPostersRepository.find(date).map {
-        case Some(day) => day.categories
-        case None => eventsScraper.scheduleFor(date).events
-      }
-      case _ => Future.successful(response.badRequest)
-    }
-  }
+//  getWithDoc("/posters/categories/?") { o =>
+//    o.summary("Read category information")
+//      .description("Read the detail information about the student.")
+//      .tag("Category")
+//      .routeParam[String]("id", "the student id")
+//      .produces("application/json")
+//      .responseWith[List[Category]](200, "list of categories", example = Some(
+//        List(Category(
+//          "CategoryName", List(
+//            Event(Media(
+//              "event link", "image link"), "event name", Description("event description", Some("ticket link"), true)))))))
+//      .responseWith(404, "categories are not found")
+//  } { request: CategoryRequest =>
+//    request match {
+//      case CategoryRequest(Some(date), Some(category), _) => PostgresPostersRepository.find(date).map {
+//        case None => eventsScraper.scheduleFor(date).events.filter(_.name.equalsIgnoreCase(category))
+//        case Some(day) => day.categories.filter(_.name.equalsIgnoreCase(category))
+//      }
+//      case CategoryRequest(Some(date), _, Some(true)) => PostgresPostersRepository.find(date).map {
+//        case Some(day) => day.categories
+//        case None => eventsScraper.scheduleFor(date).events
+//      }
+//      case CategoryRequest(Some(date), None, None) => PostgresPostersRepository.find(date).map {
+//        case Some(day) => day.categories
+//        case None => eventsScraper.scheduleFor(date).events
+//      }
+//      case _ => Future.successful(response.badRequest)
+//    }
+//  }
 
-  post("/posters/assignee/?") { request: Assign =>
-    PostgresPostersRepository.save(request)
-  }
+//  post("/posters/assignee/?") { request: Assign =>
+//    PostgresPostersRepository.save(request)
+//  }
+//
+//  get("/posters/assignee/?") { request: AssigneeRequest =>
+//    PostgresPostersRepository.find(request.category, request.date, request.name)
+//  }
+//
+//  get("/posters/info/?") { request: EventInfoRequest =>
+//    PostgresPostersRepository.find(request.link)
+//  }
+//
+//  get("/posters/eventinfo/?") { request: EventInfoRequest =>
+//    eventsScraper.eventInfo(request.link)
+//  }
 
-  get("/posters/assignee/?") { request: AssigneeRequest =>
-    PostgresPostersRepository.find(request.category, request.date, request.name)
-  }
-
-  get("/posters/info/?") { request: EventInfoRequest =>
-    PostgresPostersRepository.find(request.link)
-  }
-  
-  get("/posters/eventinfo/?") { request: EventInfoRequest =>
-    eventsScraper.eventInfo(request.link)
-  }
-
-  post("/posters/webhook/?") { request: DialogflowRequest =>
+  post("/webhook/?") { request: DialogflowRequest =>
     logger.info(request.toString)
     if (!FlowKeyDataExtractor.actionIncomplete(request)) {
       FlowKeyDataExtractor.extract(request) match {
