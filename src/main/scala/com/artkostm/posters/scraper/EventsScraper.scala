@@ -1,7 +1,7 @@
 package com.artkostm.posters.scraper
 
-import com.artkostm.ScraperConfig
 import com.artkostm.posters.model._
+import com.artkostm.posters.modules.ScraperConfig
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser
 import net.ruippeixotog.scalascraper.dsl.DSL._
 import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
