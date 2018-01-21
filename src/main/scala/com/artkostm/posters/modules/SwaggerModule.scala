@@ -14,8 +14,8 @@ object PostersSwaggerModule extends SwaggerModule {
     val swagger = new Swagger()
 
     val info = new Info()
-      .description("The Student / Course management API, this is a sample for swagger document generation")
-      .version("1.0.1")
+      .description("The Categories / Events retrieve API")
+      .version("1.0.0")
       .title("Posters / Events Retrieve API")
 
     swagger
