@@ -8,9 +8,8 @@ import io.swagger.models.auth.BasicAuthDefinition
 import io.swagger.models.{Info, Swagger}
 
 object PostersSwaggerModule extends SwaggerModule {
-  @Singleton
-  @Provides
-  def swagger: Swagger = {
+
+  @Singleton @Provides def swagger: Swagger = {
     val swagger = new Swagger()
 
     val info = new Info()
