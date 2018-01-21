@@ -1,5 +1,7 @@
 package com.artkostm.posters.collector
 
+import javax.inject.Singleton
+
 import akka.NotUsed
 import akka.stream.{ActorMaterializer, ClosedShape}
 import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, RunnableGraph, Sink, Source}
@@ -8,10 +10,12 @@ import org.joda.time.DateTime
 import com.artkostm.posters._
 import com.artkostm.posters.repository.{DaysRepository, InfoRepository}
 import com.artkostm.posters.scraper.EventsScraper
+import com.google.inject.Inject
 
 import scala.concurrent.Future
 
-class EventsCollector(scraper: EventsScraper, days: Seq[DateTime],
+@Singleton
+class EventsCollector @Inject()(scraper: EventsScraper, days: Seq[DateTime],
                       repository: DaysRepository with InfoRepository) {
   implicit val system = actorSystem
   implicit val materializer = ActorMaterializer()
