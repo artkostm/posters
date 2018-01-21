@@ -32,5 +32,5 @@ trait EventsByCategoryNameOperation { self: SwaggerController =>
         "CategoryName", List(
           Event(Media(
             "event link", "image link"), "event name", Description("event description", Some("ticket link"), true)))))))
-      .responseWith(404, "categories are not found for received date")
+      .responseWith(404, "category with the name are not found for received date")
 }
