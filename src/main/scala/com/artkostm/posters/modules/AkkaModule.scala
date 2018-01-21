@@ -13,7 +13,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 object AkkaModule extends TwitterModule {
   private var actor: ActorRef = _
 
-  @Singleton @Provides def actorSystem() = null
+  @Singleton @Provides def actorSystem() = ActorSystem("posters")
 
   override def singletonStartup(injector: Injector): Unit = {
     actor = injector.instance[ActorSystem].actorOf(Props[ShutdownActor])
