@@ -15,7 +15,7 @@ import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import scala.concurrent.duration.FiniteDuration
 
 object DbModule extends TwitterModule {
-  override def modules: Seq[Module] = Seq(ConfigModule, AkkaModule, ToolsModule)
+  override def modules: Seq[Module] = Seq(ConfigModule)
 
   @Singleton @Provides def postgresDataSource(config: Config): DataSource = {
     val uri = new URI(config.getString("postgres.url"))

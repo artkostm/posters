@@ -8,18 +8,19 @@ import akka.stream.{ActorMaterializer, ClosedShape}
 import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, RunnableGraph, Sink, Source}
 import com.artkostm.posters.model._
 import org.joda.time.DateTime
-import com.artkostm.posters.repository.{DaysRepository, InfoRepository}
+import com.artkostm.posters.repository.PostgresPostersRepository
 import com.artkostm.posters.scraper.EventsScraper
 import com.google.inject.Inject
 
 import scala.concurrent.Future
 
 @Singleton
-class EventsCollector @Inject()(scraper: EventsScraper, days: Seq[DateTime],
-                      repository: DaysRepository with InfoRepository, actorSystem: ActorSystem) {
-  implicit val system = actorSystem
-  implicit val materializer = ActorMaterializer()
-  implicit val ec = actorSystem.dispatcher
+class EventsCollector @Inject()(scraper: EventsScraper, repository: PostgresPostersRepository,
+                                actorSystem: ActorSystem) {
+  private implicit val system = actorSystem
+  private implicit val materializer = ActorMaterializer()
+  private implicit val ec = actorSystem.dispatcher
+  private val days = (-2 to 30).map(DateTime.now().plusDays).map(_.withTimeAtStartOfDay())
 
   private val g = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
     import GraphDSL.Implicits._
