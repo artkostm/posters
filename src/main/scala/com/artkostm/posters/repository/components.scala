@@ -1,6 +1,8 @@
 package com.artkostm.posters.repository
 
-import com.artkostm.posters._
+import javax.sql.DataSource
+
+import com.google.inject.Inject
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -13,14 +15,15 @@ trait H2DbComponent extends DbComponent {
 }
 
 trait JsonSupportDbComponent extends DbComponent {
+  protected def dataSource: DataSource
   override lazy val driver = JsonSupportPostgresProfile
 
   import driver.api._
 
-  override lazy val db: driver.api.Database = Database.forDataSource(postgresDS, Some(19))
+  override lazy val db: driver.api.Database = Database.forDataSource(dataSource, Some(19))
 }
 
-object PostgresPostersRepository extends AssignRepository
+trait PostgresPostersRepository extends AssignRepository
                                     with DaysRepository
                                     with InfoRepository
                                     with JsonSupportDbComponent {
@@ -32,4 +35,6 @@ object PostgresPostersRepository extends AssignRepository
           """)))
 }
 
-object H2AssignRepository extends AssignRepository with H2DbComponent
+class PostersRepository @Inject() (ds: DataSource) extends PostgresPostersRepository {
+  override protected def dataSource: DataSource = ds
+}
