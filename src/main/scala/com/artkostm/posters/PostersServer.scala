@@ -3,7 +3,7 @@ package com.artkostm.posters
 import com.artkostm.posters.controllers.CategoryController
 import com.artkostm.posters.dialog._
 import com.artkostm.posters.model._
-import com.artkostm.posters.modules.{AkkaModule, DbModule, PostersSwaggerModule}
+import com.artkostm.posters.modules._
 import com.artkostm.posters.repository.PostgresPostersRepository
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.module.SimpleModule
@@ -27,10 +27,10 @@ object PostersJacksonModule extends FinatraJacksonModule {
 }
 
 class PostersServer extends HttpServer {
-  override val defaultFinatraHttpPort: String = httpConfig.port
+  override val defaultFinatraHttpPort: String = ":8080"
   override protected def disableAdminHttpServer = true
   override protected def jacksonModule = PostersJacksonModule
-  override protected def modules: Seq[Module] = Seq(DbModule, AkkaModule, PostersSwaggerModule)
+  override protected def modules: Seq[Module] = Seq(ConfigModule, AkkaModule, ToolsModule, DbModule, PostersSwaggerModule)
   override protected def configureHttp(router: HttpRouter): Unit =
     router
       .exceptionMapper[IllegalArgumentExceptionHandler]
@@ -44,7 +44,7 @@ class PostersServer extends HttpServer {
 class ScheduleController @Inject()(s: Swagger) extends SwaggerController {
   override implicit protected val swagger = s
 
-  implicit val ec = actorSystem.dispatcher
+//  implicit val ec = actorSystem.dispatcher
 
 //  getWithDoc("/posters/categories/?") { o =>
 //    o.summary("Read category information")
