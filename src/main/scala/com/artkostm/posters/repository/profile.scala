@@ -12,7 +12,7 @@ trait JsonSupportPostgresProfile extends PostgresProfile
                                with PgPlayJsonSupport
                                with PgArrayJdbcTypes {
 
-  override val pgjson = "jsonb"
+  override def pgjson = "jsonb"
 
   override val api: API = new PostersDBAPI {}
 
