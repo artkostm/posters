@@ -1,1 +1,1 @@
-web: target/universal/stage/bin/posters
+web: target/universal/stage/bin/posters -- -admin.port=:0 -http.port=:$PORT
