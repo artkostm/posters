@@ -92,25 +92,25 @@ class ScheduleController @Inject()(s: Swagger) extends SwaggerController {
 //    eventsScraper.eventInfo(request.link)
 //  }
 
-  post("/webhook/?") { request: DialogflowRequest =>
-    logger.info(request.toString)
-    if (!FlowKeyDataExtractor.actionIncomplete(request)) {
-      FlowKeyDataExtractor.extract(request) match {
-        case FlowKeyData(category, Some(date), _) =>
-          if (FlowKeyDataExtractor.shouldShowAll(request)) PostgresPostersRepository.find(date).map {
-            case Some(day) => DialogflowResponse("", ResponseData(day.categories), "posters")
-            case None => DialogflowResponse("", ResponseData(eventsScraper.scheduleFor(date).events), "posters")
-          } else PostgresPostersRepository.find(date).map {
-            case None => DialogflowResponse("", ResponseData(eventsScraper.scheduleFor(date).events.filter(cat => category.contains(cat.name))), "posters")
-            case Some(day) => DialogflowResponse("", ResponseData(day.categories.filter(cat => category.contains(cat.name))), "posters")
-          }
-        case FlowKeyData(category, _, Some(period)) => Future.successful(response.badRequest)
-        case _ => Future.successful(response.badRequest)
-      }
-    } else {
-      Future.successful(response.badRequest)
-    }
-  }
+//  post("/webhook/?") { request: DialogflowRequest =>
+//    logger.info(request.toString)
+//    if (!FlowKeyDataExtractor.actionIncomplete(request)) {
+//      FlowKeyDataExtractor.extract(request) match {
+//        case FlowKeyData(category, Some(date), _) =>
+//          if (FlowKeyDataExtractor.shouldShowAll(request)) PostgresPostersRepository.find(date).map {
+//            case Some(day) => DialogflowResponse("", ResponseData(day.categories), "posters")
+//            case None => DialogflowResponse("", ResponseData(eventsScraper.scheduleFor(date).events), "posters")
+//          } else PostgresPostersRepository.find(date).map {
+//            case None => DialogflowResponse("", ResponseData(eventsScraper.scheduleFor(date).events.filter(cat => category.contains(cat.name))), "posters")
+//            case Some(day) => DialogflowResponse("", ResponseData(day.categories.filter(cat => category.contains(cat.name))), "posters")
+//          }
+//        case FlowKeyData(category, _, Some(period)) => Future.successful(response.badRequest)
+//        case _ => Future.successful(response.badRequest)
+//      }
+//    } else {
+//      Future.successful(response.badRequest)
+//    }
+//  }
 }
 
 @Singleton
