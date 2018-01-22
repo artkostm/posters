@@ -1,6 +1,6 @@
 package com.artkostm.posters.controllers
 
-import com.artkostm.posters.model.{Category, Description, Event, Media}
+import com.artkostm.posters.model._
 import com.jakehschwartz.finatra.swagger.SwaggerController
 import io.swagger.models.Operation
 
@@ -27,10 +27,46 @@ trait EventsByCategoryNameOperation { self: SwaggerController =>
       .queryParam[String]("date", "the date in the format yyyy-mm-dd")
       .queryParam[String]("name", "the name of requested category")
       .produces("application/json")
-      .responseWith[List[Category]](200, "singleton list of an category found", example = Some(
-      List(Category(
+      .responseWith[Category](200, "an category found with the name", example = Some(
+      Category(
         "CategoryName", List(
           Event(Media(
-            "event link", "image link"), "event name", Description("event description", Some("ticket link"), true)))))))
+            "event link", "image link"), "event name", Description("event description", Some("ticket link"), true))))))
       .responseWith(404, "category with the name are not found for received date")
+}
+
+trait EventInfoByLinkOperation { self: SwaggerController =>
+  def eventInfoByLinkOp(o: Operation): Operation =
+    o.summary("Get an event using direct link to it")
+      .description("Get an event busing direct link to it.")
+      .tag("Event")
+      .queryParam[String]("link", "the event link in the format https://.../")
+      .produces("application/json")
+      .responseWith[Info](200, "singleton list of an category found", example = Some(Info("https://link.to/the/specified/event/",
+        EventInfo("event detailed description", List("https://links.to/the/event/photo/"), List(Comment("author", "date", "comment text"))))))
+      .responseWith(404, "event is not found")
+}
+
+trait GetIntentOperation { self: SwaggerController =>
+  def getIntentOp(o: Operation): Operation =
+    o.summary("Get an event using direct link to it")
+      .description("Get an event busing direct link to it.")
+      .tag("Event")
+      .queryParam[String]("link", "the event link in the format https://.../")
+      .produces("application/json")
+      .responseWith[Info](200, "singleton list of an category found", example = Some(Info("https://link.to/the/specified/event/",
+      EventInfo("event detailed description", List("https://links.to/the/event/photo/"), List(Comment("author", "date", "comment text"))))))
+      .responseWith(404, "event is not found")
+}
+
+trait SaveIntentOperation { self: SwaggerController =>
+  def saveIntentOp(o: Operation): Operation =
+    o.summary("Get an event using direct link to it")
+      .description("Get an event busing direct link to it.")
+      .tag("Event")
+      .queryParam[String]("link", "the event link in the format https://.../")
+      .produces("application/json")
+      .responseWith[Info](200, "singleton list of an category found", example = Some(Info("https://link.to/the/specified/event/",
+      EventInfo("event detailed description", List("https://links.to/the/event/photo/"), List(Comment("author", "date", "comment text"))))))
+      .responseWith(404, "event is not found")
 }
