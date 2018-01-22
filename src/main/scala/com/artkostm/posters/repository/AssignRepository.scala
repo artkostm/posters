@@ -19,7 +19,9 @@ trait AssignRepository extends AssignTable { this: DbComponent =>
     DBIO.seq(createIfNotExist, assigneesTableQuery.filter(event => event.date < DateTime.now.minusDays(1)).delete)
   }
 
-  def save(assign: Assign): Future[Int] = db.run(assigneesTableQuery.insertOrUpdate(assign.copy(date = assign.date.withTimeAtStartOfDay())))
+  def save(assign: Assign) = db.run(
+    assigneesTableQuery.returning(assigneesTableQuery).insertOrUpdate(assign.copy(date = assign.date.withTimeAtStartOfDay())).transactionally
+  )
 
   def all: Future[List[Assign]] = db.run(assigneesTableQuery.to[List].result)
 
