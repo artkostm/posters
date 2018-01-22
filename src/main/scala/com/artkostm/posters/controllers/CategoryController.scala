@@ -16,7 +16,7 @@ class CategoryController @Inject()(s: Swagger, repository: PostgresPostersReposi
 
   override implicit protected val swagger = s
 
-  implicit val ec = system.dispatcher
+  private implicit val ec = system.dispatcher
 
   getWithDoc("/posters/:date/?")(allDayOfEventsOp) { request: WithDate =>
     repository.find(request.date).map {

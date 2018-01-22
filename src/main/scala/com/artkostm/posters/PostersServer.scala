@@ -1,26 +1,20 @@
 package com.artkostm.posters
 
 import com.artkostm.posters.controllers.CategoryController
-import com.artkostm.posters.dialog._
-import com.artkostm.posters.model._
 import com.artkostm.posters.modules._
-import com.artkostm.posters.repository.PostgresPostersRepository
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
-import com.fasterxml.jackson.databind.module.SimpleModule
 import com.google.inject.{Inject, Module, Singleton}
 import com.jakehschwartz.finatra.swagger.{DocsController, SwaggerController}
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.exceptions.ExceptionMapper
 import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.response.ResponseBuilder
-import com.twitter.finatra.http.{Controller, HttpServer}
+import com.twitter.finatra.http.HttpServer
 import com.twitter.finatra.http.routing.HttpRouter
 import com.twitter.finatra.json.modules.FinatraJacksonModule
 import com.twitter.finatra.request.QueryParam
 import io.swagger.models.Swagger
 import org.joda.time.DateTime
-
-import scala.concurrent.Future
 
 object PostersJacksonModule extends FinatraJacksonModule {
   override protected val propertyNamingStrategy = PropertyNamingStrategy.LOWER_CAMEL_CASE
@@ -43,55 +37,6 @@ class PostersServer extends HttpServer {
 
 class ScheduleController @Inject()(s: Swagger) extends SwaggerController {
   override implicit protected val swagger = s
-
-//  implicit val ec = actorSystem.dispatcher
-
-//  getWithDoc("/posters/categories/?") { o =>
-//    o.summary("Read category information")
-//      .description("Read the detail information about the student.")
-//      .tag("Category")
-//      .routeParam[String]("id", "the student id")
-//      .produces("application/json")
-//      .responseWith[List[Category]](200, "list of categories", example = Some(
-//        List(Category(
-//          "CategoryName", List(
-//            Event(Media(
-//              "event link", "image link"), "event name", Description("event description", Some("ticket link"), true)))))))
-//      .responseWith(404, "categories are not found")
-//  } { request: CategoryRequest =>
-//    request match {
-//      case CategoryRequest(Some(date), Some(category), _) => PostgresPostersRepository.find(date).map {
-//        case None => eventsScraper.scheduleFor(date).events.filter(_.name.equalsIgnoreCase(category))
-//        case Some(day) => day.categories.filter(_.name.equalsIgnoreCase(category))
-//      }
-//      case CategoryRequest(Some(date), _, Some(true)) => PostgresPostersRepository.find(date).map {
-//        case Some(day) => day.categories
-//        case None => eventsScraper.scheduleFor(date).events
-//      }
-//      case CategoryRequest(Some(date), None, None) => PostgresPostersRepository.find(date).map {
-//        case Some(day) => day.categories
-//        case None => eventsScraper.scheduleFor(date).events
-//      }
-//      case _ => Future.successful(response.badRequest)
-//    }
-//  }
-
-//  post("/posters/assignee/?") { request: Assign =>
-//    PostgresPostersRepository.save(request)
-//  }
-//
-//  get("/posters/assignee/?") { request: AssigneeRequest =>
-//    PostgresPostersRepository.find(request.category, request.date, request.name)
-//  }
-//
-//  get("/posters/info/?") { request: EventInfoRequest =>
-//    PostgresPostersRepository.find(request.link)
-//  }
-//
-//  get("/posters/eventinfo/?") { request: EventInfoRequest =>
-//    eventsScraper.eventInfo(request.link)
-//  }
-
 //  post("/webhook/?") { request: DialogflowRequest =>
 //    logger.info(request.toString)
 //    if (!FlowKeyDataExtractor.actionIncomplete(request)) {
