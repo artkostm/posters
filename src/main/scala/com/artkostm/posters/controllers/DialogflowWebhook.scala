@@ -31,6 +31,7 @@ class DialogflowWebhook @Inject() (s: Swagger, repository: PostgresPostersReposi
             case IndexedSeq() =>
               DialogflowResponse("", ResponseData(scraper.scheduleFor(date).events.filter(cat => categories.contains(cat.name))), "posters")
             case nonEmpty =>
+              logger.info(s"Categories to find: $categories")
               DialogflowResponse("", ResponseData(nonEmpty.toList), "posters")
           }
         case FlowKeyData(category, _, Some(period)) => Future.failed(???)

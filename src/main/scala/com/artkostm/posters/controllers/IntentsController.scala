@@ -17,7 +17,7 @@ class IntentsController @Inject() (s: Swagger, repository: PostgresPostersReposi
   private implicit val ec = system.dispatcher
 
   postWithDoc("/intents/?")(saveIntentOp) { request: Assign =>
-    repository.save(request)
+    repository.save(request).map(Added)
   }
 
   getWithDoc("/intents/?")(getIntentOp) { request: AssigneeRequest =>
@@ -28,3 +28,4 @@ class IntentsController @Inject() (s: Swagger, repository: PostgresPostersReposi
 case class AssigneeRequest(@QueryParam date: DateTime,
                            @QueryParam category: String,
                            @QueryParam name: String)
+case class Added(count: Int)
