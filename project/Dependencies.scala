@@ -2,7 +2,7 @@ import sbt._
 
 object Dependencies {
   lazy val versions = new {
-    val finatra  = "17.11.0"
+    val finatra  = "18.1.0"
     val logback  = "1.2.3"
     val scraper  = "2.0.0"
     val akka     = "2.5.6"
@@ -11,6 +11,7 @@ object Dependencies {
     val hikaricp = "3.2.1"
     val postgres = "9.4.1208"
     val swagger = "0.7.2"
+    val finatra_swagger  = "17.11.0"
   }
 
   val finatra_http    = "com.twitter"          %%  "finatra-http"       % versions.finatra
@@ -23,7 +24,7 @@ object Dependencies {
   val hikaricp        = "com.typesafe.slick"   %%  "slick-hikaricp"     % versions.hikaricp
   val postgres        = "org.postgresql"       %   "postgresql"         % versions.postgres
   val akka_streams    = "com.typesafe.akka"    %%  "akka-stream"        % versions.akka
-  val swagger         = "com.jakehschwartz"    %%  "finatra-swagger"    % versions.finatra
+  val swagger         = "com.jakehschwartz"    %%  "finatra-swagger"    % versions.finatra_swagger
 
 
   lazy val all = Seq(finatra_http, logback, scraper, akka_actor, slick,
