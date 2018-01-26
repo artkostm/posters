@@ -4,7 +4,7 @@ import com.artkostm.posters.model.{Category, EventsDay, EventsDayTable}
 import org.joda.time.DateTime
 import play.api.libs.json.Json
 import slick.dbio.DBIOAction
-import slick.jdbc.{GetResult, PositionedParameters, SetParameter}
+import slick.jdbc.{GetResult, PositionedParameters, SQLActionBuilder, SetParameter}
 import slick.jdbc.meta.MTable
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,8 +37,26 @@ trait DaysRepository extends EventsDayTable { this: JsonSupportDbComponent =>
          SELECT obj FROM days d, jsonb_array_elements(d.categories) obj WHERE date = ${date.withTimeAtStartOfDay()} AND obj->>'name' = $name
        """.as[Category].headOption)
 
+  private def concat(a: SQLActionBuilder, b: SQLActionBuilder): SQLActionBuilder = {
+    SQLActionBuilder(a.queryParts ++ b.queryParts, (p: Unit, pp: PositionedParameters) => {
+      a.unitPConv.apply(p, pp)
+      b.unitPConv.apply(p, pp)
+    })
+  }
+
+  private def values[T](xs: TraversableOnce[T])(implicit sp: SetParameter[T]): SQLActionBuilder = {
+    var b = sql"("
+    var first = true
+    xs.foreach { x =>
+      if(first) first = false
+      else b = concat(b, sql",")
+      b = concat(b, sql"$x")
+    }
+    concat(b, sql")")
+  }
+
   def findCategories(date: DateTime, names: List[String]): Future[Vector[Category]] = db.run(
-    sql"""
-         SELECT obj FROM days d, jsonb_array_elements(d.categories) obj WHERE date = ${date.withTimeAtStartOfDay()} AND obj->>'name' IN (#${names.mkString(",")})
-       """.as[Category])
+    concat(sql"""
+         SELECT obj FROM days d, jsonb_array_elements(d.categories) obj WHERE date = ${date.withTimeAtStartOfDay()} AND obj->>'name' IN
+       """, values(names)).as[Category])
 }
