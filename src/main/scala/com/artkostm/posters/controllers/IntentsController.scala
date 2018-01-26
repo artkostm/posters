@@ -11,7 +11,7 @@ import org.joda.time.DateTime
 
 class IntentsController @Inject() (s: Swagger, repository: PostgresPostersRepository,
                                    system: ActorSystem)
-  extends SwaggerController with GetIntentOperation with SaveIntentOperation {
+  extends SwaggerController with IntentOperation {
   override implicit protected val swagger = s
 
   private implicit val ec = system.dispatcher
