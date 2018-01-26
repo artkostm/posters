@@ -12,7 +12,7 @@ import org.joda.time.DateTime
 
 class CategoryController @Inject()(s: Swagger, repository: PostgresPostersRepository,
                                    system: ActorSystem, scraper: EventsScraper)
-  extends SwaggerController with AllDayOfEventsOperation with EventsByCategoryNameOperation {
+  extends SwaggerController with AllDayOfEventsOperation {
 
   override implicit protected val swagger = s
 
