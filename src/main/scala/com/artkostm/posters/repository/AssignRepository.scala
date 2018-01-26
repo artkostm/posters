@@ -20,7 +20,7 @@ trait AssignRepository extends AssignTable { this: DbComponent =>
   }
 
   def save(assign: Assign) = db.run(
-    assigneesTableQuery.returning(assigneesTableQuery).insertOrUpdate(assign.copy(date = assign.date.withTimeAtStartOfDay())).transactionally
+    assigneesTableQuery.insertOrUpdate(assign.copy(date = assign.date.withTimeAtStartOfDay())).transactionally
   )
 
   def all: Future[List[Assign]] = db.run(assigneesTableQuery.to[List].result)
