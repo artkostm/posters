@@ -18,7 +18,6 @@ object PostersJacksonModule extends FinatraJacksonModule {
 }
 
 class PostersServer extends HttpServer {
-  override val defaultFinatraHttpPort: String = ":8080"
   override protected def disableAdminHttpServer = true
   override protected def jacksonModule = PostersJacksonModule
   override protected def modules: Seq[Module] = Seq(ConfigModule, AkkaModule, ToolsModule, DbModule, PostersSwaggerModule)
