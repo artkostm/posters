@@ -34,7 +34,9 @@ class DialogflowWebhook @Inject() (s: Swagger, repository: PostgresPostersReposi
               DialogflowResponse("", ResponseData(nonEmpty.toList), "posters")
           }
         case FlowKeyData(categories, _, Some(period)) =>
-          repository.findCategories(FlowKeyDataExtractor.getPeriod(period), categories)
+          repository.findCategories(FlowKeyDataExtractor.getPeriod(period), categories).map { events =>
+            DialogflowResponse("", ResponseData(events.toList), "posters")
+          }
         case _ => Future.successful(response.badRequest(ErrorResponse("1", "cannot extract key data")))
       }
     else Future.successful(response.badRequest(ErrorResponse("1", "action is incomplete")))
