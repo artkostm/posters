@@ -39,7 +39,6 @@ class PostersServer extends HttpServer {
 class IllegalArgumentExceptionHandler @Inject() (response: ResponseBuilder)
   extends ExceptionMapper[Exception] {
   override def toResponse(request: Request, throwable: Exception): Response = {
-    throwable.printStackTrace()
     response.badRequest(ErrorResponse("1", throwable.getMessage))
   }
 }
