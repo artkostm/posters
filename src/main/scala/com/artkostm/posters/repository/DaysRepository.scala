@@ -59,4 +59,9 @@ trait DaysRepository extends EventsDayTable { this: JsonSupportDbComponent =>
     concat(sql"""
          SELECT obj FROM days d, jsonb_array_elements(d.categories) obj WHERE date = ${date.withTimeAtStartOfDay()} AND obj->>'name' IN
        """, values(names)).as[Category])
+
+  def findCategories(dates: List[DateTime], names: List[String]) = db.run(
+    concat(concat(sql"""
+         SELECT obj FROM days d, jsonb_array_elements(d.categories) obj WHERE date IN
+       """, values(dates)), concat(sql""" AND obj->>'name' IN """, values(names))).as[Category])
 }
