@@ -31,10 +31,10 @@ class DialogflowWebhook @Inject() (s: Swagger, repository: PostgresPostersReposi
             case IndexedSeq() =>
               DialogflowResponse("", ResponseData(scraper.scheduleFor(date).events.filter(cat => categories.contains(cat.name))), "posters")
             case nonEmpty =>
-              logger.info(s"Categories to find: $categories")
               DialogflowResponse("", ResponseData(nonEmpty.toList), "posters")
           }
-        case FlowKeyData(category, _, Some(period)) => Future.failed(???)
+        case FlowKeyData(categories, _, Some(period)) =>
+          repository.findCategories(FlowKeyDataExtractor.getPeriod(period), categories)
         case _ => Future.successful(response.badRequest(ErrorResponse("1", "cannot extract key data")))
       }
     else Future.successful(response.badRequest(ErrorResponse("1", "action is incomplete")))
