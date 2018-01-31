@@ -25,7 +25,7 @@ object DbModule extends TwitterModule {
     c.setJdbcUrl(s"jdbc:postgresql://${uri.getHost()}:${uri.getPort()}${uri.getPath()}?sslmode=require")
     c.setUsername(user)
     c.setPassword(password)
-    c.setMaximumPoolSize(1)
+    c.setMaximumPoolSize(19)
     c.addDataSourceProperty("sslmode", "require")
     c.setConnectionTimeout(120000)
     new HikariDataSource(c)
