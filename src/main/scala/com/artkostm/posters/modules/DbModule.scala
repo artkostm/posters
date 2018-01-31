@@ -5,7 +5,9 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 import javax.sql.DataSource
 
+
 import akka.actor.ActorSystem
+import com.artkostm.posters.collector.EventsCollector
 import com.artkostm.posters.repository.{PostersRepository, PostgresPostersRepository}
 import com.google.inject.{Module, Provides}
 import com.twitter.inject.{Injector, TwitterModule}
