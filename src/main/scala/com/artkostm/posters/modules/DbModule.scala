@@ -5,7 +5,9 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 import javax.sql.DataSource
 
+
 import akka.actor.ActorSystem
+import com.artkostm.posters.collector.EventsCollector
 import com.artkostm.posters.repository.{PostersRepository, PostgresPostersRepository}
 import com.google.inject.{Module, Provides}
 import com.twitter.inject.{Injector, TwitterModule}
@@ -25,7 +27,7 @@ object DbModule extends TwitterModule {
     c.setJdbcUrl(s"jdbc:postgresql://${uri.getHost()}:${uri.getPort()}${uri.getPath()}?sslmode=require")
     c.setUsername(user)
     c.setPassword(password)
-    c.setMaximumPoolSize(1)
+    c.setMaximumPoolSize(19)
     c.addDataSourceProperty("sslmode", "require")
     c.setConnectionTimeout(120000)
     new HikariDataSource(c)
@@ -36,9 +38,9 @@ object DbModule extends TwitterModule {
   override def singletonStartup(injector: Injector): Unit = {
     val system = injector.instance[ActorSystem]
     implicit val ec = system.dispatcher
-    //injector.instance[PostgresPostersRepository].setUp
-    system.scheduler.schedule(FiniteDuration(10, TimeUnit.SECONDS), FiniteDuration(24, TimeUnit.HOURS)) {
-      //injector.instance[EventsCollector].run()
+    injector.instance[PostgresPostersRepository].setUp
+    system.scheduler.schedule(FiniteDuration(15, TimeUnit.SECONDS), FiniteDuration(24, TimeUnit.HOURS)) {
+      injector.instance[EventsCollector].run()
     }
   }
 
