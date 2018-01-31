@@ -36,9 +36,9 @@ object DbModule extends TwitterModule {
   override def singletonStartup(injector: Injector): Unit = {
     val system = injector.instance[ActorSystem]
     implicit val ec = system.dispatcher
-    //injector.instance[PostgresPostersRepository].setUp
-    system.scheduler.schedule(FiniteDuration(10, TimeUnit.SECONDS), FiniteDuration(24, TimeUnit.HOURS)) {
-      //injector.instance[EventsCollector].run()
+    injector.instance[PostgresPostersRepository].setUp
+    system.scheduler.schedule(FiniteDuration(15, TimeUnit.SECONDS), FiniteDuration(24, TimeUnit.HOURS)) {
+      injector.instance[EventsCollector].run()
     }
   }
 
