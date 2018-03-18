@@ -19,13 +19,18 @@ class GraphQlController @Inject() (repository: PostgresPostersRepository,
 
   post("/test") { request: GraphQlRequest =>
     QueryParser.parse(request.query) match {
-      case Success(queryAst) => Executor.execute(TestSchema.instance, queryAst, new SimpleRepo, operationName = request.operationName)
+      case Success(queryAst) => Executor.execute(
+        TestSchema.instance,
+        queryAst,
+        new SimpleRepo,
+        variables = request.variables.getOrElse(Map.empty),
+        operationName = request.operationName)
       case Failure(error: SyntaxError) => Future.failed(error)
     }
   }
 }
 
-case class GraphQlRequest(query: String, operationName: Option[String])
+case class GraphQlRequest(query: String, operationName: Option[String], variables: Option[Map[String, Any]])
 
 class SimpleRepo {
 
