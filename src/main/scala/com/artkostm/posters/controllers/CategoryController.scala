@@ -1,7 +1,7 @@
 package com.artkostm.posters.controllers
 
 import akka.actor.ActorSystem
-import com.artkostm.posters.model.{Category, Description, EventsDay, Media}
+import com.artkostm.posters.model._
 import com.artkostm.posters.repository.PostgresPostersRepository
 import com.artkostm.posters.scraper.EventsScraper
 import com.google.inject.Inject
@@ -55,7 +55,14 @@ object Schema {
     Field("isFree", BooleanType, resolve = _.value.isFree)
   ))
 
+  val EventType = ObjectType("Event", "The event type", fields[Unit, Event](
+    Field("media", MediaType, resolve = _.value.media),
+    Field("name", StringType, resolve = _.value.name),
+    Field("description", DescriptionType, resolve = _.value.description)
+  ))
+
   val CategoryType = ObjectType("Category", "The category type", fields[Unit, Category](
-    Field("name", StringType, resolve = _.value.name)
+    Field("name", StringType, resolve = _.value.name),
+    Field("events", ListType(EventType), resolve = _.value.events)
   ))
 }
