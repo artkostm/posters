@@ -20,8 +20,7 @@ class GraphQlController @Inject() (repository: PostgresPostersRepository,
   post("/test") { request: GraphQlRequest =>
     QueryParser.parse(request.query) match {
       case Success(queryAst) => Executor.execute(TestSchema.instance, queryAst, new SimpleRepo, operationName = request.operationName)
-        .map(x => response.ok(x.toString))
-      case Failure(error: SyntaxError) => Future.successful(response.badRequest(error.getMessage()))
+      case Failure(error: SyntaxError) => Future.failed(error)
     }
   }
 }

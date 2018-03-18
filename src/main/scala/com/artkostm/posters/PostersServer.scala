@@ -1,6 +1,6 @@
 package com.artkostm.posters
 
-import com.artkostm.posters.controllers.{CategoryController, DialogflowWebhook, EventInfoController, IntentsController}
+import com.artkostm.posters.controllers._
 import com.artkostm.posters.modules._
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.google.inject.{Inject, Module, Singleton}
@@ -32,6 +32,7 @@ class PostersServer extends HttpServer {
       .add[EventInfoController]
       .add[IntentsController]
       .add[DialogflowWebhook]
+      .add[GraphQlController]
 }
 
 @Singleton
