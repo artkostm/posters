@@ -9,6 +9,12 @@ import com.jakehschwartz.finatra.swagger.SwaggerController
 import com.twitter.finatra.request.{QueryParam, RouteParam}
 import io.swagger.models.Swagger
 import org.joda.time.DateTime
+import sangria.execution._
+import sangria.parser.{QueryParser, SyntaxError}
+import sangria.validation.ValueCoercionViolation
+
+import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 class CategoryController @Inject()(s: Swagger, repository: PostgresPostersRepository,
                                    system: ActorSystem, scraper: EventsScraper)
@@ -31,15 +37,23 @@ class CategoryController @Inject()(s: Swagger, repository: PostgresPostersReposi
       case _ => scraper.scheduleFor(request.date).events.filter(_.name.equalsIgnoreCase(request.name)).headOption
     }
   }
+
+  post("/test") { request: GraphQlRequest =>
+    QueryParser.parse(request.query) match {
+      case Success(queryAst) => Executor.execute(TestSchema.instance, queryAst, new SimpleRepo, operationName = request.operationName)
+          .map(x => response.ok(x.toString))
+      case Failure(error: SyntaxError) => Future.successful(response.badRequest(error.getMessage()))
+    }
+  }
 }
 
 case class WithDate(@RouteParam date: DateTime)
 case class WithNameAndDate(@QueryParam name: String, @QueryParam date: DateTime)
-
+case class GraphQlRequest(query: String, operationName: Option[String])
 
 class SimpleRepo {
 
-  def categories(date: String): List[Category] = List(
+  def categories(): List[Category] = List(
     Category("category1", List(
       Event(Media("link1", "img1"), "event name1", Description("desc1", Some("ticket1"), true))
     )),
@@ -49,8 +63,10 @@ class SimpleRepo {
   )
 }
 
-object Schema {
+object TestSchema {
   import sangria.schema._
+
+  case object DateCoercionViolation extends ValueCoercionViolation("Date value expected")
 
   val MediaType = ObjectType("Media", "The media type", fields[Unit, Media](
     Field("link", StringType, resolve = _.value.link),
@@ -78,7 +94,8 @@ object Schema {
 
   val QueryType = ObjectType("Query", fields[SimpleRepo, Unit](
     Field("categories", ListType(CategoryType), description = Some("Returns a list of all available products."),
-      arguments = DateArgument :: Nil,
-      resolve = c => c.ctx.categories(c arg DateArgument))
+      resolve = c => c.ctx.categories())
   ))
+
+  val instance = Schema(QueryType)
 }
