@@ -37,8 +37,16 @@ case class WithDate(@RouteParam date: DateTime)
 case class WithNameAndDate(@QueryParam name: String, @QueryParam date: DateTime)
 
 
-object SimpleRepo {
+class SimpleRepo {
 
+  def categories(date: String): List[Category] = List(
+    Category("category1", List(
+      Event(Media("link1", "img1"), "event name1", Description("desc1", Some("ticket1"), true))
+    )),
+    Category("category2", List(
+      Event(Media("link2", "img2"), "event name2", Description("desc2", None, false))
+    ))
+  )
 }
 
 object Schema {
@@ -64,5 +72,13 @@ object Schema {
   val CategoryType = ObjectType("Category", "The category type", fields[Unit, Category](
     Field("name", StringType, resolve = _.value.name),
     Field("events", ListType(EventType), resolve = _.value.events)
+  ))
+
+  val DateArgument = Argument("date", StringType)
+
+  val QueryType = ObjectType("Query", fields[SimpleRepo, Unit](
+    Field("categories", ListType(CategoryType), description = Some("Returns a list of all available products."),
+      arguments = DateArgument :: Nil,
+      resolve = c => c.ctx.categories(c arg DateArgument))
   ))
 }
