@@ -12,6 +12,7 @@ object Dependencies {
     val postgres = "9.4.1208"
     val swagger = "0.7.2"
     val finatra_swagger  = "17.11.0"
+    val sangria = "1.4.0"
   }
 
   val finatra_http    = "com.twitter"          %%  "finatra-http"       % versions.finatra
@@ -25,8 +26,9 @@ object Dependencies {
   val postgres        = "org.postgresql"       %   "postgresql"         % versions.postgres
   val akka_streams    = "com.typesafe.akka"    %%  "akka-stream"        % versions.akka
   val swagger         = "com.jakehschwartz"    %%  "finatra-swagger"    % versions.finatra_swagger
+  val sangria         = "org.sangria-graphql"  %%  "sangria"            % versions.sangria
 
 
   lazy val all = Seq(finatra_http, logback, scraper, akka_actor, slick,
-    slick_pg, slick_pg_play, hikaricp, postgres, akka_streams, swagger)
+    slick_pg, slick_pg_play, hikaricp, postgres, akka_streams, swagger, sangria)
 }

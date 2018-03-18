@@ -1,7 +1,7 @@
 package com.artkostm.posters.controllers
 
 import akka.actor.ActorSystem
-import com.artkostm.posters.model.EventsDay
+import com.artkostm.posters.model._
 import com.artkostm.posters.repository.PostgresPostersRepository
 import com.artkostm.posters.scraper.EventsScraper
 import com.google.inject.Inject
