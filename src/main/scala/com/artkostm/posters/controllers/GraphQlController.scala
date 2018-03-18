@@ -11,6 +11,7 @@ import sangria.parser.{QueryParser, SyntaxError}
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
+import sangria.marshalling.ScalaInput.scalaInput
 
 class GraphQlController @Inject() (repository: PostgresPostersRepository,
                                    system: ActorSystem) extends Controller {
@@ -23,7 +24,7 @@ class GraphQlController @Inject() (repository: PostgresPostersRepository,
         TestSchema.instance,
         queryAst,
         new SimpleRepo,
-        variables = request.variables.getOrElse(Map.empty),
+        variables = scalaInput(request.variables.getOrElse(Map.empty)),
         operationName = request.operationName)
       case Failure(error: SyntaxError) => Future.failed(error)
     }
