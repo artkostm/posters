@@ -42,6 +42,9 @@ Authorization: http://sangria-graphql.org/learn/#authentication-and-authorisatio
 
 Maybe generate key and create tocken for each user logged in
 
+For token, generate jwt using https://github.com/jasongoodwin/authentikat-jwt or https://github.com/input-output-hk/scrypto. Secret key should be set explicitly (for example, env variables).
+
+
 Create serializers for joda date time: https://github.com/sangria-graphql/sangria/issues/283 and https://gist.github.com/OlegIlyenko/a9c0e52540ce7090abaf
 
 
