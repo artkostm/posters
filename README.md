@@ -5,7 +5,10 @@ Design notes:
  
 Next steps:
 
-1) Update Assignment table for volunteers users
+1) Update Assignment table for volunteers and users
+
+- Update primary key and add something like this `index("idx_a", (volunteerId, userId), unique = true)` if we wouldn't integrate with Redis
+
 2) Need to decide whether we should use Redis or not
 3) Update request model for user assignment
 4) Update GraphQL schemas
