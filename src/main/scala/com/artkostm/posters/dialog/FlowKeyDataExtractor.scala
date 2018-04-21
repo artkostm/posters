@@ -1,5 +1,8 @@
 package com.artkostm.posters.dialog
 
+import java.net.{URI, URLDecoder, URLEncoder}
+import java.nio.charset.StandardCharsets
+
 import com.artkostm.posters.dialog.v1.{DialogflowRequest => DFRequestV1}
 import com.artkostm.posters.dialog.v2.{Period, DialogflowRequest => DFRequestV2}
 import org.joda.time.{DateTime, Days}
@@ -11,7 +14,7 @@ trait FlowKeyDataExtractor {
   def actionIncomplete(req: DFRequestV2): Boolean = !req.queryResult.allRequiredParamsPresent
 
   def extract(request: DFRequestV1): FlowKeyData = {
-    val category = request.result.parameters.category
+    val category = request.result.parameters.category.map(URLDecoder.decode(_, StandardCharsets.UTF_8.name()))
     val date = request.result.parameters.datetime.date
     val period = request.result.parameters.datetime.period
     FlowKeyData(category, date, period, None)
