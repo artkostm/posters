@@ -8,7 +8,7 @@ case class FlowKeyData(category: List[String], date: Option[DateTime], period: O
 
 trait FlowKeyDataExtractor {
   def actionIncomplete(req: DFRequestV1): Boolean = req.result.actionIncomplete
-  def actionIncomplete(req: DFRequestV2): Boolean = req.queryResult.allRequiredParamsPresent
+  def actionIncomplete(req: DFRequestV2): Boolean = !req.queryResult.allRequiredParamsPresent
 
   def extract(request: DFRequestV1): FlowKeyData = {
     val category = request.result.parameters.category
