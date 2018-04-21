@@ -4,7 +4,8 @@ import com.artkostm.posters.model.Category
 import org.joda.time.DateTime
 
 // for request
-case class Datetime(date: Option[DateTime], period: Option[String])
+case class Period(endDate: DateTime, startDate: DateTime)
+case class Datetime(date: Option[DateTime], period: Option[Period])
 
 case class Parameters(category: List[String], datetime: Datetime)
 
