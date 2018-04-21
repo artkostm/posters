@@ -1,0 +1,50 @@
+[
+  {
+    "id": "b39be240-b294-44a4-a4d6-493b9ae7304b",
+    "data": [
+      {
+        "text": "Здравствуйте",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 0
+  },
+  {
+    "id": "ae2a9fa2-dc92-4536-8e53-69047d12465b",
+    "data": [
+      {
+        "text": "Привет",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 0
+  },
+  {
+    "id": "536b91a3-a702-4ccf-8b2c-35451e1ce7ff",
+    "data": [
+      {
+        "text": "Здравствуйте",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 0
+  },
+  {
+    "id": "737dafd8-4597-42e5-b254-37367560c067",
+    "data": [
+      {
+        "text": "Привет",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 0
+  }
+]

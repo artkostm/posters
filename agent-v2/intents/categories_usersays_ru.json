@@ -1,0 +1,506 @@
+[
+  {
+    "id": "e320f7c5-73cc-4413-aaf4-a7b3c0edc99d",
+    "data": [
+      {
+        "text": "Покажи ",
+        "userDefined": false
+      },
+      {
+        "text": "фильмы",
+        "alias": "category",
+        "meta": "@category",
+        "userDefined": false
+      },
+      {
+        "text": " на ",
+        "userDefined": false
+      },
+      {
+        "text": "двадцатьпятое число",
+        "alias": "datetime",
+        "meta": "@datetime",
+        "userDefined": true
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 0
+  },
+  {
+    "id": "f993bf64-280b-4db8-ad89-931b388831ed",
+    "data": [
+      {
+        "text": "на ",
+        "userDefined": false
+      },
+      {
+        "text": "завтра",
+        "alias": "datetime",
+        "meta": "@datetime",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 0
+  },
+  {
+    "id": "7f1088ad-7563-4266-bd6d-cc1e66a95f25",
+    "data": [
+      {
+        "text": "кино",
+        "alias": "category",
+        "meta": "@category",
+        "userDefined": false
+      },
+      {
+        "text": " на ",
+        "userDefined": false
+      },
+      {
+        "text": "завтра",
+        "alias": "datetime",
+        "meta": "@datetime",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 0
+  },
+  {
+    "id": "7fdd2a4f-b172-47b6-b5eb-8d6e14af1bad",
+    "data": [
+      {
+        "text": "Покажи ",
+        "userDefined": false
+      },
+      {
+        "text": "спектакли",
+        "alias": "category",
+        "meta": "@category",
+        "userDefined": false
+      },
+      {
+        "text": " в ",
+        "userDefined": false
+      },
+      {
+        "text": "следующую неделю",
+        "alias": "datetime",
+        "meta": "@datetime",
+        "userDefined": true
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 0
+  },
+  {
+    "id": "81e9f2ae-624a-42fd-becb-8377ce4104ce",
+    "data": [
+      {
+        "text": "следующая неделя",
+        "alias": "datetime",
+        "meta": "@datetime",
+        "userDefined": true
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 0
+  },
+  {
+    "id": "ba9574c3-ece0-4ad8-b3ed-c737135e0e4a",
+    "data": [
+      {
+        "text": "что ",
+        "userDefined": false
+      },
+      {
+        "text": "завтра",
+        "alias": "datetime",
+        "meta": "@datetime",
+        "userDefined": true
+      },
+      {
+        "text": " в ",
+        "userDefined": false
+      },
+      {
+        "text": "кино",
+        "alias": "category",
+        "meta": "@category",
+        "userDefined": true
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 0
+  },
+  {
+    "id": "054aa987-0268-4908-b0c0-62c9c7ca2c0e",
+    "data": [
+      {
+        "text": "@category:category  на @datetime:datetime",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": true,
+    "count": 0
+  },
+  {
+    "id": "2956d62b-4f2e-4332-a026-95a40c0ad06f",
+    "data": [
+      {
+        "text": "Меня интересуют @category:category на @datetime:datetime",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": true,
+    "count": 0
+  },
+  {
+    "id": "0f86d243-d182-4fab-9e71-97d5ef03bc7e",
+    "data": [
+      {
+        "text": "Хочу сходить на ",
+        "userDefined": false
+      },
+      {
+        "text": "концерт",
+        "alias": "category",
+        "meta": "@category",
+        "userDefined": true
+      },
+      {
+        "text": "  ",
+        "userDefined": false
+      },
+      {
+        "text": "завтра",
+        "alias": "datetime",
+        "meta": "@datetime",
+        "userDefined": true
+      }
+    ],
+    "isTemplate": false,
+    "count": 0
+  },
+  {
+    "id": "f1bd12ca-0b2b-4623-8a48-57299a28e5ec",
+    "data": [
+      {
+        "text": "Хочу пойти в ",
+        "userDefined": false
+      },
+      {
+        "text": "кино",
+        "alias": "category",
+        "meta": "@category",
+        "userDefined": true
+      },
+      {
+        "text": " на ",
+        "userDefined": false
+      },
+      {
+        "text": "следующей неделе",
+        "alias": "datetime",
+        "meta": "@datetime",
+        "userDefined": true
+      }
+    ],
+    "isTemplate": false,
+    "count": 0
+  },
+  {
+    "id": "4a3f9e6a-f1cb-4849-88b0-8e93eaf676f2",
+    "data": [
+      {
+        "text": "Что ",
+        "userDefined": false
+      },
+      {
+        "text": "завтра",
+        "alias": "datetime",
+        "meta": "@datetime",
+        "userDefined": false
+      },
+      {
+        "text": " в ",
+        "userDefined": false
+      },
+      {
+        "text": "кино",
+        "alias": "category",
+        "meta": "@category",
+        "userDefined": true
+      },
+      {
+        "text": "?",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 0
+  },
+  {
+    "id": "22437981-a53c-4533-822f-84d89263d775",
+    "data": [
+      {
+        "text": "Что ",
+        "userDefined": false
+      },
+      {
+        "text": "завтра",
+        "alias": "datetime",
+        "meta": "@datetime",
+        "userDefined": false
+      },
+      {
+        "text": " в ",
+        "userDefined": false
+      },
+      {
+        "text": "афише",
+        "alias": "category",
+        "meta": "@category",
+        "userDefined": true
+      },
+      {
+        "text": "?",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 0
+  },
+  {
+    "id": "f56787de-d9e3-4d74-bf03-c5fb77236d04",
+    "data": [
+      {
+        "text": "Какие ",
+        "userDefined": false
+      },
+      {
+        "text": "сегодня",
+        "alias": "datetime",
+        "meta": "@datetime",
+        "userDefined": false
+      },
+      {
+        "text": " ",
+        "userDefined": false
+      },
+      {
+        "text": "фильмы",
+        "alias": "category",
+        "meta": "@category",
+        "userDefined": true
+      },
+      {
+        "text": "?",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 0
+  },
+  {
+    "id": "785785fc-aa9a-461e-afaf-614216f31256",
+    "data": [
+      {
+        "text": "Какие ",
+        "userDefined": false
+      },
+      {
+        "text": "завтра",
+        "alias": "datetime",
+        "meta": "@datetime",
+        "userDefined": false
+      },
+      {
+        "text": " ",
+        "userDefined": false
+      },
+      {
+        "text": "фильмы",
+        "alias": "category",
+        "meta": "@category",
+        "userDefined": true
+      },
+      {
+        "text": "?",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 0
+  },
+  {
+    "id": "186a807a-3255-4cce-868c-0ad427996ea9",
+    "data": [
+      {
+        "text": "Какие ",
+        "userDefined": false
+      },
+      {
+        "text": "фильмы",
+        "alias": "category",
+        "meta": "@category",
+        "userDefined": true
+      },
+      {
+        "text": " ",
+        "userDefined": false
+      },
+      {
+        "text": "завтра",
+        "alias": "datetime",
+        "meta": "@datetime",
+        "userDefined": false
+      },
+      {
+        "text": "?",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 0
+  },
+  {
+    "id": "fe07e6be-ddf3-4c4e-b6d4-4e2b25ecb818",
+    "data": [
+      {
+        "text": "Завтра",
+        "alias": "datetime",
+        "meta": "@datetime",
+        "userDefined": false
+      },
+      {
+        "text": " есть ",
+        "userDefined": false
+      },
+      {
+        "text": "фильмы",
+        "alias": "category",
+        "meta": "@category",
+        "userDefined": true
+      },
+      {
+        "text": "?",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 0
+  },
+  {
+    "id": "9e77952e-4cb2-417b-86ef-32622ee410b0",
+    "data": [
+      {
+        "text": "Что за ",
+        "userDefined": false
+      },
+      {
+        "text": "фильмы",
+        "alias": "category",
+        "meta": "@category",
+        "userDefined": true
+      },
+      {
+        "text": " ",
+        "userDefined": false
+      },
+      {
+        "text": "завтра",
+        "alias": "datetime",
+        "meta": "@datetime",
+        "userDefined": false
+      },
+      {
+        "text": "?",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 0
+  },
+  {
+    "id": "2ef09135-2ee1-4c58-a868-c19e839d4f4d",
+    "data": [
+      {
+        "text": "Какие ",
+        "userDefined": false
+      },
+      {
+        "text": "фильмы",
+        "alias": "category",
+        "meta": "@category",
+        "userDefined": true
+      },
+      {
+        "text": " будут на ",
+        "userDefined": false
+      },
+      {
+        "text": "следующей неделе",
+        "alias": "datetime",
+        "meta": "@datetime",
+        "userDefined": false
+      },
+      {
+        "text": "?",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1516184032
+  },
+  {
+    "id": "a14c5060-0140-4700-bbe6-73be1f49525f",
+    "data": [
+      {
+        "text": "Покажи ",
+        "userDefined": false
+      },
+      {
+        "text": "кино",
+        "alias": "category",
+        "meta": "@category",
+        "userDefined": true
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1516184032
+  },
+  {
+    "id": "394b2ad9-f17e-4452-bec0-ff540f10fd18",
+    "data": [
+      {
+        "text": "Покажи ",
+        "userDefined": false
+      },
+      {
+        "text": "фильмы",
+        "alias": "category",
+        "meta": "@category",
+        "userDefined": true
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1516184032
+  }
+]
