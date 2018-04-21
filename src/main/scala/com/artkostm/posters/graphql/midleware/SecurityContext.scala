@@ -1,5 +1,5 @@
 package com.artkostm.posters.graphql.midleware
 
-class SecurityContext {
+case class SecurityContext() {
 
 }
