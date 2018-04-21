@@ -2,6 +2,7 @@ package com.artkostm.posters.controllers
 
 import akka.actor.ActorSystem
 import com.artkostm.posters.graphql.TestSchema
+import com.artkostm.posters.graphql.midleware.{SecurityContext, TokenEnforcer}
 import com.artkostm.posters.model.{Category, Description, Event, Media}
 import com.artkostm.posters.repository.PostgresPostersRepository
 import com.google.inject.Inject
@@ -18,6 +19,10 @@ class GraphQlController @Inject() (repository: PostgresPostersRepository,
 
   private implicit val ec = system.dispatcher
 
+  get("/graphql") { request: GraphQlRequest =>
+    request
+  }
+
   post("/test") { request: GraphQlRequest =>
     QueryParser.parse(request.query) match {
       case Success(queryAst) => Executor.execute(
@@ -26,6 +31,7 @@ class GraphQlController @Inject() (repository: PostgresPostersRepository,
         new SimpleRepo,
         variables = scalaInput(request.variables.getOrElse(Map.empty)),
         operationName = request.operationName)
+        //middleware = TokenEnforcer :: Nil)
       case Failure(error: SyntaxError) => Future.failed(error)
     }
   }

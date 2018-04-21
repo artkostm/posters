@@ -39,7 +39,7 @@ class PostersServer extends HttpServer {
 class IllegalArgumentExceptionHandler @Inject() (response: ResponseBuilder)
   extends ExceptionMapper[Exception] {
   override def toResponse(request: Request, throwable: Exception): Response = {
-    response.badRequest(ErrorResponse("1", throwable.getMessage))
+    response.badRequest(ErrorResponse("400", throwable.getMessage))
   }
 }
 
