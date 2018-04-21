@@ -1,16 +1,26 @@
 package com.artkostm.posters.dialog
 
+import com.artkostm.posters.dialog.v1.{DialogflowRequest => DFRequestV1}
+import com.artkostm.posters.dialog.v2.{DialogflowRequest => DFRequestV2}
 import org.joda.time.{DateTime, Days}
 
 case class FlowKeyData(category: List[String], date: Option[DateTime], period: Option[String])
 
 trait FlowKeyDataExtractor {
-  def actionIncomplete(req: DialogflowRequest): Boolean = req.result.actionIncomplete
+  def actionIncomplete(req: DFRequestV1): Boolean = req.result.actionIncomplete
+  def actionIncomplete(req: DFRequestV2): Boolean = req.queryResult.allRequiredParamsPresent
 
-  def extract(request: DialogflowRequest): FlowKeyData = {
+  def extract(request: DFRequestV1): FlowKeyData = {
     val category = request.result.parameters.category
     val date = request.result.parameters.datetime.date
     val period = request.result.parameters.datetime.period
+    FlowKeyData(category, date, period)
+  }
+
+  def extract(request: DFRequestV2): FlowKeyData = {
+    val category = request.queryResult.parameters.category
+    val date = request.queryResult.parameters.datetime.date
+    val period = request.queryResult.parameters.datetime.period
     FlowKeyData(category, date, period)
   }
 
@@ -29,8 +39,9 @@ trait FlowKeyDataExtractor {
 object FlowKeyDataExtractor extends FlowKeyDataExtractor {
   private val allCategories = "Все"
 
-  def shouldShowAll(request: DialogflowRequest): Boolean = {
-    val category = request.result.parameters.category
-    category.size == 1 && category.contains(allCategories)
-  }
+  def shouldShowAll(request: DFRequestV1): Boolean = shouldShowAll(request.result.parameters.category)
+
+  def shouldShowAll(request: DFRequestV2): Boolean = shouldShowAll(request.queryResult.parameters.category)
+
+  private def shouldShowAll(categories: List[String]): Boolean = categories.size == 1 && categories.contains(allCategories)
 }
