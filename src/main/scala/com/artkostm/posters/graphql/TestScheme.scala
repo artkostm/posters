@@ -39,4 +39,8 @@ object TestSchema {
   ))
 
   val instance = Schema(QueryType)
+
+//  def main(args: Array[String]): Unit = {
+//    println(SchemaRenderer.renderSchema(instance))
+//  }
 }
