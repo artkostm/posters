@@ -3,6 +3,8 @@ package com.artkostm.posters.controllers
 import akka.actor.ActorSystem
 import com.artkostm.posters.ErrorResponse
 import com.artkostm.posters.dialog._
+import com.artkostm.posters.dialog.v1.{DialogflowResponse => DFResponseV1, ResponseData, DialogflowRequest => DFRequestV1}
+import com.artkostm.posters.dialog.v2.{ResponsePayload, DialogflowRequest => DFRequestV2, DialogflowResponse => DFResponseV2}
 import com.artkostm.posters.repository.PostgresPostersRepository
 import com.artkostm.posters.scraper.EventsScraper
 import com.google.inject.Inject
@@ -18,24 +20,48 @@ class DialogflowWebhook @Inject() (s: Swagger, repository: PostgresPostersReposi
 
   private implicit val ec = system.dispatcher
 
-  postWithDoc("/webhook/?")(webhookOp) { request: DialogflowRequest =>
+  postWithDoc("/webhook/v1/?")(webhookOpV1) { request: DFRequestV1 =>
     if (!FlowKeyDataExtractor.actionIncomplete(request))
       FlowKeyDataExtractor.extract(request) match {
         case FlowKeyData(categories, Some(date), _) =>
           if (FlowKeyDataExtractor.shouldShowAll(request)) repository.find(date).map {
             case Some(day) =>
-              DialogflowResponse("", ResponseData(day.categories), "posters")
+              DFResponseV1("", ResponseData(day.categories), "posters")
             case None =>
-              DialogflowResponse("", ResponseData(scraper.scheduleFor(date).events), "posters")
+              DFResponseV1("", ResponseData(scraper.scheduleFor(date).events), "posters")
           } else repository.findCategories(date, categories).map {
             case IndexedSeq() =>
-              DialogflowResponse("", ResponseData(scraper.scheduleFor(date).events.filter(cat => categories.contains(cat.name))), "posters")
+              DFResponseV1("", ResponseData(scraper.scheduleFor(date).events.filter(cat => categories.contains(cat.name))), "posters")
             case nonEmpty =>
-              DialogflowResponse("", ResponseData(nonEmpty.toList), "posters")
+              DFResponseV1("", ResponseData(nonEmpty.toList), "posters")
           }
         case FlowKeyData(categories, _, Some(period)) =>
           repository.findCategories(FlowKeyDataExtractor.getPeriod(period), categories).map { events =>
-            DialogflowResponse("", ResponseData(events.toList), "posters")
+            DFResponseV1("", ResponseData(events.toList), "posters")
+          }
+        case _ => Future.successful(response.badRequest(ErrorResponse("1", "cannot extract key data")))
+      }
+    else Future.successful(response.badRequest(ErrorResponse("1", "action is incomplete")))
+  }
+
+  postWithDoc("/webhook/v2/?")(webhookOpV2) { request: DFRequestV2 =>
+    if (!FlowKeyDataExtractor.actionIncomplete(request))
+      FlowKeyDataExtractor.extract(request) match {
+        case FlowKeyData(categories, Some(date), _) =>
+          if (FlowKeyDataExtractor.shouldShowAll(request)) repository.find(date).map {
+            case Some(day) =>
+              DFResponseV2("", ResponsePayload(day.categories), "posters")
+            case None =>
+              DFResponseV2("", ResponsePayload(scraper.scheduleFor(date).events), "posters")
+          } else repository.findCategories(date, categories).map {
+            case IndexedSeq() =>
+              DFResponseV2("", ResponsePayload(scraper.scheduleFor(date).events.filter(cat => categories.contains(cat.name))), "posters")
+            case nonEmpty =>
+              DFResponseV2("", ResponsePayload(nonEmpty.toList), "posters")
+          }
+        case FlowKeyData(categories, _, Some(period)) =>
+          repository.findCategories(FlowKeyDataExtractor.getPeriod(period), categories).map { events =>
+            DFResponseV2("", ResponsePayload(events.toList), "posters")
           }
         case _ => Future.successful(response.badRequest(ErrorResponse("1", "cannot extract key data")))
       }

@@ -1,4 +1,4 @@
-package com.artkostm.posters.dialog
+package com.artkostm.posters.dialog.v1
 
 import com.artkostm.posters.model.Category
 import org.joda.time.DateTime

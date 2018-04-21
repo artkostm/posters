@@ -1,6 +1,7 @@
 package com.artkostm.posters.controllers
 
-import com.artkostm.posters.dialog.{DialogflowRequest, DialogflowResponse, ResponseData}
+import com.artkostm.posters.dialog.v1.{DialogflowResponse => DFResponseV1, ResponseData, DialogflowRequest => DFRequestV1}
+import com.artkostm.posters.dialog.v2.{ResponsePayload, DialogflowRequest => DFRequestV2, DialogflowResponse => DFResponseV2}
 import com.artkostm.posters.model._
 import com.jakehschwartz.finatra.swagger.SwaggerController
 import io.swagger.models.Operation
@@ -69,17 +70,31 @@ trait IntentOperation { self: SwaggerController =>
 }
 
 trait DialogflowWebhookOperation { self: SwaggerController =>
-  def webhookOp(o: Operation): Operation =
+  def webhookOpV1(o: Operation): Operation =
     o.summary("Get all events by category name for the requested date")
       .description("Get all events by category name for the requested date.")
-      .tag("Dialogflow")
-      .request[DialogflowRequest]
+      .tag("DialogflowV1")
+      .request[DFRequestV1]
       .produces("application/json")
-      .responseWith[DialogflowResponse](200, "list of categories in dialog flow specific response",
-        example = Some(DialogflowResponse("speech", ResponseData(List(Category(
+      .responseWith[DFResponseV1](200, "list of categories in dialog flow specific response V1",
+        example = Some(DFResponseV1("speech", ResponseData(List(Category(
           "CategoryName", List(
             Event(Media(
               "event link", "image link"), "event name", Description("event description", Some("ticket link"), true)))))), "posters source")))
+      .responseWith(404, "events are not found")
+      .responseWith(400, "cannot extract key data from request or action is incomplete")
+
+  def webhookOpV2(o: Operation): Operation =
+    o.summary("Get all events by category name for the requested date")
+      .description("Get all events by category name for the requested date.")
+      .tag("DialogflowV2")
+      .request[DFRequestV2]
+      .produces("application/json")
+      .responseWith[DFResponseV2](200, "list of categories in dialog flow specific response V2",
+      example = Some(DFResponseV2("speech", ResponsePayload(List(Category(
+        "CategoryName", List(
+          Event(Media(
+            "event link", "image link"), "event name", Description("event description", Some("ticket link"), true)))))), "posters source")))
       .responseWith(404, "events are not found")
       .responseWith(400, "cannot extract key data from request or action is incomplete")
 }
