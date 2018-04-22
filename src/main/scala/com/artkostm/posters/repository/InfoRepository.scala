@@ -9,7 +9,7 @@ import scala.concurrent.{ExecutionContext, Future}
 trait InfoRepository extends InfoTable { this: JsonSupportDbComponent =>
   import driver.plainAPI._
 
-  def setUpInfo()(implicit ctx: ExecutionContext): Future[Unit] = db.run {
+  def setUpInfo()(implicit ctx: ExecutionContext) = {
     val createIfNotExist = MTable.getTables.flatMap(v => {
       val names = v.map(_.name.name)
       if (!names.contains(infoTableQuery.baseTableRow.tableName)) infoTableQuery.schema.create
