@@ -45,7 +45,6 @@ class DialogflowWebhook @Inject() (s: Swagger, repository: PostgresPostersReposi
   }
 
   postWithDoc("/webhook/v2/?")(webhookOpV2) { request: DFRequestV2 =>
-    logger.info(request.toString)
     if (!FlowKeyDataExtractor.actionIncomplete(request))
       FlowKeyDataExtractor.extract(request) match {
         case FlowKeyData(categories, Some(date), _, _) =>

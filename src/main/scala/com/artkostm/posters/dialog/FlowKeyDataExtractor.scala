@@ -14,7 +14,7 @@ trait FlowKeyDataExtractor {
   def actionIncomplete(req: DFRequestV2): Boolean = !req.queryResult.allRequiredParamsPresent
 
   def extract(request: DFRequestV1): FlowKeyData = {
-    val category = request.result.parameters.category.map(URLDecoder.decode(_, StandardCharsets.UTF_8.name()))
+    val category = request.result.parameters.category
     val date = request.result.parameters.datetime.date
     val period = request.result.parameters.datetime.period
     FlowKeyData(category, date, period, None)
