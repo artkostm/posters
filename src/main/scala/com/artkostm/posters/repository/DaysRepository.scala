@@ -12,7 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 trait DaysRepository extends EventsDayTable { this: JsonSupportDbComponent =>
   import driver.plainAPI._
 
-  def setUpDays()(implicit ctx: ExecutionContext): Future[Unit] = db.run {
+  def setUpDays()(implicit ctx: ExecutionContext)= {
     val createIfNotExist = MTable.getTables.flatMap(v => {
       val names = v.map(_.name.name)
       if (!names.contains(daysTableQuery.baseTableRow.tableName)) daysTableQuery.schema.create
