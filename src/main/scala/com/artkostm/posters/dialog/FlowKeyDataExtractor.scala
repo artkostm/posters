@@ -1,10 +1,13 @@
 package com.artkostm.posters.dialog
 
+import java.net.{URI, URLDecoder, URLEncoder}
+import java.nio.charset.StandardCharsets
+
 import com.artkostm.posters.dialog.v1.{DialogflowRequest => DFRequestV1}
-import com.artkostm.posters.dialog.v2.{DialogflowRequest => DFRequestV2}
+import com.artkostm.posters.dialog.v2.{Period, DialogflowRequest => DFRequestV2}
 import org.joda.time.{DateTime, Days}
 
-case class FlowKeyData(category: List[String], date: Option[DateTime], period: Option[String])
+case class FlowKeyData(category: List[String], date: Option[DateTime], period: Option[String], range: Option[Period])
 
 trait FlowKeyDataExtractor {
   def actionIncomplete(req: DFRequestV1): Boolean = req.result.actionIncomplete
@@ -14,14 +17,14 @@ trait FlowKeyDataExtractor {
     val category = request.result.parameters.category
     val date = request.result.parameters.datetime.date
     val period = request.result.parameters.datetime.period
-    FlowKeyData(category, date, period)
+    FlowKeyData(category, date, period, None)
   }
 
   def extract(request: DFRequestV2): FlowKeyData = {
     val category = request.queryResult.parameters.category
     val date = request.queryResult.parameters.datetime.date
     val period = request.queryResult.parameters.datetime.period
-    FlowKeyData(category, date, period)
+    FlowKeyData(category, date, None, period)
   }
 
   // period in the format yyyy-mm-dd/yyyy-mm-dd
@@ -34,6 +37,9 @@ trait FlowKeyDataExtractor {
       case _ => throw new IllegalArgumentException ("Invalid period format")
     }
   }
+
+  def getPeriod(period: Period): List[DateTime] =
+    (0 to Days.daysBetween(period.startDate, period.endDate).getDays).map(period.startDate.plusDays(_)).toList
 }
 
 object FlowKeyDataExtractor extends FlowKeyDataExtractor {

@@ -23,7 +23,7 @@ class DialogflowWebhook @Inject() (s: Swagger, repository: PostgresPostersReposi
   postWithDoc("/webhook/v1/?")(webhookOpV1) { request: DFRequestV1 =>
     if (!FlowKeyDataExtractor.actionIncomplete(request))
       FlowKeyDataExtractor.extract(request) match {
-        case FlowKeyData(categories, Some(date), _) =>
+        case FlowKeyData(categories, Some(date), _, _) =>
           if (FlowKeyDataExtractor.shouldShowAll(request)) repository.find(date).map {
             case Some(day) =>
               DFResponseV1("", ResponseData(day.categories), "posters")
@@ -35,7 +35,7 @@ class DialogflowWebhook @Inject() (s: Swagger, repository: PostgresPostersReposi
             case nonEmpty =>
               DFResponseV1("", ResponseData(nonEmpty.toList), "posters")
           }
-        case FlowKeyData(categories, _, Some(period)) =>
+        case FlowKeyData(categories, _, Some(period), _) =>
           repository.findCategories(FlowKeyDataExtractor.getPeriod(period), categories).map { events =>
             DFResponseV1("", ResponseData(events.toList), "posters")
           }
@@ -47,7 +47,7 @@ class DialogflowWebhook @Inject() (s: Swagger, repository: PostgresPostersReposi
   postWithDoc("/webhook/v2/?")(webhookOpV2) { request: DFRequestV2 =>
     if (!FlowKeyDataExtractor.actionIncomplete(request))
       FlowKeyDataExtractor.extract(request) match {
-        case FlowKeyData(categories, Some(date), _) =>
+        case FlowKeyData(categories, Some(date), _, _) =>
           if (FlowKeyDataExtractor.shouldShowAll(request)) repository.find(date).map {
             case Some(day) =>
               DFResponseV2("", ResponsePayload(day.categories), "posters")
@@ -59,7 +59,7 @@ class DialogflowWebhook @Inject() (s: Swagger, repository: PostgresPostersReposi
             case nonEmpty =>
               DFResponseV2("", ResponsePayload(nonEmpty.toList), "posters")
           }
-        case FlowKeyData(categories, _, Some(period)) =>
+        case FlowKeyData(categories, _, _, Some(period)) =>
           repository.findCategories(FlowKeyDataExtractor.getPeriod(period), categories).map { events =>
             DFResponseV2("", ResponsePayload(events.toList), "posters")
           }
