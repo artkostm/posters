@@ -10,7 +10,7 @@ import scala.concurrent.{ExecutionContext, Future}
 trait AssignRepository extends AssignTable { this: DbComponent =>
   import driver.api._
 
-  def setUpAssign()(implicit ctx: ExecutionContext): Future[Unit] = db.run {
+  def setUpAssign()(implicit ctx: ExecutionContext) = {
     val createIfNotExist = MTable.getTables.flatMap(v => {
       val names = v.map(_.name.name)
       if (!names.contains(assigneesTableQuery.baseTableRow.tableName)) assigneesTableQuery.schema.create
