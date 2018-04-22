@@ -28,11 +28,10 @@ trait PostgresPostersRepository extends AssignRepository
                                     with InfoRepository
                                     with JsonSupportDbComponent {
   import driver.api._
-  def setUp()(implicit ec: ExecutionContext): Future[List[Any]] = Future.sequence(List(setUpAssign(), setUpDays(), setUpInfo(),
-    db.run(
-      sqlu"""
+  def setUp()(implicit ec: ExecutionContext) =
+    db.run((setUpAssign >> setUpDays >> setUpInfo >> sqlu"""
             DELETE FROM info WHERE NOT EXISTS (SELECT * FROM days WHERE categories::jsonb::text LIKE '%' || info.link || '%')
-          """)))
+          """).transactionally)
 }
 
 class PostersRepository @Inject() (ds: DataSource) extends PostgresPostersRepository {
