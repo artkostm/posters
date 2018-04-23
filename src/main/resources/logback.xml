@@ -37,6 +37,9 @@
     <logger name="com.twitter" level="info"/>
     <logger name="com.artkostm.posters" level="debug"/>
 
+    <!-- Slick Config to see the generated sql -->
+    <logger name="slick.basic.BasicBackend.action" level="DEBUG" />
+
     <!-- Root Config -->
     <root level="${log_level:-INFO}">
         <appender-ref ref="ASYNC-SERVICE"/>
