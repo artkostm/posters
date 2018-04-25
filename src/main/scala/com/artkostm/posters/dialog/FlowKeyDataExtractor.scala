@@ -28,18 +28,16 @@ trait FlowKeyDataExtractor {
   }
 
   // period in the format yyyy-mm-dd/yyyy-mm-dd
-  def getPeriod(period: String): List[DateTime] = {
+  def getPeriod(period: String): (DateTime, DateTime) = {
     period.split("/") match {
       case Array(start, end) =>
-        val startDate = DateTime.parse(start)
-        val endDate = DateTime.parse(end)
-        (0 to Days.daysBetween(startDate, endDate).getDays).map(startDate.plusDays(_)).toList
+        (DateTime.parse(start).withTimeAtStartOfDay(), DateTime.parse(end).withTimeAtStartOfDay())
       case _ => throw new IllegalArgumentException ("Invalid period format")
     }
   }
 
-  def getPeriod(period: Period): List[DateTime] =
-    (0 to Days.daysBetween(period.startDate, period.endDate).getDays).map(period.startDate.plusDays(_)).toList
+  def getPeriod(period: Period): (DateTime, DateTime) =
+    (period.startDate.withTimeAtStartOfDay(), period.endDate.withTimeAtStartOfDay())
 }
 
 object FlowKeyDataExtractor extends FlowKeyDataExtractor {
