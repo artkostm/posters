@@ -36,7 +36,8 @@ class DialogflowWebhook @Inject() (s: Swagger, repository: PostgresPostersReposi
               DFResponseV1("", ResponseData(nonEmpty.toList), "posters")
           }
         case FlowKeyData(categories, _, Some(period), _) =>
-          repository.findCategories(FlowKeyDataExtractor.getPeriod(period), categories).map { events =>
+          val (startDate, endDate) = FlowKeyDataExtractor.getPeriod(period)
+          repository.findCategories(startDate, endDate, categories).map { events =>
             DFResponseV1("", ResponseData(events.toList), "posters")
           }
         case _ => Future.successful(response.badRequest(ErrorResponse("1", "cannot extract key data")))
@@ -60,7 +61,8 @@ class DialogflowWebhook @Inject() (s: Swagger, repository: PostgresPostersReposi
               DFResponseV2("", ResponsePayload(nonEmpty.toList), "posters")
           }
         case FlowKeyData(categories, _, _, Some(period)) =>
-          repository.findCategories(FlowKeyDataExtractor.getPeriod(period), categories).map { events =>
+          val (startDate, endDate) = FlowKeyDataExtractor.getPeriod(period)
+          repository.findCategories(startDate, endDate, categories).map { events =>
             DFResponseV2("", ResponsePayload(events.toList), "posters")
           }
         case _ => Future.successful(response.badRequest(ErrorResponse("1", "cannot extract key data")))
