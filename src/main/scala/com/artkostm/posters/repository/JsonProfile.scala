@@ -7,6 +7,7 @@ import com.github.tminglei.slickpg.utils.SimpleArrayUtils
 import org.joda.time.DateTime
 import play.api.libs.json.{JsValue, Json}
 import slick.jdbc.PostgresProfile
+import play.api.libs.json._
 
 trait JsonSupportPostgresProfile extends PostgresProfile
                                with PgPlayJsonSupport
@@ -30,6 +31,7 @@ trait JsonSupportPostgresProfile extends PostgresProfile
     implicit val dateTime2SqlTimestampMapper = MappedColumnType.base[DateTime, java.sql.Timestamp](
       date => new java.sql.Timestamp(date.toDate.getTime),
       sqlTimestamp => new DateTime(sqlTimestamp.getTime()))
+    implicit val strListTypeMapper = new SimpleArrayJdbcType[String]("text").to(_.toList)
   }
 }
 
