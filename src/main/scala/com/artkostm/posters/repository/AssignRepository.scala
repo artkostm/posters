@@ -31,17 +31,15 @@ trait AssignRepository extends AssignTable with DBSetupOps { self: HasDatabaseCo
   def setUpAssign()(implicit ctx: ExecutionContext) =
     setUp(Assignees, Assignees.filter(event => event.date < DateTime.now.minusDays(1)).delete)
 
-  def save(assign: Assign) = db.run(
-    Assignees.insertOrUpdate(assign.copy(date = assign.date.withTimeAtStartOfDay())).transactionally
-  )
+  def saveAssign(assign: Assign) =
+    db.run(Assignees.insertOrUpdate(assign.copy(date = assign.date.withTimeAtStartOfDay())).transactionally)
 
-  def all: Future[List[Assign]] = db.run(Assignees.to[List].result)
+  def allAssignees: Future[List[Assign]] = db.run(Assignees.to[List].result)
 
-  def find(category: String, date: DateTime, eventName: String): Future[Option[Assign]] = db.run {
-    Assignees.filter(a =>
+  def findAssign(category: String, date: DateTime, eventName: String): Future[Option[Assign]] =
+    db.run { Assignees.filter(a =>
       a.category === category
         && a.eventName === eventName
         && a.date === date.withTimeAtStartOfDay()
-    ).result.headOption
-  }
+    ).result.headOption }
 }
