@@ -32,6 +32,7 @@ trait JsonSupportPostgresProfile extends PostgresProfile
       date => new java.sql.Timestamp(date.toDate.getTime),
       sqlTimestamp => new DateTime(sqlTimestamp.getTime()))
     implicit val strListTypeMapper = new SimpleArrayJdbcType[String]("text").to(_.toList)
+    import com.artkostm.posters.model.Testdd._
     implicit val testJsonTypeMapper = MappedJdbcType.base[Test, JsValue](Json.toJson(_), _.as[Test])
   }
 }
