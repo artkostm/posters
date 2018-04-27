@@ -18,18 +18,17 @@ trait InfoTable { self: HasDatabaseConfig[PostersPgProfile] =>
     def pk = primaryKey("pk_info", link)
   }
 
-  protected val Info = TableQuery[Information]
+  protected val Information = TableQuery[Information]
 }
 
 trait InfoRepository extends InfoTable with DBSetupOps { self: HasDatabaseConfig[PostersPgProfile] =>
   import profile.api._
 
   def setUpInfo()(implicit ctx: ExecutionContext) =
-    setUp(Info, DBIOAction.successful())
+    setUp(Information, DBIOAction.successful())
 
-  def save(info: Info): Future[Int] = db.run(Info.insertOrUpdate(info))
+  def save(info: Info): Future[Int] = db.run(Information.insertOrUpdate(info))
 
-  def find(link: String): Future[Option[Info]] = db.run {
-    Info.filter(i => i.link === link).result.headOption
-  }
+  def find(link: String): Future[Option[Info]] =
+    db.run(Information.filter(i => i.link === link).result.headOption)
 }
