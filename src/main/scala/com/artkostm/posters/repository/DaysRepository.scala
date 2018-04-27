@@ -30,9 +30,9 @@ trait DaysRepository extends EventsDayTable with DBSetupOps { self: HasDatabaseC
   def setUpDays()(implicit ctx: ExecutionContext) =
     setUp(Days, Days.filter(day => day.date < DateTime.now.minusDays(1)).delete)
 
-  def save(day: EventsDay): Future[Int] = db.run(Days.insertOrUpdate(day.copy(date = day.date.withTimeAtStartOfDay())))
+  def saveDay(day: EventsDay): Future[Int] = db.run(Days.insertOrUpdate(day.copy(date = day.date.withTimeAtStartOfDay())))
 
-  def find(date: DateTime): Future[Option[EventsDay]] =
+  def findDay(date: DateTime): Future[Option[EventsDay]] =
     db.run(Days.filter(d => d.date === date.withTimeAtStartOfDay()).result.headOption)
 
   import Category._

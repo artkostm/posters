@@ -27,8 +27,8 @@ trait InfoRepository extends InfoTable with DBSetupOps { self: HasDatabaseConfig
   def setUpInfo()(implicit ctx: ExecutionContext) =
     setUp(Information, DBIOAction.successful())
 
-  def save(info: Info): Future[Int] = db.run(Information.insertOrUpdate(info))
+  def saveInfo(info: Info): Future[Int] = db.run(Information.insertOrUpdate(info))
 
-  def find(link: String): Future[Option[Info]] =
+  def findInfo(link: String): Future[Option[Info]] =
     db.run(Information.filter(i => i.link === link).result.headOption)
 }
