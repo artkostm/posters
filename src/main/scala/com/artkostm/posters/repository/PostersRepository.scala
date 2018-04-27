@@ -12,6 +12,7 @@ trait PostgresPostersRepository extends AssignRepository
                                     with TestRepo
                                     with JsonSupportDbComponent {
   import driver.api._
+
   def setUp()(implicit ec: ExecutionContext) =
     db.run((setUpAssign >> setUpDays >> setUpInfo >> sqlu"""
             DELETE FROM info WHERE NOT EXISTS (SELECT * FROM days WHERE categories::jsonb::text LIKE '%' || info.link || '%')
