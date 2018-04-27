@@ -10,13 +10,16 @@ trait PostersPgProfile extends ExPostgresProfile
 
   override def pgjson: String = "jsonb"
 
-  override val api: API = new API
+  override val api = new API
     with ArrayImplicits
     with DateTimeImplicits
     with PlayJsonImplicits {
+
     implicit val dateTime2SqlTimestampMapper = MappedColumnType.base[DateTime, java.sql.Timestamp](
       date => new java.sql.Timestamp(date.toDate.getTime),
       sqlTimestamp => new DateTime(sqlTimestamp.getTime()))
+
+    implicit val strListTypeMapper = new SimpleArrayJdbcType[String]("text").to(_.toList)
   }
 }
 
