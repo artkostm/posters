@@ -15,8 +15,15 @@ case class Info(link: String, eventInfo: EventInfo)
 
 case class Test(id: String, data: JsValue)
 
+object Testdd {
+  import play.api.libs.json._
+
+  implicit val testFmt = Json.format[Test]
+  implicit val testWrt = Json.writes[Test]
+}
+
 trait TestTable { this: JsonSupportDbComponent =>
-  import driver.api._
+  import profile.api._
 
   class Tests(tag: Tag) extends Table[Test](tag, "test") {
     def id: Rep[String] = column[String]("id")
