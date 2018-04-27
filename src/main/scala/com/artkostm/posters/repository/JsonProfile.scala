@@ -1,6 +1,6 @@
 package com.artkostm.posters.repository
 
-import com.artkostm.posters.model.{Category, EventInfo}
+import com.artkostm.posters.model.{Category, EventInfo, Test}
 import com.github.tminglei.slickpg.PgPlayJsonSupport
 import com.github.tminglei.slickpg.array.PgArrayJdbcTypes
 import com.github.tminglei.slickpg.utils.SimpleArrayUtils
@@ -15,7 +15,7 @@ trait JsonSupportPostgresProfile extends PostgresProfile
 
   override def pgjson = "jsonb"
 
-  override val api: API = new PostersDBAPI {}
+  override val api: PostersDBAPI = new PostersDBAPI {}
 
   val plainAPI = new PostersDBAPI with PlayJsonPlainImplicits
 
@@ -32,6 +32,7 @@ trait JsonSupportPostgresProfile extends PostgresProfile
       date => new java.sql.Timestamp(date.toDate.getTime),
       sqlTimestamp => new DateTime(sqlTimestamp.getTime()))
     implicit val strListTypeMapper = new SimpleArrayJdbcType[String]("text").to(_.toList)
+    implicit val testJsonTypeMapper = MappedJdbcType.base[Test, JsValue](Json.toJson(_), _.as[Test])
   }
 }
 
