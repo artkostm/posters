@@ -84,8 +84,8 @@ trait TestRepo extends TestTable {
   def test(names: List[String]) = {
 
     val q = for {
-      data <- testQuery.filter(_.id === "kk").groupBy(_.id).map { case (id, ts) => (id, ts.map(_.data.arrayElements)) }
-      q <- testQuery if q.id === "kk"
+      data <- testQuery.filter(_.id === "kkk").map(t => (t.id, t.data.arrayElements))
+      x <- testQuery if x.id === data._1 && ((data._2.+>>("name")) inSet names)
     } yield data
 
     q.result.statements.foreach(println)
