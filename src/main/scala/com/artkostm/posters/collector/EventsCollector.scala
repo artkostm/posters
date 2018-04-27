@@ -36,10 +36,10 @@ class EventsCollector @Inject()(scraper: EventsScraper, repository: PostgresPost
     val out = Sink.ignore
     val bcast = builder.add(Broadcast[Day](2))
 
-    val saveDayFlow = Flow[Day].map(day => EventsDay(new DateTime(day.date), day.events)).mapAsyncUnordered(5)(repository.save)
+    val saveDayFlow = Flow[Day].map(day => EventsDay(new DateTime(day.date), day.events)).mapAsyncUnordered(5)(repository.saveDay)
 
     val saveInfoFlow = Flow[Option[Info]].mapAsyncUnordered(5) {
-      case Some(info) => repository.save(info)
+      case Some(info) => repository.saveInfo(info)
       case None => Future.failed(new RuntimeException)
     }
 

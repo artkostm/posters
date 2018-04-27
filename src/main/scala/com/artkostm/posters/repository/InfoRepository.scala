@@ -1,26 +1,34 @@
 package com.artkostm.posters.repository
 
-import com.artkostm.posters.model.{Info, InfoTable}
+import com.artkostm.posters.model.{EventInfo, Info}
+import com.artkostm.posters.repository.util.DBSetupOps
 import slick.dbio.DBIOAction
-import slick.jdbc.meta.MTable
+import slick.lifted.ProvenShape
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait InfoRepository extends InfoTable { this: JsonSupportDbComponent =>
-  import driver.plainAPI._
+trait InfoTable { self: HasDatabaseConfig[PostersPgProfile] =>
+  import profile.api._
 
-  def setUpInfo()(implicit ctx: ExecutionContext) = {
-    val createIfNotExist = MTable.getTables.flatMap(v => {
-      val names = v.map(_.name.name)
-      if (!names.contains(infoTableQuery.baseTableRow.tableName)) infoTableQuery.schema.create
-      else DBIOAction.successful()
-    })
-    DBIO.seq(createIfNotExist)
+  private[InfoTable] class Information(tag: Tag) extends Table[Info](tag, "info") {
+    def link: Rep[String] = column[String]("link")
+    def eventsInfo: Rep[EventInfo] = column[EventInfo]("eventsInfo")
+
+    def * : ProvenShape[Info] = (link, eventsInfo) <> (Info.tupled, Info.unapply)
+    def pk = primaryKey("pk_info", link)
   }
 
-  def save(info: Info): Future[Int] = db.run(infoTableQuery.insertOrUpdate(info))
+  protected val Information = TableQuery[Information]
+}
 
-  def find(link: String): Future[Option[Info]] = db.run {
-    infoTableQuery.filter(i => i.link === link).result.headOption
-  }
+trait InfoRepository extends InfoTable with DBSetupOps { self: HasDatabaseConfig[PostersPgProfile] =>
+  import profile.api._
+
+  def setUpInfo()(implicit ctx: ExecutionContext) =
+    setUp(Information, DBIOAction.successful())
+
+  def saveInfo(info: Info): Future[Int] = db.run(Information.insertOrUpdate(info))
+
+  def findInfo(link: String): Future[Option[Info]] =
+    db.run(Information.filter(i => i.link === link).result.headOption)
 }

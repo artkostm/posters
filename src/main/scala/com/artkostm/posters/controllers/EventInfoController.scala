@@ -15,7 +15,7 @@ class EventInfoController @Inject() (s: Swagger, repository: PostgresPostersRepo
   private implicit val ec = system.dispatcher
 
   getWithDoc("/info/?")(eventInfoByLinkOp) { request: EventInfoRequest =>
-    repository.find(request.link)
+    repository.findInfo(request.link)
   }
 }
 
