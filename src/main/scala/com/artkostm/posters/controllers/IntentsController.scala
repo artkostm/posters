@@ -17,11 +17,11 @@ class IntentsController @Inject() (s: Swagger, repository: PostgresPostersReposi
   private implicit val ec = system.dispatcher
 
   postWithDoc("/intents/?")(saveIntentOp) { request: Assign =>
-    repository.save(request).map(Added)
+    repository.saveAssign(request).map(Added)
   }
 
   getWithDoc("/intents/?")(getIntentOp) { request: AssigneeRequest =>
-    repository.find(request.category, request.date, request.name)
+    repository.findAssign(request.category, request.date, request.name)
   }
 }
 

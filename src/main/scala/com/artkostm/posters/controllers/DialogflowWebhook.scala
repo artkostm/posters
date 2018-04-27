@@ -24,7 +24,7 @@ class DialogflowWebhook @Inject() (s: Swagger, repository: PostgresPostersReposi
     if (!FlowKeyDataExtractor.actionIncomplete(request))
       FlowKeyDataExtractor.extract(request) match {
         case FlowKeyData(categories, Some(date), _, _) =>
-          if (FlowKeyDataExtractor.shouldShowAll(request)) repository.find(date).map {
+          if (FlowKeyDataExtractor.shouldShowAll(request)) repository.findDay(date).map {
             case Some(day) =>
               DFResponseV1("", ResponseData(day.categories), "posters")
             case None =>
@@ -49,7 +49,7 @@ class DialogflowWebhook @Inject() (s: Swagger, repository: PostgresPostersReposi
     if (!FlowKeyDataExtractor.actionIncomplete(request))
       FlowKeyDataExtractor.extract(request) match {
         case FlowKeyData(categories, Some(date), _, _) =>
-          if (FlowKeyDataExtractor.shouldShowAll(request)) repository.find(date).map {
+          if (FlowKeyDataExtractor.shouldShowAll(request)) repository.findDay(date).map {
             case Some(day) =>
               DFResponseV2("", ResponsePayload(day.categories), "posters")
             case None =>
