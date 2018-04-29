@@ -2,7 +2,7 @@ import sbt._
 
 object Dependencies {
   lazy val versions = new {
-    val finatra  = "18.1.0"
+    val finatra  = "18.4.0"
     val logback  = "1.2.3"
     val scraper  = "2.0.0"
     val akka     = "2.5.6"
@@ -10,8 +10,7 @@ object Dependencies {
     val slick_pg = "0.16.1"
     val hikaricp = "3.2.3"
     val postgres = "9.4.1208"
-    val swagger = "0.7.2"
-    val finatra_swagger  = "17.11.0"
+    val finatra_swagger  = "18.4.0"
     val sangria = "1.4.0"
   }
 
