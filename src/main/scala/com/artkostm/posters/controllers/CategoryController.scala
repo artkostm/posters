@@ -27,8 +27,8 @@ class CategoryController @Inject()(s: Swagger, repository: PostgresPostersReposi
 
   getWithDoc("/posters/?")(eventsByCategoryNameOp) { request: WithNameAndDate =>
     repository.findCategory(request.date, request.name).map {
-      case Some(category) => category
-      case _ => scraper.scheduleFor(request.date).events.filter(_.name.equalsIgnoreCase(request.name)).headOption
+      case res @ Some(_) => res
+      case _ => scraper.scheduleFor(request.date).events.find(_.name.equalsIgnoreCase(request.name))
     }
   }
 }
