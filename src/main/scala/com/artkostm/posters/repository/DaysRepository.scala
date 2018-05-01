@@ -3,8 +3,7 @@ package com.artkostm.posters.repository
 import com.artkostm.posters.model._
 import com.artkostm.posters.repository.util.DBSetupOps
 import org.joda.time.DateTime
-import play.api.libs.json.Json
-import slick.jdbc.{GetResult, PositionedParameters, SQLActionBuilder, SetParameter}
+import play.api.libs.json.JsValue
 import slick.lifted.ProvenShape
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -14,7 +13,7 @@ trait EventsDayTable { self: HasDatabaseConfig[PostersPgProfile] =>
 
   private[EventsDayTable] class Days(tag: Tag) extends Table[EventsDay](tag, "days") {
     def date: Rep[DateTime] = column[DateTime]("date")
-    def categories: Rep[List[Category]] = column[List[Category]]("categories")
+    def categories: Rep[JsValue] = column[JsValue]("categories")
 
     def * : ProvenShape[EventsDay] = (date, categories) <> (EventsDay.tupled, EventsDay.unapply)
     def pk = primaryKey("pk_days", date)
@@ -32,64 +31,36 @@ trait DaysRepository extends EventsDayTable with DBSetupOps { self: HasDatabaseC
 
   def saveDay(day: EventsDay): Future[Int] = db.run(Days.insertOrUpdate(day.copy(date = day.date.withTimeAtStartOfDay())))
 
-  def findDay(date: DateTime): Future[Option[EventsDay]] =
-    db.run(Days.filter(d => d.date === date.withTimeAtStartOfDay()).result.headOption)
+  def findDay(date: DateTime): Future[Option[Day]] =
+    db.run(Days.filter(d => d.date === date.withTimeAtStartOfDay()).result.headOption.map(_.map(ed => Day(Category.toCategoryList(ed.categories), ed.date))))
 
-  import Category._
-
-  implicit val GetDateTime = GetResult[DateTime](r => new DateTime(r.nextTimestamp()))
-  implicit val GetCategory = GetResult[Category](r => Json.parse(r.nextString()).as[Category])
-  implicit val SetDateTime = SetParameter[DateTime]((dt: DateTime, pp: PositionedParameters) => pp.setTimestamp(new java.sql.Timestamp(dt.toDate.getTime)))
-
-  def findCategory(date: DateTime, name: String): Future[Option[Category]] = db.run(
-    sql"""
-         SELECT obj FROM days d, jsonb_array_elements(d.categories) obj WHERE date = ${date.withTimeAtStartOfDay()} AND obj->>'name' = $name
-       """.as[Category].headOption)
-
-  private def concat(a: SQLActionBuilder, b: SQLActionBuilder): SQLActionBuilder = {
-    SQLActionBuilder(a.queryParts ++ b.queryParts, (p: Unit, pp: PositionedParameters) => {
-      a.unitPConv.apply(p, pp)
-      b.unitPConv.apply(p, pp)
-    })
+  def findCategory(date: DateTime, name: String)(implicit ctx: ExecutionContext): Future[Option[Category]] =
+    db.run {
+      val filteredByDate = Days.filter(_.date === date.withTimeAtStartOfDay())
+      val category = for {
+        data <- filteredByDate.map(t => (t.date, t.categories.arrayElements))
+        _ <- filteredByDate if data._2 +>> "name" === name
+      } yield data._2
+      category.result.headOption.map(_.map(Category.toCategory))
   }
 
-  private def values[T](xs: TraversableOnce[T])(implicit sp: SetParameter[T]): SQLActionBuilder = {
-    var b = sql"("
-    var first = true
-    xs.foreach { x =>
-      if (first) first = false
-      else b = concat(b, sql",")
-      b = concat(b, sql"$x")
-    }
-    concat(b, sql")")
+  def findCategories(date: DateTime, names: List[String])(implicit ctx: ExecutionContext): Future[Seq[Category]] =
+    db.run {
+      val filteredByDate = Days.filter(_.date === date.withTimeAtStartOfDay())
+      val category = for {
+        data <- filteredByDate.map(t => (t.date, t.categories.arrayElements))
+        _ <- filteredByDate if data._2 +>> "name" inSetBind names
+      } yield data._2
+      category.result.map(jsons => jsons.map(Category.toCategory))
   }
 
-  def findCategories(date: DateTime, names: List[String]): Future[Vector[Category]] = db.run(
-    concat(
-      sql"""
-         SELECT obj FROM days d, jsonb_array_elements(d.categories) obj WHERE date = ${date.withTimeAtStartOfDay()} AND obj->>'name' IN
-       """, values(names)).as[Category])
-
-  def findCategories(startDate: DateTime, endDate: DateTime, names: List[String]): Future[Vector[Category]] = db.run(
-    concat(sql"""
-         SELECT obj FROM days d, jsonb_array_elements(d.categories) obj WHERE date >= $startDate AND date <= $endDate
-       """, concat(sql""" AND obj->>'name' IN """, values(names))).as[Category])
-}
-
-trait TestRepo extends TestTable {
-  this: JsonSupportDbComponent =>
-
-  import driver.api._
-
-  def test(names: List[String]) = {
-
-    val q = for {
-      data <- testQuery.filter(_.id === "kkk").map(t => (t.id, t.data.arrayElements))
-      x <- testQuery if x.id === data._1 && ((data._2.+>>("name")) inSet names)
-    } yield data
-
-    q.result.statements.foreach(println)
-    null
+  def findCategories(startDate: DateTime, endDate: DateTime, names: List[String])(implicit ctx: ExecutionContext): Future[Seq[Category]] =
+    db.run {
+      val filteredByDate = Days.filter(r => r.date >= startDate && r.date <= endDate)
+      val category = for {
+        data <- filteredByDate.map(t => (t.date, t.categories.arrayElements))
+        _ <- filteredByDate if data._2 +>> "name" inSetBind names
+      } yield data._2
+      category.result.map(_.map(Category.toCategory))
   }
-
 }
