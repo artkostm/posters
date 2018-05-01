@@ -24,6 +24,6 @@ case class Status(code: Int, errorType: String, webhookTimedOut: Boolean)
 
 case class DialogflowRequest(id: String, lang: String, result: Result, status: Status, sessionId: String)
 
-case class ResponseData(categories: List[Category])
+case class ResponseData(categories: Seq[Category])
 
 case class DialogflowResponse(speech: String, data: ResponseData, source: String)

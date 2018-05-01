@@ -24,6 +24,6 @@ case class DialogflowRequest(responseId: String, queryResult: QueryResult, origi
                              session: String)
 
 // for response
-case class ResponsePayload(categories: List[Category])
+case class ResponsePayload(categories: Seq[Category])
 
 case class DialogflowResponse(fulfillmentText: String, payload: ResponsePayload, source: String)
