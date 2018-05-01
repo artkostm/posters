@@ -20,7 +20,7 @@ class CategoryController @Inject()(s: Swagger, repository: PostgresPostersReposi
 
   getWithDoc("/posters/:date/?")(allDayOfEventsOp) { request: WithDate =>
     repository.findDay(request.date).map {
-      case Some(EventsDay(_, categories)) => categories
+      case Some(Day(categories, _)) => categories
       case _ => scraper.scheduleFor(request.date).events
     }
   }
