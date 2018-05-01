@@ -46,6 +46,6 @@ object DbModule extends TwitterModule {
 
   override def singletonShutdown(injector: Injector): Unit = {
     implicit val ec = injector.instance[ActorSystem].dispatcher
-    injector.instance[PostgresPostersRepository].db.close
+    injector.instance[PostgresPostersRepository].close()
   }
 }
