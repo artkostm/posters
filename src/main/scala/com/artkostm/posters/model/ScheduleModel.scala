@@ -2,13 +2,15 @@ package com.artkostm.posters.model
 
 import java.util.Date
 
+import org.joda.time.DateTime
+
 case class Media(link: String, img: String)
 case class Description(desc: String, ticket: Option[String], isFree: Boolean)
 case class Event(media: Media, name: String, description: Description)
 case class Category(name: String, events: List[Event])
 
 sealed trait Schedule
-case class Day(events: List[Category], date: Date) extends Schedule
+case class Day(events: List[Category], date: DateTime) extends Schedule
 
 object Category {
   import play.api.libs.json._
@@ -23,4 +25,8 @@ object Category {
 
   implicit val catFmt = Json.format[Category]
   implicit val catWrt = Json.writes[Category]
+
+  def toCategory(json: JsValue): Category = json.as[Category]
+  def toCategoryList(json: JsValue): List[Category] = json.as[List[Category]]
+  def toJson(categories: List[Category]): JsValue = Json.toJson(categories)
 }
