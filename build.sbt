@@ -8,5 +8,6 @@ enablePlugins(JavaAppPackaging)
 
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 resolvers += "Twitter Maven" at "https://maven.twttr.com"
+resolvers += Resolver.bintrayRepo("jmcardon", "tsec")
 
 libraryDependencies ++= Dependencies.all
