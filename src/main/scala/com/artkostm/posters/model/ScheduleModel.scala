@@ -1,7 +1,5 @@
 package com.artkostm.posters.model
 
-import java.util.Date
-
 import org.joda.time.DateTime
 
 case class Media(link: String, img: String)
