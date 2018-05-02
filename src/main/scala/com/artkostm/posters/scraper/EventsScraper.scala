@@ -20,7 +20,7 @@ class EventsScraper(config: ScraperConfig) {
       block <- blocks
     } yield Category(block >> text(config.tut.blockTitleSelector), extractEvents(block).flatten)
 
-    Day(categories, day.toDate)
+    Day(categories, day)
   }
   
   def eventInfo(link: String): Option[Info] = {
