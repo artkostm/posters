@@ -9,7 +9,6 @@ import scala.concurrent.ExecutionContext
 trait PostgresPostersRepository extends AssignRepository
                                     with DaysRepository
                                     with InfoRepository
-                                    with TestRepo
                                     with JsonSupportDbComponent {
   import driver.api._
 
