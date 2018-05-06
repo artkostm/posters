@@ -20,7 +20,7 @@ case class Fulfillment(speech: String, messages: List[Message])
 case class Result(source: String, resolvedQuery: String, speech: Option[String], action: String, actionIncomplete: Boolean,
                   parameters: Parameters, contexts: List[Context], metadata: Metadata, fulfillment: Fulfillment, score: Double)
 
-case class Status(code: Int, errorType: String, webhookTimedOut: Boolean)
+case class Status(code: Int, errorType: String, webhookTimedOut: Option[Boolean])
 
 case class DialogflowRequest(id: String, lang: String, result: Result, status: Status, sessionId: String)
 
