@@ -26,22 +26,26 @@ trait DaysRepository extends EventsDayTable with DBSetupOps { self: HasDatabaseC
 
   import profile.api._
 
+  val compiledCategoryByDate = Compiled { date: Rep[DateTime] => Days.filter(_.date === date) }
+
+  val compiledCategoryByDateAndName = Compiled { (date: Rep[DateTime], name: Rep[String]) =>
+    val filteredByDate = Days.filter(_.date === date)
+    for {
+      data <- filteredByDate.map(t => (t.date, t.categories.arrayElements))
+      _ <- filteredByDate if data._2 +>> "name" === name
+    } yield data._2
+  }
+
   def setUpDays()(implicit ctx: ExecutionContext) =
     setUp(Days, Days.filter(day => day.date < DateTime.now.minusDays(1)).delete)
 
   def saveDay(day: EventsDay): Future[Int] = db.run(Days.insertOrUpdate(day.copy(date = day.date.withTimeAtStartOfDay())))
 
   def findDay(date: DateTime)(implicit ctx: ExecutionContext): Future[Option[Day]] =
-    db.run(Days.filter(d => d.date === date.withTimeAtStartOfDay()).result.headOption.map(_.map(ed => Day(Category.toCategoryList(ed.categories), ed.date))))
+    db.run(compiledCategoryByDate(date.withTimeAtStartOfDay()).result.headOption.map(_.map(ed => Day(Category.toCategoryList(ed.categories), ed.date))))
 
-  def findCategory(date: DateTime, name: String)(implicit ctx: ExecutionContext): Future[Option[Category]] =
-    db.run {
-      val filteredByDate = Days.filter(_.date === date.withTimeAtStartOfDay())
-      val category = for {
-        data <- filteredByDate.map(t => (t.date, t.categories.arrayElements))
-        _ <- filteredByDate if data._2 +>> "name" === name
-      } yield data._2
-      category.result.headOption.map(_.map(Category.toCategory))
+  def findCategory(date: DateTime, name: String)(implicit ctx: ExecutionContext): Future[Option[Category]] = db.run {
+    compiledCategoryByDateAndName(date.withTimeAtStartOfDay(), name).result.headOption.map(_.map(Category.toCategory))
   }
 
   def findCategories(date: DateTime, names: List[String])(implicit ctx: ExecutionContext): Future[Seq[Category]] =

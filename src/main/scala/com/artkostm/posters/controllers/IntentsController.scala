@@ -16,16 +16,22 @@ class IntentsController @Inject() (s: Swagger, repository: PostgresPostersReposi
 
   private implicit val ec = system.dispatcher
 
-  postWithDoc("/intents/?")(saveIntentOp) { request: Assign =>
-    repository.saveAssign(request).map(Added)
+  postWithDoc("/intents/?")(saveIntentOp) { request: Intent =>
+    repository.saveAssign(request.isUser, request.date, request.eventName, request.id).map(Affected)
+  }
+
+  deleteWithDoc("/intents/?")(saveIntentOp) { request: Intent =>
+    repository.removeAssign(request.isUser, request.date, request.eventName, request.id).map(Affected)
   }
 
   getWithDoc("/intents/?")(getIntentOp) { request: AssigneeRequest =>
-    repository.findAssign(request.category, request.date, request.name)
+    repository.findAssign(request.date, request.name)
   }
 }
 
 case class AssigneeRequest(@QueryParam date: DateTime,
-                           @QueryParam category: String,
                            @QueryParam name: String)
-case class Added(count: Int)
+
+case class Affected(count: Int)
+
+case class Intent(isUser: Boolean, date: DateTime, eventName: String, id: String)
