@@ -12,13 +12,13 @@ trait AssignTable { self: HasDatabaseConfig[PostersPgProfile] =>
 
   private[AssignTable] class Assignees(tag: Tag) extends Table[Assign](tag, "assignees") {
 
-    def category: Rep[String] = column[String]("category")
     def date: Rep[DateTime] = column[DateTime]("date")
     def eventName: Rep[String] = column[String]("event_name")
-    def ids: Rep[String] = column[String]("ids")
+    def vIds: Rep[List[String]] = column[List[String]]("vids")// TODO: sould be pgarray
+    def uIds: Rep[List[String]] = column[List[String]]("uids")// TODO: sould be pgarray
 
-    def * : ProvenShape[Assign] = (category, date, eventName, ids) <> (Assign.tupled, Assign.unapply)
-    def pk = primaryKey("pk_events", (category, date, eventName))
+    def * : ProvenShape[Assign] = (date, eventName, vIds, uIds) <> (Assign.tupled, Assign.unapply)
+    def pk = primaryKey("pk_events", (date, eventName))
   }
 
   protected val Assignees = TableQuery[Assignees]
@@ -28,18 +28,41 @@ trait AssignTable { self: HasDatabaseConfig[PostersPgProfile] =>
 trait AssignRepository extends AssignTable with DBSetupOps { self: HasDatabaseConfig[PostersPgProfile] =>
   import profile.api._
 
+  val compiledFilteredByDateAndName = Compiled { (date: Rep[DateTime], name: Rep[String]) =>
+    Assignees.filter(a => a.eventName === name && a.date === date)
+  }
+
   def setUpAssign()(implicit ctx: ExecutionContext) =
     setUp(Assignees, Assignees.filter(event => event.date < DateTime.now.minusDays(1)).delete)
 
-  def saveAssign(assign: Assign) =
-    db.run(Assignees.insertOrUpdate(assign.copy(date = assign.date.withTimeAtStartOfDay())).transactionally)
+  def saveAssign(isUser: Boolean, date: DateTime, eventName: String, id: String) =
+    db.run {
+      val target = Assignees.filter(a => a.eventName === eventName && a.date === date.withTimeAtStartOfDay())
+        .map(a => if (isUser) a.uIds else a.vIds)
+      (for {
+        idsOpt <- target.result.headOption
+        updateActionOption = idsOpt.map(ids => target.update(ids.::(id)))
+        affected <- updateActionOption.getOrElse(
+          Assignees += Assign(date, eventName, if (isUser) List.empty else List(id), if (isUser) List(id) else List.empty)
+        )
+      } yield affected) transactionally
+    }
+
+  def removeAssign(isUser: Boolean, date: DateTime, eventName: String, id: String) =
+    db.run {
+      val target = Assignees.filter(a => a.eventName === eventName && a.date === date.withTimeAtStartOfDay())
+        .map(a => if (isUser) a.uIds else a.vIds)
+      (for {
+        idsOpt <- target.result.headOption
+        updateActionOption = idsOpt.map(ids => target.update(ids.filter(_ != id)))
+        affected <- updateActionOption.getOrElse(
+          Assignees += Assign(date, eventName, if (isUser) List.empty else List(id), if (isUser) List(id) else List.empty)
+        )
+      } yield affected) transactionally
+    }
 
   def allAssignees: Future[List[Assign]] = db.run(Assignees.to[List].result)
 
-  def findAssign(category: String, date: DateTime, eventName: String): Future[Option[Assign]] =
-    db.run { Assignees.filter(a =>
-      a.category === category
-        && a.eventName === eventName
-        && a.date === date.withTimeAtStartOfDay()
-    ).result.headOption }
+  def findAssign(date: DateTime, eventName: String): Future[Option[Assign]] =
+    db.run(compiledFilteredByDateAndName(date.withTimeAtStartOfDay(), eventName).result.headOption)
 }
