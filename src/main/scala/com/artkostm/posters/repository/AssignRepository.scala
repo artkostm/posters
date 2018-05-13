@@ -28,14 +28,14 @@ trait AssignTable { self: HasDatabaseConfig[PostersPgProfile] =>
 trait AssignRepository extends AssignTable with DBSetupOps { self: HasDatabaseConfig[PostersPgProfile] =>
   import profile.api._
 
-  val compiledFilteredByDateAndName = Compiled { (date: Rep[DateTime], name: Rep[String]) =>
+  val compiledAssignByDateAndName = Compiled { (date: Rep[DateTime], name: Rep[String]) =>
     Assignees.filter(a => a.eventName === name && a.date === date)
   }
 
   def setUpAssign()(implicit ctx: ExecutionContext) =
     setUp(Assignees, Assignees.filter(event => event.date < DateTime.now.minusDays(1)).delete)
 
-  def saveAssign(isUser: Boolean, date: DateTime, eventName: String, id: String) =
+  def saveAssign(isUser: Boolean, date: DateTime, eventName: String, id: String)(implicit ctx: ExecutionContext) =
     db.run {
       val target = Assignees.filter(a => a.eventName === eventName && a.date === date.withTimeAtStartOfDay())
         .map(a => if (isUser) a.uIds else a.vIds)
@@ -48,7 +48,7 @@ trait AssignRepository extends AssignTable with DBSetupOps { self: HasDatabaseCo
       } yield affected) transactionally
     }
 
-  def removeAssign(isUser: Boolean, date: DateTime, eventName: String, id: String) =
+  def removeAssign(isUser: Boolean, date: DateTime, eventName: String, id: String)(implicit ctx: ExecutionContext) =
     db.run {
       val target = Assignees.filter(a => a.eventName === eventName && a.date === date.withTimeAtStartOfDay())
         .map(a => if (isUser) a.uIds else a.vIds)
@@ -64,5 +64,5 @@ trait AssignRepository extends AssignTable with DBSetupOps { self: HasDatabaseCo
   def allAssignees: Future[List[Assign]] = db.run(Assignees.to[List].result)
 
   def findAssign(date: DateTime, eventName: String): Future[Option[Assign]] =
-    db.run(compiledFilteredByDateAndName(date.withTimeAtStartOfDay(), eventName).result.headOption)
+    db.run(compiledAssignByDateAndName(date.withTimeAtStartOfDay(), eventName).result.headOption)
 }

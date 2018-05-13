@@ -16,7 +16,7 @@ trait JsonSupportDbComponent extends DbComponent[PostersPgProfile] with HasDatab
   protected def dataSource: DataSource
 
   import driver.api._
-  override lazy val database = Database.forDataSource(dataSource, Some(19))
+  override lazy val database = Database.forDataSource(dataSource, None)
 }
 
 trait HasDatabaseConfig[P <: BasicProfile] {
