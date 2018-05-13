@@ -14,8 +14,8 @@ trait AssignTable { self: HasDatabaseConfig[PostersPgProfile] =>
 
     def date: Rep[DateTime] = column[DateTime]("date")
     def eventName: Rep[String] = column[String]("event_name")
-    def vIds: Rep[List[String]] = column[List[String]]("vids")// TODO: sould be pgarray
-    def uIds: Rep[List[String]] = column[List[String]]("uids")// TODO: sould be pgarray
+    def vIds: Rep[List[String]] = column[List[String]]("vids")
+    def uIds: Rep[List[String]] = column[List[String]]("uids")
 
     def * : ProvenShape[Assign] = (date, eventName, vIds, uIds) <> (Assign.tupled, Assign.unapply)
     def pk = primaryKey("pk_events", (date, eventName))

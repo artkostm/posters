@@ -20,7 +20,7 @@ class IntentsController @Inject() (s: Swagger, repository: PostgresPostersReposi
     repository.saveAssign(request.isUser, request.date, request.eventName, request.id).map(Affected)
   }
 
-  deleteWithDoc("/intents/?")(saveIntentOp) { request: Intent =>
+  deleteWithDoc("/intents/?")(deleteIntentOp) { request: Intent =>
     repository.removeAssign(request.isUser, request.date, request.eventName, request.id).map(Affected)
   }
 
