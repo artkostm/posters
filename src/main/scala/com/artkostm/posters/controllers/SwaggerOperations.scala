@@ -63,7 +63,15 @@ trait IntentOperation { self: SwaggerController =>
     o.summary("Save or update an intent")
       .description("Save or update an intent")
       .tag("Intent")
-      .request[Assign]
+      .request[Intent]
+      .produces("application/json")
+      .responseWith[Assign](200, "a new intent created", example = Some(Assign(DateTime.now, "event name", List("1","2","3"), List("4","5","6"))))
+
+  def deleteIntentOp(o: Operation): Operation =
+    o.summary("Delete an assign")
+      .description("Delete an assign")
+      .tag("Intent")
+      .request[Intent]
       .produces("application/json")
       .responseWith[Assign](200, "a new intent created", example = Some(Assign(DateTime.now, "event name", List("1","2","3"), List("4","5","6"))))
 }
