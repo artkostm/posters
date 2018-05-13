@@ -54,10 +54,9 @@ trait IntentOperation { self: SwaggerController =>
       .description("Get an intent using event name, category name and date.")
       .tag("Intent")
       .queryParam[String]("date", "the date in the format yyyy-mm-dd")
-      .queryParam[String]("category", "the name of category that cantains the event")
       .queryParam[String]("name", "the name of the event")
       .produces("application/json")
-      .responseWith[Assign](200, "an intent", example = Some(Assign("category name", DateTime.now, "event name", "1,2,4,6,8")))
+      .responseWith[Assign](200, "an intent", example = Some(Assign(DateTime.now, "event name", List("1","2","3"), List("4","5","6"))))
       .responseWith(404, "intent is not found")
 
   def saveIntentOp(o: Operation): Operation =
@@ -66,7 +65,7 @@ trait IntentOperation { self: SwaggerController =>
       .tag("Intent")
       .request[Assign]
       .produces("application/json")
-      .responseWith[Assign](200, "a new intent created", example = Some(Assign("category name", DateTime.now, "event name", "1,2,4,6,8")))
+      .responseWith[Assign](200, "a new intent created", example = Some(Assign(DateTime.now, "event name", List("1","2","3"), List("4","5","6"))))
 }
 
 trait DialogflowWebhookOperation { self: SwaggerController =>
