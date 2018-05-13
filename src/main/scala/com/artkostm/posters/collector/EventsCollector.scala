@@ -1,11 +1,10 @@
 package com.artkostm.posters.collector
 
 import javax.inject.Singleton
-
 import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, ClosedShape}
-import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, RunnableGraph, Sink, Source}
+import akka.stream._
+import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Merge, Sink, Source}
 import com.artkostm.posters.model._
 import org.joda.time.DateTime
 import com.artkostm.posters.repository.PostgresPostersRepository
@@ -17,12 +16,23 @@ import scala.concurrent.Future
 @Singleton
 class EventsCollector @Inject()(scraper: EventsScraper, repository: PostgresPostersRepository,
                                 actorSystem: ActorSystem) {
+
   private implicit val system = actorSystem
-  private implicit val materializer = ActorMaterializer()
+
+  private val decider: Supervision.Decider = {
+    case e: Exception =>
+      println("Exception handled, recovering collector stream: " + e.getMessage)
+      Supervision.Restart
+    case _ => Supervision.Stop
+  }
+
+  private implicit val materializer = ActorMaterializer(ActorMaterializerSettings(actorSystem).withSupervisionStrategy(decider))
+
   private implicit val ec = actorSystem.dispatcher
+
   private val days = (-2 to 30).map(DateTime.now().plusDays).map(_.withTimeAtStartOfDay())
 
-  private val g = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
+  private val g = Source.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
     import GraphDSL.Implicits._
     val in = Source.fromIterator[DateTime](() => days.toIterator)
       //.throttle(5, 1 second, 1, ThrottleMode.shaping)
@@ -33,20 +43,20 @@ class EventsCollector @Inject()(scraper: EventsScraper, repository: PostgresPost
       //.throttle(5, 1 second, 1, ThrottleMode.shaping)
       .mapAsyncUnordered(5)(event => Future(scraper.eventInfo(event.media.link)))
 
-    val out = Sink.ignore
+    val fanIn = builder.add(Merge[Int](2))
     val bcast = builder.add(Broadcast[Day](2))
 
-    val saveDayFlow = Flow[Day].map(day => EventsDay(new DateTime(day.date), Category.toJson(day.events))).mapAsyncUnordered(5)(repository.saveDay)
+    val saveDayFlow = Flow[Day].map(day => EventsDay(day.date, Category.toJson(day.events))).mapAsyncUnordered(5)(repository.saveDay)
 
     val saveInfoFlow = Flow[Option[Info]].mapAsyncUnordered(5) {
       case Some(info) => repository.saveInfo(info)
-      case None => Future.failed(new RuntimeException)
+      case None => Future.failed(new RuntimeException("Can't save an event info"))
     }
 
-    in ~> bcast ~> saveDayFlow                    ~> out
-          bcast ~> eventsInfoFlow ~> saveInfoFlow ~> out
-    ClosedShape
+    in ~> bcast ~> saveDayFlow                    ~> fanIn
+          bcast ~> eventsInfoFlow ~> saveInfoFlow ~> fanIn
+    SourceShape(fanIn.out)
   })
 
-  def run() = g.run()
+  def run(sink: Graph[SinkShape[Int], _] = Sink.ignore) = g.to(sink)
 }
