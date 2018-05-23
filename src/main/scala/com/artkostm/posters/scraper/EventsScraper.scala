@@ -26,7 +26,7 @@ class EventsScraper(config: ScraperConfig) {
   def eventInfo(link: String): Option[Info] = {
     val doc = loadDocument(link)
     for {
-      images <- doc >?> elementList(config.tut.eventPhotoSelector) >> attr(config.tut.hrefAttrSelector)
+      images <- doc >?> elementList(config.tut.eventPhotoSelector) >> attr(config.tut.srcAttrSelector)
       description: String = doc >> text(config.tut.eventDescriptionSelector)
       comments <- doc >?> elementList(config.tut.commentsSelector)
     } yield Info(link, EventInfo(description, images, extractComments(comments)))
