@@ -58,5 +58,5 @@ class EventsCollector @Inject()(scraper: EventsScraper, repository: PostgresPost
     SourceShape(fanIn.out)
   })
 
-  def run(sink: Graph[SinkShape[Int], _] = Sink.ignore) = g.to(sink)
+  def run(sink: Graph[SinkShape[Int], _] = Sink.ignore) = g.to(sink).run()
 }
