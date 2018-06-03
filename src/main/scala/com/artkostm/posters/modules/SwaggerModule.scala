@@ -14,7 +14,7 @@ object PostersSwaggerModule extends SwaggerModule {
 
     val info = new Info()
       .description("The Categories / Events retrieve API")
-      .version("1.0.0")
+      .version("2.6.0")
       .title("Posters / Events Retrieve API")
 
     swagger
