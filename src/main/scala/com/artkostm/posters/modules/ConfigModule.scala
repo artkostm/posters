@@ -15,6 +15,8 @@ object ConfigModule extends TwitterModule {
     config.getString("api.key"),
     config.getString("api.token"))
 
+  @Singleton @Provides def appConfig(config: Config): AppConfig = AppConfig(config.getString("posters.version"))
+
   @Singleton @Provides def httpConfig(config: Config): HttpConfig = HttpConfig(s":${config.getString("http.port")}")
 
   @Singleton @Provides def scraperConfig(config: Config): ScraperConfig =
@@ -55,3 +57,4 @@ case class TutScraper(url: String, format: DateTimeFormatter, blocksSelector: St
 case class ScraperConfig(tut: TutScraper)
 case class HttpConfig(port: String)
 case class ApiConfig(apiKey: String, apiToken: String)
+case class AppConfig(version: String)
