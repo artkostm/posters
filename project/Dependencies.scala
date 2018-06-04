@@ -2,7 +2,7 @@ import sbt._
 
 object Dependencies {
   lazy val versions = new {
-    val finatra  = "18.4.0"
+    val finatra  = "18.5.0"
     val logback  = "1.2.3"
     val scraper  = "2.0.0"
     val akka     = "2.5.6"

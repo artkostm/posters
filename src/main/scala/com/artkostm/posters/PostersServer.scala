@@ -1,6 +1,7 @@
 package com.artkostm.posters
 
 import com.artkostm.posters.controllers._
+import com.artkostm.posters.controllers.auth.AuthFilter
 import com.artkostm.posters.modules._
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.google.inject.{Inject, Module, Singleton}
@@ -27,6 +28,7 @@ class PostersServer extends HttpServer {
       .filter[LoggingMDCFilter[Request, Response]]
       .filter[TraceIdMDCFilter[Request, Response]]
       .filter[CommonFilters]
+      .filter[AuthFilter]
       .add[DocsController]
       .add[CategoryController]
       .add[EventInfoController]
