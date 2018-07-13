@@ -1,19 +1,28 @@
 package com.artkostm.posters
 
 import java.net.URI
+import java.util.Date
 
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.W
 import cats.effect._
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
 import fs2.StreamApp
 import org.http4s._
 import org.http4s.dsl.io._
+import org.joda.time.DateTime
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 object Main extends StreamApp[IO] {
   type ApiKey = String Refined MatchesRegex[W.`"[a-zA-Z0-9]{25,40}"`.T]
+
+  case class Personalities(info: String)
+  case class User(name: String, personalities: List[Personalities], birth: Long)
+
+  implicit val codec: JsonValueCodec[User] = JsonCodecMaker.make[User](CodecMakerConfig())
 
   import ciris.env
 
@@ -31,7 +40,7 @@ object Main extends StreamApp[IO] {
 
   val helloWorldService = HttpService[IO] {
     case GET -> Root / "hello" / name =>
-      Ok(s"Hello, $name.")
+      Ok(new String(writeToArray(User(name, List(Personalities(name.toUpperCase)), DateTime.now().getMillis)), "UTF-8"))
   }
 
   import fs2.Stream
