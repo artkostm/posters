@@ -1,6 +1,7 @@
 package com.artkostm.posters
 
 import java.net.URI
+import java.time.Instant
 import java.util.Date
 
 import eu.timepit.refined.api.Refined
@@ -20,7 +21,7 @@ object Main extends StreamApp[IO] {
   type ApiKey = String Refined MatchesRegex[W.`"[a-zA-Z0-9]{25,40}"`.T]
 
   case class Personalities(info: String)
-  case class User(name: String, personalities: List[Personalities], birth: Long)
+  case class User(name: String, personalities: List[Personalities], birth: Instant)
 
   implicit val codec: JsonValueCodec[User] = JsonCodecMaker.make[User](CodecMakerConfig())
 
@@ -40,7 +41,7 @@ object Main extends StreamApp[IO] {
 
   val helloWorldService = HttpService[IO] {
     case GET -> Root / "hello" / name =>
-      Ok(new String(writeToArray(User(name, List(Personalities(name.toUpperCase)), DateTime.now().getMillis)), "UTF-8"))
+      Ok(new String(writeToArray(User(name, List(Personalities(name.toUpperCase)), Instant.now())), "UTF-8"))
   }
 
   import fs2.Stream
