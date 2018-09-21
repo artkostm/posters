@@ -46,7 +46,7 @@ object Configuration {
   ))
 
   import AppEnvironment._
-  val config = withValue(env[AppEnvironment]("APP_ENV")) {
+  val config = withValue(env[AppEnvironment]("APP_ENV").orElse(ConfigValue(Right(Local)))) {
     case Local => loadConfig {
       AppConfig(version = "2.6.0",
         scraperConfig = scraperConfig,
