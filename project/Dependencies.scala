@@ -37,6 +37,10 @@ object Dependencies {
 
   lazy val all = Seq(finatra_http, logback, scraper, akka_actor, slick,
     slick_pg, slick_pg_play, hikaricp, postgres, akka_streams, swagger, sangria, tsec_jwt_sig, tsec_jwt_mac)
+  
+  lazy val commonDependencies = Seq(
+    "joda-time" % "joda-time" % "2.9.9"
+  )
 
   lazy val cirisDependencies = Seq(
     "is.cir" %% "ciris-cats",
