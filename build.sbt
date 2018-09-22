@@ -1,16 +1,23 @@
 name := "posters"
 
-enablePlugins(JavaAppPackaging)
-
 lazy val commonSettings = Seq(
   version             := "0.5.0",
   scalaVersion        := "2.12.4",
-  crossScalaVersions  := Seq("2.12.4"),
-  scalaVersion        := crossScalaVersions.value.head,
-  scalacOptions       ++= Seq("-feature", "-deprecation", "-encoding", "utf-8", "-language:implicitConversions", "-Ypartial-unification"),
-  resolvers           ++= Seq("Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+  scalacOptions       ++= Seq(
+    "utf-8",
+    "-feature",
+    "-encoding",
+    "-deprecation",
+    "-Ypartial-unification",
+    "-language:higherKinds",
+    "-language:existentials",
+    "-language:implicitConversions"
+  ),
+  resolvers           ++= Seq(
     "Twitter Maven" at "https://maven.twttr.com",
-    Resolver.bintrayRepo("jmcardon", "tsec"))
+    Resolver.bintrayRepo("jmcardon", "tsec"),
+    "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+  )
 )
 
 lazy val root = (project in file(".")).aggregate(interface, internal, web, worker)
@@ -31,8 +38,11 @@ lazy val web = (project in file("web")).settings(
   libraryDependencies ++= Dependencies.jsoniterDependencies,
   libraryDependencies ++= Dependencies.http4sDependencies
 ).dependsOn(internal)
+  .enablePlugins(JavaAppPackaging)
 
 lazy val worker = (project in file("worker")).settings(
   commonSettings,
-  libraryDependencies ++= Dependencies.all
+  libraryDependencies ++= Dependencies.all,
+  libraryDependencies ++= Dependencies.workerSpecificDependencies
 ).dependsOn(internal)
+  .enablePlugins(JavaAppPackaging)
