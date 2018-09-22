@@ -17,7 +17,8 @@ lazy val commonSettings = Seq(
     "Twitter Maven" at "https://maven.twttr.com",
     Resolver.bintrayRepo("jmcardon", "tsec"),
     "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
-  )
+  ),
+  libraryDependencies ++= Dependencies.commonDependencies
 )
 
 lazy val root = (project in file(".")).aggregate(interface, internal, web, worker)
