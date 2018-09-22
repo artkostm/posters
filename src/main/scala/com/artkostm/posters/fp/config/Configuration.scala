@@ -3,6 +3,7 @@ package com.artkostm.posters.fp.config
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import ciris._
 import ciris.refined._
+import ciris.enumeratum._
 import com.artkostm.posters.fp.config.environments._
 import eu.timepit.refined.W
 import eu.timepit.refined.api.Refined
@@ -46,7 +47,7 @@ object Configuration {
   ))
 
   import AppEnvironment._
-  val config = withValue(env[AppEnvironment]("APP_ENV").orElse(ConfigValue(Right(Local)))) {
+  lazy val config = withValue(env[AppEnvironment]("APP_ENV").orElse(ConfigValue(Right(Local)))) {
     case Local => loadConfig {
       AppConfig(version = "2.6.0",
         scraperConfig = scraperConfig,
