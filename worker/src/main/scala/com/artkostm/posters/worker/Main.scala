@@ -1,5 +1,5 @@
 package com.artkostm.posters.worker
 
-class Main {
+class Main extends App {
 
 }
