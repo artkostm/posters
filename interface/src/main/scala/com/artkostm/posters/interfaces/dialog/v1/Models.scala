@@ -1,5 +1,8 @@
 package com.artkostm.posters.interfaces.dialog.v1
 
+import com.artkostm.posters.interfaces.schedule.Category
+import org.joda.time.DateTime
+
 case class Datetime(date: Option[DateTime], period: Option[String])
 
 case class Parameters(category: List[String], datetime: Datetime)
