@@ -1,7 +1,7 @@
 import sbt._
 
 object Dependencies {
-  lazy val versions = new {
+  val versions = new {
     val finatra  = "18.5.0"
     val logback  = "1.2.3"
     val scraper  = "2.0.0"
@@ -13,6 +13,10 @@ object Dependencies {
     val finatra_swagger  = "18.4.0"
     val sangria = "1.4.0"
     val tsecV = "0.0.1-M11"
+    val ciris = "0.10.0"
+    val doobie = "0.5.3"
+    val http4s = "0.18.14"
+    val jsoniter = "0.29.2"
   }
 
   val finatra_http    = "com.twitter"          %%  "finatra-http"       % versions.finatra
@@ -33,4 +37,38 @@ object Dependencies {
 
   lazy val all = Seq(finatra_http, logback, scraper, akka_actor, slick,
     slick_pg, slick_pg_play, hikaricp, postgres, akka_streams, swagger, sangria, tsec_jwt_sig, tsec_jwt_mac)
+
+  lazy val cirisDependencies = Seq(
+    "is.cir" %% "ciris-cats",
+    "is.cir" %% "ciris-cats-effect",
+    "is.cir" %% "ciris-core",
+    "is.cir" %% "ciris-enumeratum",
+    "is.cir" %% "ciris-generic",
+    "is.cir" %% "ciris-refined",
+    "is.cir" %% "ciris-spire",
+    "is.cir" %% "ciris-squants"
+  ).map(_ % versions.ciris)
+
+  lazy val doobieDependencies = Seq(
+    "org.tpolecat" %% "doobie-core",
+    "org.tpolecat" %% "doobie-hikari",
+    "org.tpolecat" %% "doobie-postgres", // Postgres driver 42.2.2 + type mappings.
+    "org.tpolecat" %% "doobie-specs2",
+    "org.tpolecat" %% "doobie-scalatest"
+  ).map(_ % versions.doobie)
+
+  lazy val http4sDependencies = Seq(
+    "org.http4s" %% "http4s-dsl",
+    "org.http4s" %% "http4s-blaze-server"
+  ).map(_ % versions.http4s)
+
+  lazy val jsoniterDependencies = Seq(
+    "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % versions.jsoniter % Compile,
+    "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % versions.jsoniter % Provided
+  )
+
+  lazy val workerSpecificDependencies = Seq(
+    "com.typesafe.akka" %% "akka-actor" % versions.akka,
+    "net.ruippeixotog" %% "scala-scraper" % versions.scraper
+  )
 }
