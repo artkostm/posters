@@ -57,8 +57,7 @@ object Configuration {
     }
     case Production => loadConfig(
       env[Secret[ApiKey]]("API_KEY").orElse(prop("api.key")),
-      env[UserPortNumber]("PORT"), env[NonEmptyString]("DATABASE_URL")) {
-      (apiKey, port, dbUrl) =>
+      env[UserPortNumber]("PORT"), env[NonEmptyString]("DATABASE_URL")) { (apiKey, port, dbUrl) =>
         AppConfig(version = "2.6.0",
           scraperConfig = scraperConfig,
           httpConfig = HttpConfig(port),
