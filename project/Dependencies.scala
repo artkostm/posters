@@ -17,6 +17,8 @@ object Dependencies {
     val doobie = "0.5.3"
     val http4s = "0.18.14"
     val jsoniter = "0.29.2"
+    val flyway = "5.1.4"
+    val H2 = "1.4.196"
   }
 
   val finatra_http    = "com.twitter"          %%  "finatra-http"       % versions.finatra
@@ -73,6 +75,9 @@ object Dependencies {
 
   lazy val workerSpecificDependencies = Seq(
     "com.typesafe.akka" %% "akka-actor" % versions.akka,
-    "net.ruippeixotog" %% "scala-scraper" % versions.scraper
+    "net.ruippeixotog" %% "scala-scraper" % versions.scraper,
+    "org.flywaydb" % "flyway-core" % versions.flyway,
+    "com.h2database" %  "h2" % versions.H2,
+    "org.tpolecat"  %% "doobie-h2" % versions.doobie
   )
 }
