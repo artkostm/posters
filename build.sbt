@@ -3,15 +3,15 @@ name := "posters"
 lazy val commonSettings = Seq(
   version             := "0.5.0",
   scalaVersion        := "2.12.4",
-  scalacOptions       ++= Seq(
-    "utf-8",
+  scalacOptions       := Seq(
     "-feature",
     "-encoding",
     "-deprecation",
-    "-Ypartial-unification",
+    "UTF-8",
     "-language:higherKinds",
     "-language:existentials",
-    "-language:implicitConversions"
+    "-language:implicitConversions",
+    "-Ypartial-unification"
   ),
   resolvers           ++= Seq(
     "Twitter Maven" at "https://maven.twttr.com",
@@ -44,6 +44,7 @@ lazy val web = (project in file("web")).settings(
 lazy val worker = (project in file("worker")).settings(
   commonSettings,
   libraryDependencies ++= Dependencies.all,
-  libraryDependencies ++= Dependencies.workerSpecificDependencies
+  libraryDependencies ++= Dependencies.workerSpecificDependencies,
+  libraryDependencies ++= Dependencies.doobieDependencies
 ).dependsOn(internal)
   .enablePlugins(JavaAppPackaging)
