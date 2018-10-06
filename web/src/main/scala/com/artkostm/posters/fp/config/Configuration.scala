@@ -4,7 +4,7 @@ import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import ciris._
 import ciris.refined._
 import ciris.enumeratum._
-import com.artkostm.posters.fp.config.environments._
+import com.artkostm.posters.environments.AppEnvironment
 import eu.timepit.refined.W
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.auto._
@@ -46,7 +46,7 @@ object Configuration {
       commentTextSelector = ".comment_txt"
   ))
 
-  import AppEnvironment._
+  import com.artkostm.posters.environments.AppEnvironment._
   lazy val config = withValue(env[AppEnvironment]("APP_ENV").orElse(ConfigValue(Right(Local)))) {
     case Local => loadConfig {
       AppConfig(version = "2.6.0",
