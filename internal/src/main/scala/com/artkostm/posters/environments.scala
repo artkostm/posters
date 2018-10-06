@@ -1,4 +1,4 @@
-package com.artkostm.posters.fp.config
+package com.artkostm.posters
 
 object environments {
   import enumeratum._

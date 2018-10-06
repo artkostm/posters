@@ -28,13 +28,13 @@ lazy val interface = (project in file("interface")).settings(
 )
 
 lazy val internal = (project in file("internal")).settings(
-  commonSettings
+  commonSettings,
+  libraryDependencies ++= Dependencies.cirisDependencies
 ).dependsOn(interface)
 
 lazy val web = (project in file("web")).settings(
   commonSettings,
   libraryDependencies ++= Dependencies.all,
-  libraryDependencies ++= Dependencies.cirisDependencies,
   libraryDependencies ++= Dependencies.doobieDependencies,
   libraryDependencies ++= Dependencies.jsoniterDependencies,
   libraryDependencies ++= Dependencies.http4sDependencies
