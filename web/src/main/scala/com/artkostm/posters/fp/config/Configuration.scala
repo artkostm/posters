@@ -1,10 +1,14 @@
 package com.artkostm.posters.fp.config
 
+import cats.effect.IO
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import ciris._
+import ciris.api.Monad
 import ciris.refined._
 import ciris.enumeratum._
+import com.artkostm.posters.Configuration
 import com.artkostm.posters.environments.AppEnvironment
+import com.artkostm.posters.fp.config.ConfigurationT.ApiKey
 import eu.timepit.refined.W
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.auto._
@@ -13,7 +17,7 @@ import eu.timepit.refined.types.net.UserPortNumber
 import eu.timepit.refined.types.numeric.PosInt
 import eu.timepit.refined.types.string.NonEmptyString
 
-object Configuration {
+object ConfigurationT extends Configuration[IO, AppConfig] {
   type ApiKey = String Refined MatchesRegex[W.`"[a-zA-Z0-9]{25,40}"`.T]
 
   private val buildDbConfig: NonEmptyString => DatabaseConfig = DatabaseConfig(
@@ -47,38 +51,40 @@ object Configuration {
   ))
 
   import com.artkostm.posters.environments.AppEnvironment._
-  lazy val config = withValue(env[AppEnvironment]("APP_ENV").orElse(ConfigValue(Right(Local)))) {
-    case Local => loadConfig {
-      AppConfig(version = "2.6.0",
-        scraperConfig = scraperConfig,
-        httpConfig = HttpConfig(8080),
-        databaseConfig = buildDbConfig("url"),
-        apiConfig = ApiConfig(Secret("uufdeddddd00d0d00d0d00d0d0"), "token"))
-    }
-    case Production => loadConfig(
-      env[Secret[ApiKey]]("API_KEY").orElse(prop("api.key")),
-      env[UserPortNumber]("PORT"), env[NonEmptyString]("DATABASE_URL")) { (apiKey, port, dbUrl) =>
+
+  override protected def config =
+    withValue(env[AppEnvironment]("APP_ENV").orElse(ConfigValue(Right(Local)))) {
+      case Local => loadConfig {
         AppConfig(version = "2.6.0",
           scraperConfig = scraperConfig,
-          httpConfig = HttpConfig(port),
-          databaseConfig = buildDbConfig(dbUrl),
-          apiConfig = ApiConfig(apiKey, "token"))
-    }
+          httpConfig = HttpConfig(8080),
+          databaseConfig = buildDbConfig("url"),
+          apiConfig = ApiConfig(Secret("uufdeddddd00d0d00d0d00d0d0"), "token"))
+      }
+      case Production => loadConfig(
+        env[Secret[ApiKey]]("API_KEY").orElse(prop("api.key")),
+        env[UserPortNumber]("PORT"), env[NonEmptyString]("DATABASE_URL")) { (apiKey, port, dbUrl) =>
+          AppConfig(version = "2.6.0",
+            scraperConfig = scraperConfig,
+            httpConfig = HttpConfig(port),
+            databaseConfig = buildDbConfig(dbUrl),
+            apiConfig = ApiConfig(apiKey, "token"))
+      }
   }
-
-  case class TutScraper(url: String, format: DateTimeFormatter, blocksSelector: String,
-                        blockTitleSelector: String, eventsSelector: String,
-                        mediaSelector: String, eventNameSelector: String,
-                        descriptionSelector: String, descriptionTextSelector: String,
-                        ticketSelector: String, freeEventSelector: String,
-                        hrefAttrSelector: String, srcAttrSelector: String,
-                        imgSelector: String, eventPhotoSelector: String,
-                        eventDescriptionSelector: String, commentsSelector: String,
-                        commentAuthorSelector: String, commentDateSelector: String,
-                        commentTextSelector: String)
-  case class ScraperConfig(tut: TutScraper)
-  case class HttpConfig(port: UserPortNumber)
-  case class DatabaseConfig(url: NonEmptyString, driver: NonEmptyString, numThreads: PosInt, maxConnections: PosInt, minConnections: PosInt)
-  case class ApiConfig(apiKey: Secret[ApiKey], apiToken: String)
-  case class AppConfig(version: String, scraperConfig: ScraperConfig, httpConfig: HttpConfig, databaseConfig: DatabaseConfig, apiConfig: ApiConfig)
 }
+
+case class TutScraper(url: String, format: DateTimeFormatter, blocksSelector: String,
+                      blockTitleSelector: String, eventsSelector: String,
+                      mediaSelector: String, eventNameSelector: String,
+                      descriptionSelector: String, descriptionTextSelector: String,
+                      ticketSelector: String, freeEventSelector: String,
+                      hrefAttrSelector: String, srcAttrSelector: String,
+                      imgSelector: String, eventPhotoSelector: String,
+                      eventDescriptionSelector: String, commentsSelector: String,
+                      commentAuthorSelector: String, commentDateSelector: String,
+                      commentTextSelector: String)
+case class ScraperConfig(tut: TutScraper)
+case class HttpConfig(port: UserPortNumber)
+case class DatabaseConfig(url: NonEmptyString, driver: NonEmptyString, numThreads: PosInt, maxConnections: PosInt, minConnections: PosInt)
+case class ApiConfig(apiKey: Secret[ApiKey], apiToken: String)
+case class AppConfig(version: String, scraperConfig: ScraperConfig, httpConfig: HttpConfig, databaseConfig: DatabaseConfig, apiConfig: ApiConfig)
