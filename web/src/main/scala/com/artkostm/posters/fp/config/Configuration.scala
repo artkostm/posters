@@ -3,12 +3,11 @@ package com.artkostm.posters.fp.config
 import cats.effect.IO
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import ciris._
-import ciris.api.Monad
 import ciris.refined._
 import ciris.enumeratum._
 import com.artkostm.posters.Configuration
 import com.artkostm.posters.environments.AppEnvironment
-import com.artkostm.posters.fp.config.ConfigurationT.ApiKey
+import com.artkostm.posters.fp.config.WebConfiguration.ApiKey
 import eu.timepit.refined.W
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.auto._
@@ -17,7 +16,7 @@ import eu.timepit.refined.types.net.UserPortNumber
 import eu.timepit.refined.types.numeric.PosInt
 import eu.timepit.refined.types.string.NonEmptyString
 
-object ConfigurationT extends Configuration[IO, AppConfig] {
+object WebConfiguration extends Configuration[IO, AppConfig] {
   type ApiKey = String Refined MatchesRegex[W.`"[a-zA-Z0-9]{25,40}"`.T]
 
   private val buildDbConfig: NonEmptyString => DatabaseConfig = DatabaseConfig(
