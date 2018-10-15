@@ -16,7 +16,8 @@ lazy val commonSettings = Seq(
   resolvers           ++= Seq(
     "Twitter Maven" at "https://maven.twttr.com",
     Resolver.bintrayRepo("jmcardon", "tsec"),
-    "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+    "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+    "krasserm at bintray" at "http://dl.bintray.com/krasserm/maven"
   ),
   libraryDependencies ++= Dependencies.commonDependencies
 )
@@ -39,7 +40,7 @@ lazy val web = (project in file("web")).settings(
   libraryDependencies ++= Dependencies.jsoniterDependencies,
   libraryDependencies ++= Dependencies.http4sDependencies
 ).dependsOn(internal)
-  .enablePlugins(JavaAppPackaging)
+  //.enablePlugins(JavaAppPackaging)
 
 lazy val worker = (project in file("worker")).settings(
   commonSettings,
@@ -47,4 +48,4 @@ lazy val worker = (project in file("worker")).settings(
   libraryDependencies ++= Dependencies.workerSpecificDependencies,
   libraryDependencies ++= Dependencies.doobieDependencies
 ).dependsOn(internal)
-  .enablePlugins(JavaAppPackaging)
+  //.enablePlugins(JavaAppPackaging)
