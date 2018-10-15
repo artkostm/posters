@@ -24,21 +24,24 @@ object WebConfiguration extends Configuration[IO, AppConfig] {
     withValue(env[AppEnvironment]("APP_ENV").orElse(ConfigValue(Right(Local)))) {
       case Local => loadConfig {
         AppConfig(version = Configuration.APP_VERSION,
-          httpConfig = HttpConfig(8080),
-          databaseConfig = Configuration.buildDbConfig("url"),
-          apiConfig = ApiConfig(Secret("uufdeddddd00d0d00d0d00d0d0"), "token"))
+          http = HttpConfig(8080),
+          db = Configuration.buildDbConfig("url"),
+          api = ApiConfig(Secret("uufdeddddd00d0d00d0d00d0d0"), "token"))
       }
-      case Production => loadConfig(
+      case Production | Heroku => loadConfig(
         env[Secret[ApiKey]]("API_KEY").orElse(prop("api.key")),
-        env[UserPortNumber]("PORT"), env[NonEmptyString]("DATABASE_URL")) { (apiKey, port, dbUrl) =>
+        env[UserPortNumber]("PORT"),
+        env[NonEmptyString]("JDBC_DATABASE_URL"),
+        env[NonEmptyString]("JDBC_DATABASE_USERNAME"),
+        env[NonEmptyString]("JDBC_DATABASE_PASSWORD")) { (apiKey, port, dbUrl, user, password) =>
           AppConfig(version = Configuration.APP_VERSION,
-            httpConfig = HttpConfig(port),
-            databaseConfig = Configuration.buildDbConfig(dbUrl),
-            apiConfig = ApiConfig(apiKey, "token"))
+            http = HttpConfig(port),
+            db = Configuration.buildDbConfigForHeroku(dbUrl, user, password),
+            api = ApiConfig(apiKey, "token"))
       }
   }
 }
 
 case class HttpConfig(port: UserPortNumber)
-case class ApiConfig(apiKey: Secret[ApiKey], apiToken: String)
-case class AppConfig(version: String, httpConfig: HttpConfig, databaseConfig: DatabaseConfig, apiConfig: ApiConfig)
+case class ApiConfig(key: Secret[ApiKey], token: String)
+case class AppConfig(version: String, http: HttpConfig, db: DatabaseConfig, api: ApiConfig)
