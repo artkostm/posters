@@ -20,10 +20,11 @@ object Configuration {
   val NUM_THREADS = 10
   val MAX_CONNECTIONS = 15
   val MIN_CONNECTIONS = 4
+  val DRIVER = "org.postgresql.Driver"
 
   val buildDbConfig: NonEmptyString => DatabaseConfig = DatabaseConfig(
     _,
-    driver = "org.postgresql.Driver",
+    driver = DRIVER,
     numThreads = NUM_THREADS,
     maxConnections = MAX_CONNECTIONS,
     minConnections = MIN_CONNECTIONS)
@@ -31,7 +32,7 @@ object Configuration {
   val buildDbConfigForHeroku: (NonEmptyString, NonEmptyString, NonEmptyString) => DatabaseConfig =
     (url, user, password) => DatabaseConfig(
       url,
-      driver = "org.postgresql.Driver",
+      driver = DRIVER,
       user = user,
       password = password,
       numThreads = NUM_THREADS,
