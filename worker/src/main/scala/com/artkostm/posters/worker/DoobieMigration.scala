@@ -3,6 +3,7 @@ package com.artkostm.posters.worker
 import java.sql.Connection
 
 import cats.effect.{IO, Sync}
+import com.artkostm.posters.worker.config.AppConfig
 import doobie._
 import doobie.implicits._
 import org.flywaydb.core.Flyway
@@ -18,7 +19,7 @@ trait DoobieMigration extends JdbcMigration {
 }
 
 object DoobieMigration {
-  def run[F[_]]()(implicit F: Sync[F]): F[Int] = F.delay {
+  def run[F[_]](config: AppConfig)(implicit F: Sync[F]): F[Int] = F.delay {
     val flyway = new Flyway
     val location = classOf[migration.V0001__CreateVisitors].getPackage.getName.replace(".", "/")
 

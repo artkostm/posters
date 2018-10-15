@@ -19,14 +19,16 @@ object AppConfiguration extends Configuration[IO, AppConfig]{
     withValue(env[AppEnvironment]("APP_ENV").orElse(ConfigValue(Right(Local)))) {
       case Local => loadConfig {
         AppConfig(version = Configuration.APP_VERSION,
-          scraperConfig = scraperConfig,
-          databaseConfig = Configuration.buildDbConfig("url"))
+          scraper = scraperConfig,
+          db = Configuration.buildDbConfig("url"))
       }
-      case Production => loadConfig(
-        env[NonEmptyString]("DATABASE_URL")) { (dbUrl) =>
+      case Production | Heroku => loadConfig(
+        env[NonEmptyString]("JDBC_DATABASE_URL"),
+        env[NonEmptyString]("JDBC_DATABASE_USERNAME"),
+        env[NonEmptyString]("JDBC_DATABASE_PASSWORD")) { (dbUrl, user, password) =>
         AppConfig(version = Configuration.APP_VERSION,
-          scraperConfig = scraperConfig,
-          databaseConfig = Configuration.buildDbConfig(dbUrl))
+          scraper = scraperConfig,
+          db = Configuration.buildDbConfigForHeroku(dbUrl, user, password)
       }
     }
 
@@ -65,4 +67,4 @@ case class TutScraper(url: String, format: DateTimeFormatter, blocksSelector: St
                       commentAuthorSelector: String, commentDateSelector: String,
                       commentTextSelector: String)
 case class ScraperConfig(tut: TutScraper)
-case class AppConfig(version: String, scraperConfig: ScraperConfig, databaseConfig: DatabaseConfig)
+case class AppConfig(version: String, scraper: ScraperConfig, db: DatabaseConfig)

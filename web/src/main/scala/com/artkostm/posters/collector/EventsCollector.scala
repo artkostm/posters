@@ -13,6 +13,12 @@ import com.google.inject.Inject
 
 import scala.concurrent.Future
 
+/**
+  * FS2 to Akka Stream example: https://github.com/krasserm/streamz/blob/master/streamz-examples/src/main/scala/streamz/examples/converter/Example.scala
+  * @param scraper
+  * @param repository
+  * @param actorSystem
+  */
 @Singleton
 class EventsCollector @Inject()(scraper: EventsScraper, repository: PostgresPostersRepository,
                                 actorSystem: ActorSystem) {

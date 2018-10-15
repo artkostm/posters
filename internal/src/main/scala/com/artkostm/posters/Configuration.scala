@@ -17,17 +17,33 @@ abstract class Configuration[F[_], Conf](implicit me: MonadError[F, Throwable]) 
 
 object Configuration {
   val APP_VERSION = "2.6.0"
+  val NUM_THREADS = 10
+  val MAX_CONNECTIONS = 15
+  val MIN_CONNECTIONS = 4
+  val DRIVER = "org.postgresql.Driver"
 
   val buildDbConfig: NonEmptyString => DatabaseConfig = DatabaseConfig(
     _,
-    driver = "org.postgresql.Driver",
-    numThreads = 10,
-    maxConnections = 19,
-    minConnections = 4)
+    driver = DRIVER,
+    numThreads = NUM_THREADS,
+    maxConnections = MAX_CONNECTIONS,
+    minConnections = MIN_CONNECTIONS)
+
+  val buildDbConfigForHeroku: (NonEmptyString, NonEmptyString, NonEmptyString) => DatabaseConfig =
+    (url, user, password) => DatabaseConfig(
+      url,
+      driver = DRIVER,
+      user = user,
+      password = password,
+      numThreads = NUM_THREADS,
+      maxConnections = MAX_CONNECTIONS,
+      minConnections = MIN_CONNECTIONS)
 
   final case class DatabaseConfig(
                                    url: NonEmptyString,
                                    driver: NonEmptyString,
+                                   user: NonEmptyString = NonEmptyString(""),
+                                   password: NonEmptyString = NonEmptyString(""),
                                    numThreads: PosInt,
                                    maxConnections: PosInt,
                                    minConnections: PosInt
