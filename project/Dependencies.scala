@@ -19,6 +19,7 @@ object Dependencies {
     val jsoniter = "0.29.2"
     val flyway = "5.1.4"
     val H2 = "1.4.196"
+    val streamz = "0.9.1"
   }
 
   val finatra_http    = "com.twitter"          %%  "finatra-http"       % versions.finatra
@@ -78,6 +79,7 @@ object Dependencies {
     "net.ruippeixotog" %% "scala-scraper" % versions.scraper,
     "org.flywaydb" % "flyway-core" % versions.flyway,
     "com.h2database" %  "h2" % versions.H2,
-    "org.tpolecat"  %% "doobie-h2" % versions.doobie
+    "org.tpolecat"  %% "doobie-h2" % versions.doobie,
+    "com.github.krasserm" %% "streamz-converter" % versions.streamz
   )
 }
