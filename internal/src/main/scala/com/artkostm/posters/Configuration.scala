@@ -22,7 +22,7 @@ object Configuration {
     _,
     driver = "org.postgresql.Driver",
     numThreads = 10,
-    maxConnections = 19,
+    maxConnections = 15,
     minConnections = 4)
 
   final case class DatabaseConfig(
