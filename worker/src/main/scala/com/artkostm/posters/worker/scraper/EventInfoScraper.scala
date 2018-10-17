@@ -10,6 +10,8 @@ import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
 import org.joda.time.DateTime
 
 class EventInfoScraper[F[_]](config: ScraperConfig)(implicit F: Sync[F]) extends Scraper(config) {
+  private lazy val browser = F.delay(new JsoupBrowser())
+
   def event(link: String): F[Option[EventInfo]] =
     load(link) map { doc =>
       for {
@@ -19,6 +21,6 @@ class EventInfoScraper[F[_]](config: ScraperConfig)(implicit F: Sync[F]) extends
       } yield EventInfo(description, images, comments)
   }
 
-  override def loadEvents(day: DateTime) = load(s"${config.tut.url}${config.tut.format.print(day)}")
-  override def load(link: String) = F.delay { new JsoupBrowser().get(link) }
+  override def load(day: DateTime) = load(s"${config.tut.url}${config.tut.format.print(day)}")
+  override def load(link: String) = browser.map(_.get(link))
 }

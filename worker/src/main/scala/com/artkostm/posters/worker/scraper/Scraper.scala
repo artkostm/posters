@@ -22,6 +22,6 @@ abstract class Scraper[F[_]: Sync](config: ScraperConfig) {
   protected lazy val eventImagesExtractor: HtmlExtractor[Element, List[String]] =
     _.map(_ >> attr(config.tut.hrefAttrSelector)).toList
 
-  def loadEvents(day: DateTime): F[Document]
+  def load(day: DateTime): F[Document]
   def load(link: String): F[Document]
 }
