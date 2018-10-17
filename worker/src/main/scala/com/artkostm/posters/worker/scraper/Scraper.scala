@@ -15,7 +15,7 @@ abstract class Scraper[F[_]: Sync](config: ScraperConfig) {
       Comment(comment >> text(config.tut.commentAuthorSelector),
         comment >> text(config.tut.commentDateSelector),
         comment >> text(config.tut.commentTextSelector),
-        comment >?> text(".rating")
+        comment >?> text(config.tut.commentRatingSelector)
       )
     }.toList
 
