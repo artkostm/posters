@@ -8,6 +8,6 @@ final case class Context[F[_]]()
 object Context {
   def prepare[F[_]: Async]: Stream[F, Context[F]] =
     for {
-      _ <- Stream.eval(DoobieMigration.run[F]())
+      _ <- Stream.eval(DoobieMigration.run[F](null))
     } yield Context[F]()
 }
