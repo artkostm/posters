@@ -28,7 +28,7 @@ object AppConfiguration extends Configuration[IO, AppConfig]{
         env[NonEmptyString]("JDBC_DATABASE_PASSWORD")) { (dbUrl, user, password) =>
         AppConfig(version = Configuration.APP_VERSION,
           scraper = scraperConfig,
-          db = Configuration.buildDbConfigForHeroku(dbUrl, user, password)
+          db = Configuration.buildDbConfigForHeroku(dbUrl, user, password))
       }
     }
 
@@ -52,7 +52,8 @@ object AppConfiguration extends Configuration[IO, AppConfig]{
     commentsSelector = "#comments .comments__content",
     commentAuthorSelector = ".head span.author",
     commentDateSelector = ".head .date",
-    commentTextSelector = ".comment_txt"
+    commentTextSelector = ".comment_txt",
+    commentRatingSelector = ".rating"
   ))
 }
 
@@ -65,6 +66,6 @@ case class TutScraper(url: String, format: DateTimeFormatter, blocksSelector: St
                       imgSelector: String, eventPhotoSelector: String,
                       eventDescriptionSelector: String, commentsSelector: String,
                       commentAuthorSelector: String, commentDateSelector: String,
-                      commentTextSelector: String)
+                      commentTextSelector: String, commentRatingSelector: String)
 case class ScraperConfig(tut: TutScraper)
 case class AppConfig(version: String, scraper: ScraperConfig, db: DatabaseConfig)
