@@ -10,6 +10,8 @@ object DoobieTest extends App {
   case class User(name: String, age: Int)
 
   val program = User("Artsiom", 24).pure[ConnectionIO]
+  val x: Query0[User] = null
+  val transactor = null
 
 //  import cats.~>
 //  import cats.data.Kleisli
@@ -20,5 +22,6 @@ object DoobieTest extends App {
   val kleisli = program.foldMap(interpreter)
   val io = IO(null: java.sql.Connection) >>= kleisli.run
 
-  println(io.unsafeRunSync)
+  val user = io.unsafeRunSync
+  println(user)
 }
