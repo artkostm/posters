@@ -2,7 +2,7 @@ name := "posters"
 
 lazy val commonSettings = Seq(
   version             := "0.5.0",
-  scalaVersion        := "2.12.4",
+  scalaVersion        := "2.12.7",
   scalacOptions       := Seq(
     "-feature",
     "-encoding",
@@ -46,6 +46,7 @@ lazy val worker = (project in file("worker")).settings(
   commonSettings,
   libraryDependencies ++= Dependencies.all,
   libraryDependencies ++= Dependencies.workerSpecificDependencies,
-  libraryDependencies ++= Dependencies.doobieDependencies
+  libraryDependencies ++= Dependencies.doobieDependencies,
+  libraryDependencies += "com.github.alexandrnikitin" %% "bloom-filter" % "0.11.0"
 ).dependsOn(internal)
   //.enablePlugins(JavaAppPackaging)
