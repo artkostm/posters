@@ -38,7 +38,8 @@ lazy val web = (project in file("web")).settings(
   libraryDependencies ++= Dependencies.all,
   libraryDependencies ++= Dependencies.doobieDependencies,
   libraryDependencies ++= Dependencies.jsoniterDependencies,
-  libraryDependencies ++= Dependencies.http4sDependencies
+  libraryDependencies ++= Dependencies.http4sDependencies,
+  scalacOptions ++= Seq("-Xmacro-settings:print-codecs")
 ).dependsOn(internal)
   //.enablePlugins(JavaAppPackaging)
 
