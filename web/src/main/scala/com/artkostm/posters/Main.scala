@@ -6,7 +6,6 @@ import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.W
 import cats.effect._
-import com.artkostm.posters.jsoniter.MapValueCodec
 import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 import fs2.StreamApp
