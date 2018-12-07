@@ -15,26 +15,25 @@ trait FlowKeyDataExtractor {
 
   def extract(request: DFRequestV1): FlowKeyData = {
     val category = request.result.parameters.category
-    val date = request.result.parameters.datetime.date
-    val period = request.result.parameters.datetime.period
+    val date     = request.result.parameters.datetime.date
+    val period   = request.result.parameters.datetime.period
     FlowKeyData(category, date, period, None)
   }
 
   def extract(request: DFRequestV2): FlowKeyData = {
     val category = request.queryResult.parameters.category
-    val date = request.queryResult.parameters.datetime.date
-    val period = request.queryResult.parameters.datetime.period
+    val date     = request.queryResult.parameters.datetime.date
+    val period   = request.queryResult.parameters.datetime.period
     FlowKeyData(category, date, None, period)
   }
 
   // period in the format yyyy-mm-dd/yyyy-mm-dd
-  def getPeriod(period: String): (DateTime, DateTime) = {
+  def getPeriod(period: String): (DateTime, DateTime) =
     period.split("/") match {
       case Array(start, end) =>
         (DateTime.parse(start).withTimeAtStartOfDay(), DateTime.parse(end).withTimeAtStartOfDay())
-      case _ => throw new IllegalArgumentException ("Invalid period format")
+      case _ => throw new IllegalArgumentException("Invalid period format")
     }
-  }
 
   def getPeriod(period: Period): (DateTime, DateTime) =
     (period.startDate.withTimeAtStartOfDay(), period.endDate.withTimeAtStartOfDay())
@@ -47,5 +46,6 @@ object FlowKeyDataExtractor extends FlowKeyDataExtractor {
 
   def shouldShowAll(request: DFRequestV2): Boolean = shouldShowAll(request.queryResult.parameters.category)
 
-  private def shouldShowAll(categories: List[String]): Boolean = categories.size == 1 && categories.contains(allCategories)
+  private def shouldShowAll(categories: List[String]): Boolean =
+    categories.size == 1 && categories.contains(allCategories)
 }
