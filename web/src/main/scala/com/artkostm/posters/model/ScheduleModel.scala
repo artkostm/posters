@@ -24,7 +24,7 @@ object Category {
   implicit val catFmt = Json.format[Category]
   implicit val catWrt = Json.writes[Category]
 
-  def toCategory(json: JsValue): Category = json.as[Category]
+  def toCategory(json: JsValue): Category           = json.as[Category]
   def toCategoryList(json: JsValue): List[Category] = json.as[List[Category]]
-  def toJson(categories: List[Category]): JsValue = Json.toJson(categories)
+  def toJson(categories: List[Category]): JsValue   = Json.toJson(categories)
 }
