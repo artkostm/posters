@@ -20,7 +20,8 @@ import scala.concurrent.Future
   * @param actorSystem
   */
 @Singleton
-class EventsCollector @Inject()(scraper: EventsScraper, repository: PostgresPostersRepository,
+class EventsCollector @Inject()(scraper: EventsScraper,
+                                repository: PostgresPostersRepository,
                                 actorSystem: ActorSystem) {
 
   private implicit val system = actorSystem
@@ -32,7 +33,8 @@ class EventsCollector @Inject()(scraper: EventsScraper, repository: PostgresPost
     case _ => Supervision.Stop
   }
 
-  private implicit val materializer = ActorMaterializer(ActorMaterializerSettings(actorSystem).withSupervisionStrategy(decider))
+  private implicit val materializer = ActorMaterializer(
+    ActorMaterializerSettings(actorSystem).withSupervisionStrategy(decider))
 
   private implicit val ec = actorSystem.dispatcher
 
@@ -40,7 +42,8 @@ class EventsCollector @Inject()(scraper: EventsScraper, repository: PostgresPost
 
   private val g = Source.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
     import GraphDSL.Implicits._
-    val in = Source.fromIterator[DateTime](() => days.toIterator)
+    val in = Source
+      .fromIterator[DateTime](() => days.toIterator)
       //.throttle(5, 1 second, 1, ThrottleMode.shaping)
       .mapAsyncUnordered(5)(date => Future(scraper.scheduleFor(date)))
 
@@ -52,15 +55,16 @@ class EventsCollector @Inject()(scraper: EventsScraper, repository: PostgresPost
     val fanIn = builder.add(Merge[Int](2))
     val bcast = builder.add(Broadcast[Day](2))
 
-    val saveDayFlow = Flow[Day].map(day => EventsDay(day.date, Category.toJson(day.events))).mapAsyncUnordered(5)(repository.saveDay)
+    val saveDayFlow =
+      Flow[Day].map(day => EventsDay(day.date, Category.toJson(day.events))).mapAsyncUnordered(5)(repository.saveDay)
 
     val saveInfoFlow = Flow[Option[Info]].mapAsyncUnordered(5) {
       case Some(info) => repository.saveInfo(info)
-      case None => Future.failed(new RuntimeException("Can't save an event info"))
+      case None       => Future.failed(new RuntimeException("Can't save an event info"))
     }
 
-    in ~> bcast ~> saveDayFlow                    ~> fanIn
-          bcast ~> eventsInfoFlow ~> saveInfoFlow ~> fanIn
+    in ~> bcast ~> saveDayFlow ~> fanIn
+    bcast ~> eventsInfoFlow ~> saveInfoFlow ~> fanIn
     SourceShape(fanIn.out)
   })
 
