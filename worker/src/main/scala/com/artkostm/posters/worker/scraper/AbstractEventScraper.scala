@@ -14,7 +14,8 @@ import org.joda.time.DateTime
 abstract class AbstractEventScraper[F[_]: Sync](config: ScraperConfig) {
   private lazy val commentExtractor: HtmlExtractor[Element, List[Comment]] =
     _.map { comment =>
-      Comment(comment >> text(config.tut.commentAuthorSelector),
+      Comment(
+        comment >> text(config.tut.commentAuthorSelector),
         comment >> text(config.tut.commentDateSelector),
         comment >> text(config.tut.commentTextSelector),
         comment >?> text(config.tut.commentRatingSelector)
@@ -28,27 +29,28 @@ abstract class AbstractEventScraper[F[_]: Sync](config: ScraperConfig) {
     _ >> elementList(config.tut.eventsSelector) map (event =>
       for {
         media <- event >?> element(config.tut.mediaSelector)
-        name <- event >?> element(config.tut.eventNameSelector)
-        txt <- event >?> element(config.tut.descriptionSelector)
-      } yield Event(
-                Media(
-                  media.attr(config.tut.hrefAttrSelector),
-                  media >> attr(config.tut.srcAttrSelector)(config.tut.imgSelector)
-                ),
-                name.text,
-                Description(
-                  txt >> text(config.tut.descriptionTextSelector),
-                  txt >?> attr(config.tut.hrefAttrSelector)(config.tut.ticketSelector),
-                  (txt >?> text(config.tut.freeEventSelector)).isDefined
-                )
-      ))
+        name  <- event >?> element(config.tut.eventNameSelector)
+        txt   <- event >?> element(config.tut.descriptionSelector)
+      } yield
+        Event(
+          Media(
+            media.attr(config.tut.hrefAttrSelector),
+            media >> attr(config.tut.srcAttrSelector)(config.tut.imgSelector)
+          ),
+          name.text,
+          Description(
+            txt >> text(config.tut.descriptionTextSelector),
+            txt >?> attr(config.tut.hrefAttrSelector)(config.tut.ticketSelector),
+            (txt >?> text(config.tut.freeEventSelector)).isDefined
+          )
+        ))
 
   def eventInfo(link: String): F[Option[EventInfo]] =
     load(link) map { doc =>
       for {
-        images <- doc >?> extractor(config.tut.eventPhotoSelector, eventImagesExtractor)
+        images              <- doc >?> extractor(config.tut.eventPhotoSelector, eventImagesExtractor)
         description: String = doc >> text(config.tut.eventDescriptionSelector)
-        comments <- doc >?> extractor(config.tut.commentsSelector, commentExtractor)
+        comments            <- doc >?> extractor(config.tut.commentsSelector, commentExtractor)
       } yield EventInfo(description, images, comments)
     }
 
