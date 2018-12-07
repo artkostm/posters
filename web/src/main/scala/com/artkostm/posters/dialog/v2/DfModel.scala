@@ -13,14 +13,21 @@ case class Intent(name: String, displayName: String)
 
 case class DiagnosticInfo()
 
-case class QueryResult(queryText: String, parameters: Parameters, allRequiredParamsPresent: Boolean, intent: Intent,
-                       intentDetectionConfidence: Double, diagnosticInfo: DiagnosticInfo, languageCode: String)
+case class QueryResult(queryText: String,
+                       parameters: Parameters,
+                       allRequiredParamsPresent: Boolean,
+                       intent: Intent,
+                       intentDetectionConfidence: Double,
+                       diagnosticInfo: DiagnosticInfo,
+                       languageCode: String)
 
 case class Payload()
 
 case class OriginalDetectIntentRequest(payload: Payload)
 
-case class DialogflowRequest(responseId: String, queryResult: QueryResult, originalDetectIntentRequest: OriginalDetectIntentRequest,
+case class DialogflowRequest(responseId: String,
+                             queryResult: QueryResult,
+                             originalDetectIntentRequest: OriginalDetectIntentRequest,
                              session: String)
 
 // for response
