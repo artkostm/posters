@@ -6,10 +6,11 @@ import com.google.inject.Inject
 
 import scala.concurrent.ExecutionContext
 
-trait PostgresPostersRepository extends AssignRepository
-                                    with DaysRepository
-                                    with InfoRepository
-                                    with JsonSupportDbComponent {
+trait PostgresPostersRepository
+    extends AssignRepository
+    with DaysRepository
+    with InfoRepository
+    with JsonSupportDbComponent {
   import driver.api._
 
   def setUp()(implicit ec: ExecutionContext) =
@@ -20,6 +21,6 @@ trait PostgresPostersRepository extends AssignRepository
   def close() = db.close()
 }
 
-class PostersRepository @Inject() (ds: DataSource) extends PostgresPostersRepository {
+class PostersRepository @Inject()(ds: DataSource) extends PostgresPostersRepository {
   override protected def dataSource: DataSource = ds
 }
