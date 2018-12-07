@@ -14,6 +14,8 @@ object ToolsModule extends TwitterModule {
 
   @Singleton @Provides def scraper(scraperConfig: ScraperConfig): EventsScraper = new EventsScraper(scraperConfig)
 
-  @Singleton @Provides def collector(scraper: EventsScraper, repo: PostgresPostersRepository, system: ActorSystem): EventsCollector =
+  @Singleton @Provides def collector(scraper: EventsScraper,
+                                     repo: PostgresPostersRepository,
+                                     system: ActorSystem): EventsCollector =
     new EventsCollector(scraper, repo, system)
 }
