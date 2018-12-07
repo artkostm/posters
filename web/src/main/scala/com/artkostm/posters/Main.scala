@@ -6,7 +6,6 @@ import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.W
 import cats.effect._
-import com.artkostm.posters.jsoniter.MapValueCodec
 import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 import fs2.StreamApp
@@ -25,7 +24,6 @@ object Main extends StreamApp[IO] {
   object User {
     implicit val codec: JsonValueCodec[User] = JsonCodecMaker.make[User](CodecMakerConfig())
   }
-
 
   import com.artkostm.posters.jsoniter._
 
@@ -52,7 +50,7 @@ object Main extends StreamApp[IO] {
       .bindHttp(8080, "localhost")
       .mountService(helloWorldService, "/")
       .serve
-}//extends PostersServer
+} //extends PostersServer
 
 //object jjjjjj extends App {
 //  //implicit val codec: JsonValueCodec[List[String]] = JsonCodecMaker.make[List[String]](CodecMakerConfig())

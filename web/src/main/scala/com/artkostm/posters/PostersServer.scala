@@ -20,8 +20,9 @@ object PostersJacksonModule extends FinatraJacksonModule {
 
 class PostersServer extends HttpServer {
   override protected def disableAdminHttpServer = true
-  override protected def jacksonModule = PostersJacksonModule
-  override protected def modules: Seq[Module] = Seq(ConfigModule, AkkaModule, ToolsModule, DbModule, PostersSwaggerModule)
+  override protected def jacksonModule          = PostersJacksonModule
+  override protected def modules: Seq[Module] =
+    Seq(ConfigModule, AkkaModule, ToolsModule, DbModule, PostersSwaggerModule)
   override protected def configureHttp(router: HttpRouter): Unit =
     router
       .exceptionMapper[IllegalArgumentExceptionHandler]
@@ -38,11 +39,9 @@ class PostersServer extends HttpServer {
 }
 
 @Singleton
-class IllegalArgumentExceptionHandler @Inject() (response: ResponseBuilder)
-  extends ExceptionMapper[Exception] {
-  override def toResponse(request: Request, throwable: Exception): Response = {
+class IllegalArgumentExceptionHandler @Inject()(response: ResponseBuilder) extends ExceptionMapper[Exception] {
+  override def toResponse(request: Request, throwable: Exception): Response =
     response.badRequest(ErrorResponse("1", throwable.getMessage))
-  }
 }
 
 case class ErrorResponse(code: String, message: String)

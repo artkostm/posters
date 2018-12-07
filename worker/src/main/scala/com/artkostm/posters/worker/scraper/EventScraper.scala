@@ -10,5 +10,5 @@ class EventScraper[F[_]](config: ScraperConfig)(implicit F: Sync[F]) extends Abs
   private lazy val browser = F.delay(new JsoupBrowser())
 
   override protected def load(day: DateTime) = load(s"${config.tut.url}${config.tut.format.print(day)}")
-  override protected def load(link: String) = browser.map(_.get(link))
+  override protected def load(link: String)  = browser.map(_.get(link))
 }

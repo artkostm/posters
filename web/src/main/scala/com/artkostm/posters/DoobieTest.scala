@@ -9,9 +9,9 @@ import cats.implicits._
 object DoobieTest extends App {
   case class User(name: String, age: Int)
 
-  val program = User("Artsiom", 24).pure[ConnectionIO]
+  val program         = User("Artsiom", 24).pure[ConnectionIO]
   val x: Query0[User] = null
-  val transactor = null
+  val transactor      = null
 
 //  import cats.~>
 //  import cats.data.Kleisli
@@ -19,8 +19,8 @@ object DoobieTest extends App {
 //  import java.sql.Connection
 
   val interpreter = KleisliInterpreter[IO].ConnectionInterpreter
-  val kleisli = program.foldMap(interpreter)
-  val io = IO(null: java.sql.Connection) >>= kleisli.run
+  val kleisli     = program.foldMap(interpreter)
+  val io          = IO(null: java.sql.Connection) >>= kleisli.run
 
   val user = io.unsafeRunSync
   println(user)

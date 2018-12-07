@@ -9,9 +9,9 @@ import com.twitter.finatra.request.QueryParam
 import io.swagger.models.Swagger
 import org.joda.time.DateTime
 
-class IntentsController @Inject() (s: Swagger, repository: PostgresPostersRepository,
-                                   system: ActorSystem)
-  extends SwaggerController with IntentOperation {
+class IntentsController @Inject()(s: Swagger, repository: PostgresPostersRepository, system: ActorSystem)
+    extends SwaggerController
+    with IntentOperation {
   override implicit protected val swagger = s
 
   private implicit val ec = system.dispatcher
@@ -29,8 +29,7 @@ class IntentsController @Inject() (s: Swagger, repository: PostgresPostersReposi
   }
 }
 
-case class AssigneeRequest(@QueryParam date: DateTime,
-                           @QueryParam name: String)
+case class AssigneeRequest(@QueryParam date: DateTime, @QueryParam name: String)
 
 case class Affected(count: Int)
 

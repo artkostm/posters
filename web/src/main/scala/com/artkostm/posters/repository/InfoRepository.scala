@@ -11,11 +11,11 @@ trait InfoTable { self: HasDatabaseConfig[PostersPgProfile] =>
   import profile.api._
 
   private[InfoTable] class Information(tag: Tag) extends Table[Info](tag, "info") {
-    def link: Rep[String] = column[String]("link")
+    def link: Rep[String]          = column[String]("link")
     def eventsInfo: Rep[EventInfo] = column[EventInfo]("eventsInfo")
 
     def * : ProvenShape[Info] = (link, eventsInfo) <> (Info.tupled, Info.unapply)
-    def pk = primaryKey("pk_info", link)
+    def pk                    = primaryKey("pk_info", link)
   }
 
   protected val Information = TableQuery[Information]

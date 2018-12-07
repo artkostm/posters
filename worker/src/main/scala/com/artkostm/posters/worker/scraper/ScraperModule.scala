@@ -14,12 +14,12 @@ class ScraperModule[F[_]: Async](appConfig: AppConfig) {
 }
 
 object testS extends StreamApp[IO] {
-  override def stream (args: List[String], requestShutdown: IO[Unit] ): fs2.Stream[IO, StreamApp.ExitCode] = {
+  override def stream(args: List[String], requestShutdown: IO[Unit]): fs2.Stream[IO, StreamApp.ExitCode] = {
     val stream = for {
-      config <- fs2.Stream.eval(AppConfiguration.load)
+      config  <- fs2.Stream.eval(AppConfiguration.load)
       scraper <- fs2.Stream.eval(IO.pure(new EventScraper[IO](config.scraper)))
-      day <- fs2.Stream.range(1, 31).covary[IO]
-      event <- fs2.Stream.eval(scraper.event(DateTime.now().plusDays(day)))
+      day     <- fs2.Stream.range(1, 31).covary[IO]
+      event   <- fs2.Stream.eval(scraper.event(DateTime.now().plusDays(day)))
     } yield {
       println(event)
     }
@@ -30,7 +30,7 @@ object testS extends StreamApp[IO] {
 
 object ttttttt extends App {
   case class Request(date: DateTime, name: String)
-  val expectedElements = 6
+  val expectedElements  = 6
   val falsePositiveRate = 0.1
 
   implicit val requestHashGenerator = new CanGenerateHashFrom[Request] {
@@ -40,7 +40,7 @@ object ttttttt extends App {
 
   val bf = BloomFilter[Request](expectedElements, falsePositiveRate)
 
-  Runtime.getRuntime.addShutdownHook(new Thread(){
+  Runtime.getRuntime.addShutdownHook(new Thread() {
     override def run(): Unit = {
       println("CLOSING THE PROGRAM")
       bf.dispose()

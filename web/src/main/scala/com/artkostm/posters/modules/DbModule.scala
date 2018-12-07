@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 import javax.sql.DataSource
 
-
 import akka.actor.ActorSystem
 import com.artkostm.posters.collector.EventsCollector
 import com.artkostm.posters.repository.{PostersRepository, PostgresPostersRepository}
@@ -20,10 +19,10 @@ object DbModule extends TwitterModule {
   override def modules: Seq[Module] = Seq(ConfigModule)
 
   @Singleton @Provides def postgresDataSource(config: Config): DataSource = {
-    val uri = new URI(config.getString("postgres.url"))
-    val user = uri.getUserInfo().split(":")(0)
+    val uri      = new URI(config.getString("postgres.url"))
+    val user     = uri.getUserInfo().split(":")(0)
     val password = uri.getUserInfo().split(":")(1)
-    val c = new HikariConfig()
+    val c        = new HikariConfig()
     c.setJdbcUrl(s"jdbc:postgresql://${uri.getHost()}:${uri.getPort()}${uri.getPath()}?sslmode=require")
     c.setUsername(user)
     c.setPassword(password)
@@ -36,7 +35,7 @@ object DbModule extends TwitterModule {
   @Singleton @Provides def postersRepository(ds: DataSource): PostgresPostersRepository = new PostersRepository(ds)
 
   override def singletonStartup(injector: Injector): Unit = {
-    val system = injector.instance[ActorSystem]
+    val system      = injector.instance[ActorSystem]
     implicit val ec = system.dispatcher
     injector.instance[PostgresPostersRepository].setUp
     system.scheduler.schedule(FiniteDuration(15, TimeUnit.SECONDS), FiniteDuration(24, TimeUnit.HOURS)) {

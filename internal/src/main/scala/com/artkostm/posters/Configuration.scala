@@ -8,7 +8,7 @@ import eu.timepit.refined.auto._
 
 abstract class Configuration[F[_], Conf](implicit me: MonadError[F, Throwable]) {
   def load: F[Conf] = config match {
-    case Right(c) => me.pure(c)
+    case Right(c)     => me.pure(c)
     case Left(errors) => me.raiseError(errors.toException)
   }
 
@@ -18,30 +18,26 @@ abstract class Configuration[F[_], Conf](implicit me: MonadError[F, Throwable]) 
 object Configuration {
   val APP_VERSION = "2.6.0"
 
-  val buildDbConfig: NonEmptyString => DatabaseConfig = DatabaseConfig(
-    _,
-    driver = "org.postgresql.Driver",
-    numThreads = 10,
-    maxConnections = 15,
-    minConnections = 4)
+  val buildDbConfig: NonEmptyString => DatabaseConfig =
+    DatabaseConfig(_, driver = "org.postgresql.Driver", numThreads = 10, maxConnections = 15, minConnections = 4)
 
   val buildDbConfigForHeroku: (NonEmptyString, NonEmptyString, NonEmptyString) => DatabaseConfig =
-    (url, user, password) => DatabaseConfig(
-      url,
-      driver = "org.postgresql.Driver",
-      user = user,
-      password = password,
-      numThreads = 10,
-      maxConnections = 15,
-      minConnections = 4)
+    (url, user, password) =>
+      DatabaseConfig(url,
+                     driver = "org.postgresql.Driver",
+                     user = user,
+                     password = password,
+                     numThreads = 10,
+                     maxConnections = 15,
+                     minConnections = 4)
 
   final case class DatabaseConfig(
-                                   url: NonEmptyString,
-                                   driver: NonEmptyString,
-                                   user: String = "",
-                                   password: String = "",
-                                   numThreads: PosInt,
-                                   maxConnections: PosInt,
-                                   minConnections: PosInt
-                                 )
+      url: NonEmptyString,
+      driver: NonEmptyString,
+      user: String = "",
+      password: String = "",
+      numThreads: PosInt,
+      maxConnections: PosInt,
+      minConnections: PosInt
+  )
 }

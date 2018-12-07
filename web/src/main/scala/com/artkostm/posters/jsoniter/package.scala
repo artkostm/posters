@@ -1,5 +1,3 @@
 package com.artkostm.posters
 
-package object jsoniter extends JsoniterInstances {
-
-}
+package object jsoniter extends JsoniterInstances {}

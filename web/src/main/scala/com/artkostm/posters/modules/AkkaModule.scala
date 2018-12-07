@@ -23,9 +23,8 @@ object AkkaModule extends TwitterModule {
     }))
   }
 
-  override def singletonShutdown(injector: Injector): Unit = {
+  override def singletonShutdown(injector: Injector): Unit =
     actor ! Stop
-  }
 }
 
 private[modules] class ShutdownActor extends Actor {

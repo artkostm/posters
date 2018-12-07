@@ -56,8 +56,7 @@ object Test extends App {
 //
 //  println(Person("Artsiom").asJson)
 
-
-  val ApiKey = "some api key"
+  val ApiKey   = "some api key"
   val ApiToken = "some api token"
 
   val jwtKey = HMACSHA256.unsafeBuildKey(ApiToken.getBytes)

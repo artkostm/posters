@@ -11,7 +11,7 @@ sealed trait DbComponent[P <: BasicProfile] {
 
 trait JsonSupportDbComponent extends DbComponent[PostersPgProfile] with HasDatabaseConfig[PostersPgProfile] {
   override lazy val component = this
-  override lazy val driver = PostersPgProfile
+  override lazy val driver    = PostersPgProfile
 
   protected def dataSource: DataSource
 
