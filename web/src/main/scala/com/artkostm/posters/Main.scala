@@ -25,7 +25,6 @@ object Main extends StreamApp[IO] {
     implicit val codec: JsonValueCodec[User] = JsonCodecMaker.make[User](CodecMakerConfig())
   }
 
-
   import com.artkostm.posters.jsoniter._
 
   val helloWorldService = HttpService[IO] {
@@ -51,7 +50,7 @@ object Main extends StreamApp[IO] {
       .bindHttp(8080, "localhost")
       .mountService(helloWorldService, "/")
       .serve
-}//extends PostersServer
+} //extends PostersServer
 
 //object jjjjjj extends App {
 //  //implicit val codec: JsonValueCodec[List[String]] = JsonCodecMaker.make[List[String]](CodecMakerConfig())
