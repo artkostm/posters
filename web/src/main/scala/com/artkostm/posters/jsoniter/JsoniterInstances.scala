@@ -11,11 +11,12 @@ import scala.util.Try
 
 trait JsoniterInstances {
   implicit def jsoniterEntityEncoder[F[_]: Applicative, A: JsonValueCodec]: EntityEncoder[F, A] =
-    EntityEncoder.byteArrayEncoder[F]
+    EntityEncoder
+      .byteArrayEncoder[F]
       .contramap[A](writeToArray(_))
       .withContentType(`Content-Type`(MediaType.`application/json`))
 
-  implicit def jsoniterEntityDecoder[F[_]: Sync, A](implicit codec: JsonValueCodec[A]): EntityDecoder[F, A] =
+  implicit def jsoniterEntityDecoder[F[_]: Sync, A: JsonValueCodec]: EntityDecoder[F, A] =
     EntityDecoder.decodeBy(MediaType.`application/json`) { msg =>
       EntityDecoder.collectBinary(msg).flatMap { segment =>
         val bb = ByteBuffer.wrap(segment.force.toArray)
@@ -24,8 +25,7 @@ trait JsoniterInstances {
             case Right(json) =>
               DecodeResult.success[F, A](json)
             case Left(pf) =>
-              DecodeResult.failure[F, A](
-                MalformedMessageBodyFailure("Invalid JSON", Some(pf)))
+              DecodeResult.failure[F, A](MalformedMessageBodyFailure("Invalid JSON", Some(pf)))
           }
         } else {
           DecodeResult.failure[F, A](MalformedMessageBodyFailure("Invalid JSON: empty body", None))

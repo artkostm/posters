@@ -10,9 +10,12 @@ import com.twitter.finatra.request.{QueryParam, RouteParam}
 import io.swagger.models.Swagger
 import org.joda.time.DateTime
 
-class CategoryController @Inject()(s: Swagger, repository: PostgresPostersRepository,
-                                   system: ActorSystem, scraper: EventsScraper)
-  extends SwaggerController with AllDayOfEventsOperation {
+class CategoryController @Inject()(s: Swagger,
+                                   repository: PostgresPostersRepository,
+                                   system: ActorSystem,
+                                   scraper: EventsScraper)
+    extends SwaggerController
+    with AllDayOfEventsOperation {
 
   override implicit protected val swagger = s
 
@@ -21,14 +24,14 @@ class CategoryController @Inject()(s: Swagger, repository: PostgresPostersReposi
   getWithDoc("/posters/:date/?")(allDayOfEventsOp) { request: WithDate =>
     repository.findDay(request.date).map {
       case Some(Day(categories, _)) => categories
-      case _ => scraper.scheduleFor(request.date).events
+      case _                        => scraper.scheduleFor(request.date).events
     }
   }
 
   getWithDoc("/posters/?")(eventsByCategoryNameOp) { request: WithNameAndDate =>
     repository.findCategory(request.date, request.name).map {
       case res @ Some(_) => res
-      case _ => scraper.scheduleFor(request.date).events.find(_.name.equalsIgnoreCase(request.name))
+      case _             => scraper.scheduleFor(request.date).events.find(_.name.equalsIgnoreCase(request.name))
     }
   }
 }
