@@ -16,10 +16,10 @@ abstract class Configuration[F[_], Conf](implicit me: MonadError[F, Throwable]) 
 }
 
 object Configuration {
-  val APP_VERSION = "2.6.0"
+  val AppVersion = "3.0.0"
 
   val buildDbConfig: NonEmptyString => DatabaseConfig =
-    DatabaseConfig(_, driver = "org.postgresql.Driver", numThreads = 10, maxConnections = 15, minConnections = 4)
+    DatabaseConfig(_, driver = "org.postgresql.Driver", user = "test", password = "12345", numThreads = 10, maxConnections = 15, minConnections = 4)
 
   val buildDbConfigForHeroku: (NonEmptyString, NonEmptyString, NonEmptyString) => DatabaseConfig =
     (url, user, password) =>
