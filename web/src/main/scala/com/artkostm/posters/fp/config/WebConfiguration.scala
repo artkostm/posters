@@ -25,7 +25,7 @@ object WebConfiguration extends Configuration[IO, AppConfig] {
       case Local =>
         loadConfig {
           AppConfig(
-            version = Configuration.APP_VERSION,
+            version = Configuration.AppVersion,
             http = HttpConfig(8080),
             db = Configuration.buildDbConfig("url"),
             api = ApiConfig(Secret("uufdeddddd00d0d00d0d00d0d0"), "token")
@@ -39,7 +39,7 @@ object WebConfiguration extends Configuration[IO, AppConfig] {
           env[NonEmptyString]("JDBC_DATABASE_USERNAME"),
           env[NonEmptyString]("JDBC_DATABASE_PASSWORD")
         ) { (apiKey, port, dbUrl, user, password) =>
-          AppConfig(version = Configuration.APP_VERSION,
+          AppConfig(version = Configuration.AppVersion,
                     http = HttpConfig(port),
                     db = Configuration.buildDbConfigForHeroku(dbUrl, user, password),
                     api = ApiConfig(apiKey, "token"))

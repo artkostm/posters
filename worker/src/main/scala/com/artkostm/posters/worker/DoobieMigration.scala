@@ -20,10 +20,12 @@ trait DoobieMigration extends JdbcMigration {
 
 object DoobieMigration {
   def run[F[_]](config: AppConfig)(implicit F: Sync[F]): F[Int] = F.delay {
+    println(config)
     val flyway   = new Flyway
     val location = classOf[migration.V0001__CreateVisitors].getPackage.getName.replace(".", "/")
 
-    flyway.setDataSource("jdbc:h2:~/test;MODE=PostgreSQL", "", "")
+//    flyway.setDataSource("jdbc:h2:~/test;MODE=PostgreSQL", "", "")
+    flyway.setDataSource(config.db.url.value, config.db.user, config.db.password)
     flyway.setLocations(location)
     flyway.migrate()
   }
