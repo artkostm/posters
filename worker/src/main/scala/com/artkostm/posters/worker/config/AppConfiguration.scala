@@ -19,15 +19,15 @@ object AppConfiguration extends Configuration[IO, AppConfig] {
     withValue(env[AppEnvironment]("APP_ENV").orElse(ConfigValue(Right(Local)))) {
       case Local =>
         loadConfig {
-          AppConfig(version = Configuration.APP_VERSION,
+          AppConfig(version = Configuration.AppVersion,
                     scraper = scraperConfig,
-                    db = Configuration.buildDbConfig("url"))
+                    db = Configuration.buildDbConfig("jdbc:postgresql://localhost:5432/postgres"))
         }
       case Production | Heroku =>
         loadConfig(env[NonEmptyString]("JDBC_DATABASE_URL"),
                    env[NonEmptyString]("JDBC_DATABASE_USERNAME"),
                    env[NonEmptyString]("JDBC_DATABASE_PASSWORD")) { (dbUrl, user, password) =>
-          AppConfig(version = Configuration.APP_VERSION,
+          AppConfig(version = Configuration.AppVersion,
                     scraper = scraperConfig,
                     db = Configuration.buildDbConfigForHeroku(dbUrl, user, password))
         }
