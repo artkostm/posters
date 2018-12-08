@@ -9,6 +9,6 @@ object Main extends StreamApp[IO] {
   override def stream(args: List[String], requestShutdown: IO[Unit]): Stream[IO, StreamApp.ExitCode] =
     for {
       config <- Stream.eval(AppConfiguration.load)
-      _ <- Context.prepare[IO](config)
+      _      <- Context.prepare[IO](config)
     } yield ExitCode.Success
 }
