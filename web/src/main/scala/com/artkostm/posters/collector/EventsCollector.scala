@@ -63,8 +63,10 @@ class EventsCollector @Inject()(scraper: EventsScraper,
       case None       => Future.failed(new RuntimeException("Can't save an event info"))
     }
 
-    in ~> bcast ~> saveDayFlow ~> fanIn
-    bcast ~> eventsInfoFlow ~> saveInfoFlow ~> fanIn
+    // format: off
+    in ~> bcast ~> saveDayFlow                    ~> fanIn
+          bcast ~> eventsInfoFlow ~> saveInfoFlow ~> fanIn
+    // format: on
     SourceShape(fanIn.out)
   })
 
