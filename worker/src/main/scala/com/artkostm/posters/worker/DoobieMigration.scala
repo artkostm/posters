@@ -23,7 +23,7 @@ object DoobieMigration {
     val flyway   = new Flyway
     val location = classOf[migration.V0001__CreateVisitors].getPackage.getName.replace(".", "/")
 
-    flyway.setDataSource("jdbc:h2:~/test;MODE=PostgreSQL", "", "")
+    flyway.setDataSource(config.db.url.value, config.db.user, config.db.password)
     flyway.setLocations(location)
     flyway.migrate()
   }

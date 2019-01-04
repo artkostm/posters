@@ -71,7 +71,6 @@ object Dependencies {
     "org.tpolecat" %% "doobie-core",
     "org.tpolecat" %% "doobie-hikari",
     "org.tpolecat" %% "doobie-postgres", // Postgres driver 42.2.2 + type mappings.
-    "org.tpolecat" %% "doobie-specs2",
     "org.tpolecat" %% "doobie-scalatest"
   ).map(_ % versions.doobie)
 

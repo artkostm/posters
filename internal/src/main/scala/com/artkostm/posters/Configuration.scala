@@ -16,7 +16,7 @@ abstract class Configuration[F[_], Conf](implicit me: MonadError[F, Throwable]) 
 }
 
 object Configuration {
-  val APP_VERSION = "2.6.0"
+  val AppVersion = "2.6.0"
 
   val buildDbConfig: NonEmptyString => DatabaseConfig =
     DatabaseConfig(_, driver = "org.postgresql.Driver", numThreads = 10, maxConnections = 15, minConnections = 4)
