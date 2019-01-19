@@ -1,6 +1,5 @@
 package com.artkostm.posters.worker.config
 
-import cats.effect.IO
 import ciris._
 import ciris.refined._
 import ciris.enumeratum._
@@ -11,7 +10,7 @@ import eu.timepit.refined.auto._
 import eu.timepit.refined.types.string.NonEmptyString
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 
-object AppConfiguration extends Configuration[IO, AppConfig] {
+object AppConfiguration extends Configuration[AppConfig] {
 
   import com.artkostm.posters.environments.AppEnvironment._
 

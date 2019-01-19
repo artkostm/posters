@@ -1,6 +1,5 @@
 package com.artkostm.posters.fp.config
 
-import cats.effect.IO
 import ciris._
 import ciris.refined._
 import ciris.enumeratum._
@@ -15,7 +14,7 @@ import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.net.UserPortNumber
 import eu.timepit.refined.types.string.NonEmptyString
 
-object WebConfiguration extends Configuration[IO, AppConfig] {
+object WebConfiguration extends Configuration[AppConfig] {
   type ApiKey = String Refined MatchesRegex[W.`"[a-zA-Z0-9]{25,40}"`.T]
 
   import com.artkostm.posters.environments.AppEnvironment._
