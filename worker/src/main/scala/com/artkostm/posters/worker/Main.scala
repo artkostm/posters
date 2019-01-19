@@ -8,7 +8,7 @@ import fs2.{Stream, StreamApp}
 object Main extends StreamApp[IO] {
   override def stream(args: List[String], requestShutdown: IO[Unit]): Stream[IO, StreamApp.ExitCode] =
     for {
-      config <- Stream.eval(AppConfiguration.load)
+      config <- Stream.eval(AppConfiguration.load[IO])
       _      <- Context.prepare[IO](config)
     } yield ExitCode.Success
 }
