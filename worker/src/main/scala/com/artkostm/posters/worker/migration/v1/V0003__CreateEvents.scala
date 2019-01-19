@@ -1,5 +1,6 @@
-package com.artkostm.posters.worker.migration
+package com.artkostm.posters.worker.migration.v1
 
+import com.artkostm.posters.worker.migration.DoobieMigration
 import doobie._
 import doobie.implicits._
 
