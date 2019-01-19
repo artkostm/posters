@@ -1,8 +1,8 @@
-package com.artkostm.posters.worker.migration
+package com.artkostm.posters.worker.migration.v1
 
+import com.artkostm.posters.worker.migration.DoobieMigration
 import doobie._
 import doobie.implicits._
-import com.artkostm.posters.worker.DoobieMigration
 
 final class V0001__CreateVisitors extends DoobieMigration {
   override def migrate: ConnectionIO[_] =

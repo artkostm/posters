@@ -2,6 +2,7 @@ package com.artkostm.posters.worker
 
 import cats.effect.Async
 import com.artkostm.posters.worker.config.AppConfig
+import com.artkostm.posters.worker.migration.DoobieMigration
 import fs2.Stream
 
 final case class Context[F[_]](config: AppConfig)

@@ -6,8 +6,8 @@ import eu.timepit.refined.types.numeric.PosInt
 import eu.timepit.refined.types.string.NonEmptyString
 import eu.timepit.refined.auto._
 
-abstract class Configuration[F[_], Conf](implicit me: MonadError[F, Throwable]) {
-  def load: F[Conf] = config match {
+trait Configuration[Conf] {
+  def load[F[_]](implicit me: MonadError[F, Throwable]): F[Conf] = config match {
     case Right(c)     => me.pure(c)
     case Left(errors) => me.raiseError(errors.toException)
   }
