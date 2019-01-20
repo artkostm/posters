@@ -1,7 +1,8 @@
 package com.artkostm.posters.worker
 
-import cats.effect.{Effect, IO}
+import cats.effect.Effect
 import com.artkostm.posters.worker.config.{AppConfig, AppConfiguration}
+import com.artkostm.posters.worker.migration.DoobieMigration
 import doobie.hikari.HikariTransactor
 
 class WorkerModule[F[_]: Effect](config: AppConfig, val xa: HikariTransactor[F]) {}
@@ -9,10 +10,8 @@ class WorkerModule[F[_]: Effect](config: AppConfig, val xa: HikariTransactor[F])
 object WorkerModule {
   def init[F[_]: Effect]: F[WorkerModule[F]] =
     for {
-      config <- AppConfiguration.load
-      xa <- HikariTransactor.newHikariTransactor[F](driverClassName = "org.postgresql.Driver",
-                                                    url = "jdbc:postgresql://localhost:5432/postgres",
-                                                    user = "test",
-                                                    pass = "12345")
+      config: AppConfig <- AppConfiguration.load[F]
+      _                 <- DoobieMigration.run[F](config)
+      xa                <- DoobieMigration.transactor(config.db)
     } yield new WorkerModule[F](config, xa)
 }
