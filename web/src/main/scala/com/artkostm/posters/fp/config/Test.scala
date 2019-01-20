@@ -7,7 +7,7 @@ import fs2.StreamApp.ExitCode
 object Test extends StreamApp[IO] {
   override def stream(args: List[String], requestShutdown: IO[Unit]): fs2.Stream[IO, StreamApp.ExitCode] =
     fs2.Stream
-      .eval(WebConfiguration.load)
+      .eval(WebConfiguration.load[IO])
       .flatMap(appConfig => {
         println(appConfig)
         Stream.eval(IO.pure(ExitCode.Success))
