@@ -1,5 +1,5 @@
-package com.artkostm.posters.db
+package com.artkostm.posters.algebra
 
-trait EventStoreAlgebra[F[_]] {
+trait EventStore[F[_]] {
 
 }

@@ -1,5 +1,5 @@
 package com.artkostm.posters.algebra
 
-trait InfoStoreAlgebra[F[_]] {
+trait InfoStore[F[_]] {
 
 }
