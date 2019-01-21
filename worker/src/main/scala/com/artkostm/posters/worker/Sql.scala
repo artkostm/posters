@@ -1,5 +1,6 @@
 package com.artkostm.posters.worker
 
+import java.nio.charset.StandardCharsets
 import java.sql.Timestamp
 
 import akka.dispatch.ExecutionContexts
@@ -11,10 +12,25 @@ import doobie.hikari._
 import org.joda.time.DateTime
 import doobie.postgres._
 import doobie.postgres.implicits._
+import org.postgresql.util.PGobject
+import com.github.plokhotnyuk.jsoniter_scala.core._
 
 import scala.concurrent.ExecutionContext
 
 object Sql extends App {
+
+  implicit def jsonbMeta[A: JsonValueCodec]: doobie.Meta[A] =
+    doobie.Meta
+      .other[PGobject]("jsonb")
+      .xmap[A](
+        pgObject => readFromArray(pgObject.getValue.getBytes(StandardCharsets.UTF_8)),
+        jsonObject => {
+          val pgObject = new PGobject()
+          pgObject.setType("jsonb")
+          pgObject.setValue(new String(writeToArray(jsonObject), StandardCharsets.UTF_8))
+          pgObject
+        }
+      )
 
   val transactor = HikariTransactor.newHikariTransactor[IO](driverClassName = "org.postgresql.Driver",
                                                             url = "jdbc:postgresql://localhost:5432/postgres",
