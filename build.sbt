@@ -52,6 +52,7 @@ lazy val worker = (project in file("worker"))
     commonSettings,
     libraryDependencies ++= Dependencies.all,
     libraryDependencies ++= Dependencies.workerSpecificDependencies,
+    libraryDependencies ++= Dependencies.jsoniterDependencies,
     libraryDependencies ++= Dependencies.doobieDependencies,
     libraryDependencies += "com.github.alexandrnikitin" %% "bloom-filter" % "0.11.0"
   )
