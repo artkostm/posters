@@ -6,7 +6,11 @@ case class Period(endDate: java.time.OffsetDateTime, startDate: java.time.Offset
 object Period {
   implicit val encodePeriod = {
     val readOnlyKeys = Set[String]()
-    Encoder.forProduct2("endDate", "startDate") { (o: Period) => (o.endDate, o.startDate) }.mapJsonObject(_.filterKeys(key => !(readOnlyKeys contains key)))
+    Encoder
+      .forProduct2("endDate", "startDate") { (o: Period) =>
+        (o.endDate, o.startDate)
+      }
+      .mapJsonObject(_.filterKeys(key => !(readOnlyKeys contains key)))
   }
   implicit val decodePeriod = Decoder.forProduct2("endDate", "startDate")(Period.apply _)
 }

@@ -6,7 +6,11 @@ case class Fulfillment(speech: String, messages: IndexedSeq[Message] = IndexedSe
 object Fulfillment {
   implicit val encodeFulfillment = {
     val readOnlyKeys = Set[String]()
-    Encoder.forProduct2("speech", "messages") { (o: Fulfillment) => (o.speech, o.messages) }.mapJsonObject(_.filterKeys(key => !(readOnlyKeys contains key)))
+    Encoder
+      .forProduct2("speech", "messages") { (o: Fulfillment) =>
+        (o.speech, o.messages)
+      }
+      .mapJsonObject(_.filterKeys(key => !(readOnlyKeys contains key)))
   }
   implicit val decodeFulfillment = Decoder.forProduct2("speech", "messages")(Fulfillment.apply _)
 }

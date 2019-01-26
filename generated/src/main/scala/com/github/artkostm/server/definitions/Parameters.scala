@@ -6,7 +6,11 @@ case class Parameters(category: IndexedSeq[String] = IndexedSeq.empty, datetime:
 object Parameters {
   implicit val encodeParameters = {
     val readOnlyKeys = Set[String]()
-    Encoder.forProduct2("category", "datetime") { (o: Parameters) => (o.category, o.datetime) }.mapJsonObject(_.filterKeys(key => !(readOnlyKeys contains key)))
+    Encoder
+      .forProduct2("category", "datetime") { (o: Parameters) =>
+        (o.category, o.datetime)
+      }
+      .mapJsonObject(_.filterKeys(key => !(readOnlyKeys contains key)))
   }
   implicit val decodeParameters = Decoder.forProduct2("category", "datetime")(Parameters.apply _)
 }

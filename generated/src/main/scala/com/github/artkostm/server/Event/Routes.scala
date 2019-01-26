@@ -3,7 +3,7 @@ import cats.data.EitherT
 import cats.implicits._
 import cats.effect.IO
 import cats.effect.Effect
-import org.http4s.{ Status => _, _ }
+import org.http4s.{Status => _, _}
 import org.http4s.circe._
 import org.http4s.client.{Client => Http4sClient}
 import org.http4s.client.blaze._
@@ -22,7 +22,9 @@ import fs2.text._
 import _root_.com.github.artkostm.server.Implicits._
 import _root_.com.github.artkostm.server.Http4sImplicits._
 import _root_.com.github.artkostm.server.definitions._
-trait EventHandler[F[_]] { def getEventByLink(respond: GetEventByLinkResponse.type)(link: String): F[GetEventByLinkResponse] }
+trait EventHandler[F[_]] {
+  def getEventByLink(respond: GetEventByLinkResponse.type)(link: String): F[GetEventByLinkResponse]
+}
 class EventResource[F[_]]()(implicit E: Effect[F]) extends Http4sDsl[F] {
   object GetEventByLinkLinkMatcher extends QueryParamDecoderMatcher[String]("link")
   val getEventByLinkOkEncoder = jsonEncoderOf[F, Info]
@@ -48,5 +50,5 @@ sealed abstract class GetEventByLinkResponse {
 }
 object GetEventByLinkResponse {
   case class Ok(value: Info) extends GetEventByLinkResponse
-  case object NotFound extends GetEventByLinkResponse
+  case object NotFound       extends GetEventByLinkResponse
 }

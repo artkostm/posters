@@ -3,7 +3,7 @@ import cats.data.EitherT
 import cats.implicits._
 import cats.effect.IO
 import cats.effect.Effect
-import org.http4s.{ Status => _, _ }
+import org.http4s.{Status => _, _}
 import org.http4s.circe._
 import org.http4s.client.{Client => Http4sClient}
 import org.http4s.client.blaze._
@@ -22,20 +22,31 @@ import fs2.text._
 import _root_.com.github.artkostm.server.Implicits._
 import _root_.com.github.artkostm.server.Http4sImplicits._
 import _root_.com.github.artkostm.server.definitions._
-trait DialogflowV1Handler[F[_]] { def getAllEventsByCatNameAndDate(respond: GetAllEventsByCatNameAndDateResponse.type)(body: Option[DialogflowRequestBody] = None): F[GetAllEventsByCatNameAndDateResponse] }
+trait DialogflowV1Handler[F[_]] {
+  def getAllEventsByCatNameAndDate(respond: GetAllEventsByCatNameAndDateResponse.type)(
+      body: Option[DialogflowRequestBody] = None): F[GetAllEventsByCatNameAndDateResponse]
+}
 class DialogflowV1Resource[F[_]]()(implicit E: Effect[F]) extends Http4sDsl[F] {
-  val getAllEventsByCatNameAndDateDecoder: EntityDecoder[F, Option[DialogflowRequestBody]] = decodeBy(MediaType.text.plain) {
-    msg => msg.contentLength.filter(_ > 0).fold[DecodeResult[F, Option[DialogflowRequestBody]]](DecodeResult.success(None)) {
-      _ => DecodeResult.success(decodeString(msg)).flatMap {
-        str => Json.fromString(str).as[Option[DialogflowRequestBody]].fold(failure => DecodeResult.failure(InvalidMessageBodyFailure(s"Could not decode response: $str", Some(failure))), DecodeResult.success(_))
+  val getAllEventsByCatNameAndDateDecoder: EntityDecoder[F, Option[DialogflowRequestBody]] =
+    decodeBy(MediaType.text.plain) { msg =>
+      msg.contentLength.filter(_ > 0).fold[DecodeResult[F, Option[DialogflowRequestBody]]](DecodeResult.success(None)) {
+        _ =>
+          DecodeResult.success(decodeString(msg)).flatMap { str =>
+            Json
+              .fromString(str)
+              .as[Option[DialogflowRequestBody]]
+              .fold(
+                failure =>
+                  DecodeResult.failure(InvalidMessageBodyFailure(s"Could not decode response: $str", Some(failure))),
+                DecodeResult.success(_))
+          }
       }
     }
-  }
   val getAllEventsByCatNameAndDateOkEncoder = jsonEncoderOf[F, DialogflowResponse]
   def routes(handler: DialogflowV1Handler[F]): HttpRoutes[F] = HttpRoutes.of {
     {
       case req @ POST -> Root / "webhook" / "v1" / "" =>
-        req.decodeWith(getAllEventsByCatNameAndDateDecoder, strict = false) { body => 
+        req.decodeWith(getAllEventsByCatNameAndDateDecoder, strict = false) { body =>
           handler.getAllEventsByCatNameAndDate(GetAllEventsByCatNameAndDateResponse)(body) flatMap {
             case GetAllEventsByCatNameAndDateResponse.Ok(value) =>
               Ok(value)(E, getAllEventsByCatNameAndDateOkEncoder)
@@ -60,6 +71,6 @@ sealed abstract class GetAllEventsByCatNameAndDateResponse {
 }
 object GetAllEventsByCatNameAndDateResponse {
   case class Ok(value: DialogflowResponse) extends GetAllEventsByCatNameAndDateResponse
-  case object BadRequest extends GetAllEventsByCatNameAndDateResponse
-  case object NotFound extends GetAllEventsByCatNameAndDateResponse
+  case object BadRequest                   extends GetAllEventsByCatNameAndDateResponse
+  case object NotFound                     extends GetAllEventsByCatNameAndDateResponse
 }

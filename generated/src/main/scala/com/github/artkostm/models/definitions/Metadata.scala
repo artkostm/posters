@@ -6,7 +6,12 @@ case class Metadata(intentId: String, webhookUsed: String, webhookForSlotFilling
 object Metadata {
   implicit val encodeMetadata = {
     val readOnlyKeys = Set[String]()
-    Encoder.forProduct4("intentId", "webhookUsed", "webhookForSlotFillingUsed", "intentName") { (o: Metadata) => (o.intentId, o.webhookUsed, o.webhookForSlotFillingUsed, o.intentName) }.mapJsonObject(_.filterKeys(key => !(readOnlyKeys contains key)))
+    Encoder
+      .forProduct4("intentId", "webhookUsed", "webhookForSlotFillingUsed", "intentName") { (o: Metadata) =>
+        (o.intentId, o.webhookUsed, o.webhookForSlotFillingUsed, o.intentName)
+      }
+      .mapJsonObject(_.filterKeys(key => !(readOnlyKeys contains key)))
   }
-  implicit val decodeMetadata = Decoder.forProduct4("intentId", "webhookUsed", "webhookForSlotFillingUsed", "intentName")(Metadata.apply _)
+  implicit val decodeMetadata =
+    Decoder.forProduct4("intentId", "webhookUsed", "webhookForSlotFillingUsed", "intentName")(Metadata.apply _)
 }

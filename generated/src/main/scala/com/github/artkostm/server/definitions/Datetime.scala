@@ -6,7 +6,11 @@ case class Datetime(date: Option[java.time.OffsetDateTime] = None, period: Optio
 object Datetime {
   implicit val encodeDatetime = {
     val readOnlyKeys = Set[String]()
-    Encoder.forProduct2("date", "period") { (o: Datetime) => (o.date, o.period) }.mapJsonObject(_.filterKeys(key => !(readOnlyKeys contains key)))
+    Encoder
+      .forProduct2("date", "period") { (o: Datetime) =>
+        (o.date, o.period)
+      }
+      .mapJsonObject(_.filterKeys(key => !(readOnlyKeys contains key)))
   }
   implicit val decodeDatetime = Decoder.forProduct2("date", "period")(Datetime.apply _)
 }

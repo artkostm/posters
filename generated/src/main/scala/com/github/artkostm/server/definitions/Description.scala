@@ -6,7 +6,11 @@ case class Description(desc: String, ticket: Option[String] = None, isFree: Bool
 object Description {
   implicit val encodeDescription = {
     val readOnlyKeys = Set[String]()
-    Encoder.forProduct3("desc", "ticket", "isFree") { (o: Description) => (o.desc, o.ticket, o.isFree) }.mapJsonObject(_.filterKeys(key => !(readOnlyKeys contains key)))
+    Encoder
+      .forProduct3("desc", "ticket", "isFree") { (o: Description) =>
+        (o.desc, o.ticket, o.isFree)
+      }
+      .mapJsonObject(_.filterKeys(key => !(readOnlyKeys contains key)))
   }
   implicit val decodeDescription = Decoder.forProduct3("desc", "ticket", "isFree")(Description.apply _)
 }

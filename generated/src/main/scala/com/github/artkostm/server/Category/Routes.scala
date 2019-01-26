@@ -3,7 +3,7 @@ import cats.data.EitherT
 import cats.implicits._
 import cats.effect.IO
 import cats.effect.Effect
-import org.http4s.{ Status => _, _ }
+import org.http4s.{Status => _, _}
 import org.http4s.circe._
 import org.http4s.client.{Client => Http4sClient}
 import org.http4s.client.blaze._
@@ -23,17 +23,19 @@ import _root_.com.github.artkostm.server.Implicits._
 import _root_.com.github.artkostm.server.Http4sImplicits._
 import _root_.com.github.artkostm.server.definitions._
 trait CategoryHandler[F[_]] {
-  def getAllEventsByName(respond: GetAllEventsByNameResponse.type)(date: String, name: String): F[GetAllEventsByNameResponse]
+  def getAllEventsByName(respond: GetAllEventsByNameResponse.type)(date: String,
+                                                                   name: String): F[GetAllEventsByNameResponse]
   def getAllEvents(respond: GetAllEventsResponse.type)(date: String): F[GetAllEventsResponse]
 }
 class CategoryResource[F[_]]()(implicit E: Effect[F]) extends Http4sDsl[F] {
   object GetAllEventsByNameDateMatcher extends QueryParamDecoderMatcher[String]("date")
   object GetAllEventsByNameNameMatcher extends QueryParamDecoderMatcher[String]("name")
   val getAllEventsByNameOkEncoder = jsonEncoderOf[F, Category]
-  val getAllEventsOkEncoder = jsonEncoderOf[F, IndexedSeq[BigDecimal]]
+  val getAllEventsOkEncoder       = jsonEncoderOf[F, IndexedSeq[BigDecimal]]
   def routes(handler: CategoryHandler[F]): HttpRoutes[F] = HttpRoutes.of {
     {
-      case req @ GET -> Root / "posters" / "" :? GetAllEventsByNameDateMatcher(date) +& GetAllEventsByNameNameMatcher(name) =>
+      case req @ GET -> Root / "posters" / "" :? GetAllEventsByNameDateMatcher(date) +& GetAllEventsByNameNameMatcher(
+            name) =>
         handler.getAllEventsByName(GetAllEventsByNameResponse)(date, name) flatMap {
           case GetAllEventsByNameResponse.Ok(value) =>
             Ok(value)(E, getAllEventsByNameOkEncoder)
@@ -60,7 +62,7 @@ sealed abstract class GetAllEventsByNameResponse {
 }
 object GetAllEventsByNameResponse {
   case class Ok(value: Category) extends GetAllEventsByNameResponse
-  case object NotFound extends GetAllEventsByNameResponse
+  case object NotFound           extends GetAllEventsByNameResponse
 }
 sealed abstract class GetAllEventsResponse {
   def fold[A](handleOk: IndexedSeq[BigDecimal] => A, handleNotFound: => A): A = this match {
@@ -72,5 +74,5 @@ sealed abstract class GetAllEventsResponse {
 }
 object GetAllEventsResponse {
   case class Ok(value: IndexedSeq[BigDecimal]) extends GetAllEventsResponse
-  case object NotFound extends GetAllEventsResponse
+  case object NotFound                         extends GetAllEventsResponse
 }

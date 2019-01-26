@@ -3,7 +3,7 @@ import cats.data.EitherT
 import cats.implicits._
 import cats.effect.IO
 import cats.effect.Effect
-import org.http4s.{ Status => _, _ }
+import org.http4s.{Status => _, _}
 import org.http4s.circe._
 import org.http4s.client.{Client => Http4sClient}
 import org.http4s.client.blaze._
@@ -28,10 +28,15 @@ trait IntentHandler[F[_]] {
   def deleteIntent(respond: DeleteIntentResponse.type)(body: Option[IntentBody] = None): F[DeleteIntentResponse]
 }
 class IntentResource[F[_]]()(implicit E: Effect[F]) extends Http4sDsl[F] {
-  val upsertIntentDecoder: EntityDecoder[F, Option[IntentBody]] = decodeBy(MediaType.text.plain) {
-    msg => msg.contentLength.filter(_ > 0).fold[DecodeResult[F, Option[IntentBody]]](DecodeResult.success(None)) {
-      _ => DecodeResult.success(decodeString(msg)).flatMap {
-        str => Json.fromString(str).as[Option[IntentBody]].fold(failure => DecodeResult.failure(InvalidMessageBodyFailure(s"Could not decode response: $str", Some(failure))), DecodeResult.success(_))
+  val upsertIntentDecoder: EntityDecoder[F, Option[IntentBody]] = decodeBy(MediaType.text.plain) { msg =>
+    msg.contentLength.filter(_ > 0).fold[DecodeResult[F, Option[IntentBody]]](DecodeResult.success(None)) { _ =>
+      DecodeResult.success(decodeString(msg)).flatMap { str =>
+        Json
+          .fromString(str)
+          .as[Option[IntentBody]]
+          .fold(failure =>
+                  DecodeResult.failure(InvalidMessageBodyFailure(s"Could not decode response: $str", Some(failure))),
+                DecodeResult.success(_))
       }
     }
   }
@@ -39,10 +44,15 @@ class IntentResource[F[_]]()(implicit E: Effect[F]) extends Http4sDsl[F] {
   object GetIntentByNameDateMatcher extends QueryParamDecoderMatcher[String]("date")
   object GetIntentByNameNameMatcher extends QueryParamDecoderMatcher[String]("name")
   val getIntentByNameOkEncoder = jsonEncoderOf[F, Assign]
-  val deleteIntentDecoder: EntityDecoder[F, Option[IntentBody]] = decodeBy(MediaType.text.plain) {
-    msg => msg.contentLength.filter(_ > 0).fold[DecodeResult[F, Option[IntentBody]]](DecodeResult.success(None)) {
-      _ => DecodeResult.success(decodeString(msg)).flatMap {
-        str => Json.fromString(str).as[Option[IntentBody]].fold(failure => DecodeResult.failure(InvalidMessageBodyFailure(s"Could not decode response: $str", Some(failure))), DecodeResult.success(_))
+  val deleteIntentDecoder: EntityDecoder[F, Option[IntentBody]] = decodeBy(MediaType.text.plain) { msg =>
+    msg.contentLength.filter(_ > 0).fold[DecodeResult[F, Option[IntentBody]]](DecodeResult.success(None)) { _ =>
+      DecodeResult.success(decodeString(msg)).flatMap { str =>
+        Json
+          .fromString(str)
+          .as[Option[IntentBody]]
+          .fold(failure =>
+                  DecodeResult.failure(InvalidMessageBodyFailure(s"Could not decode response: $str", Some(failure))),
+                DecodeResult.success(_))
       }
     }
   }
@@ -50,7 +60,7 @@ class IntentResource[F[_]]()(implicit E: Effect[F]) extends Http4sDsl[F] {
   def routes(handler: IntentHandler[F]): HttpRoutes[F] = HttpRoutes.of {
     {
       case req @ POST -> Root / "intents" / "" =>
-        req.decodeWith(upsertIntentDecoder, strict = false) { body => 
+        req.decodeWith(upsertIntentDecoder, strict = false) { body =>
           handler.upsertIntent(UpsertIntentResponse)(body) flatMap {
             case UpsertIntentResponse.Ok(value) =>
               Ok(value)(E, upsertIntentOkEncoder)
@@ -64,7 +74,7 @@ class IntentResource[F[_]]()(implicit E: Effect[F]) extends Http4sDsl[F] {
             NotFound()
         }
       case req @ DELETE -> Root / "intents" / "" =>
-        req.decodeWith(deleteIntentDecoder, strict = false) { body => 
+        req.decodeWith(deleteIntentDecoder, strict = false) { body =>
           handler.deleteIntent(DeleteIntentResponse)(body) flatMap {
             case DeleteIntentResponse.Ok(value) =>
               Ok(value)(E, deleteIntentOkEncoder)
@@ -90,7 +100,7 @@ sealed abstract class GetIntentByNameResponse {
 }
 object GetIntentByNameResponse {
   case class Ok(value: Assign) extends GetIntentByNameResponse
-  case object NotFound extends GetIntentByNameResponse
+  case object NotFound         extends GetIntentByNameResponse
 }
 sealed abstract class DeleteIntentResponse {
   def fold[A](handleOk: Assign => A): A = this match {
