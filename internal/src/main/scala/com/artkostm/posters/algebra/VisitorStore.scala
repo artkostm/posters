@@ -1,5 +1,3 @@
 package com.artkostm.posters.algebra
 
-trait VisitorStore[F[_]] {
-
-}
+trait VisitorStore[F[_]] {}
