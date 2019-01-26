@@ -1,5 +1,3 @@
 package com.artkostm.posters.algebra
 
-trait EventStore[F[_]] {
-
-}
+trait EventStore[F[_]] {}
