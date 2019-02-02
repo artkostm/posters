@@ -1,15 +1,12 @@
 package com.artkostm.posters.interfaces.schedule
+import java.time.Instant
 
-import org.joda.time.DateTime
+final case class Media(link: String, img: String)
 
-case class Media(link: String, img: String)
+final case class Description(desc: String, ticket: Option[String], isFree: Boolean)
 
-case class Description(desc: String, ticket: Option[String], isFree: Boolean)
+final case class Event(name: String, media: Media, description: Description)
 
-case class Event(media: Media, name: String, description: Description)
+final case class Category(name: String, events: List[Event])
 
-case class Category(name: String, events: List[Event])
-
-sealed trait Schedule
-
-case class Day(events: List[Category], date: DateTime) extends Schedule
+final case class Day(date: Instant, categories: List[Category])

@@ -2,10 +2,14 @@ package com.artkostm.posters.worker
 
 import java.nio.charset.StandardCharsets
 import java.sql.Timestamp
+import java.time.Instant
+import java.time.temporal.{ChronoUnit, TemporalUnit}
 
 import akka.dispatch.ExecutionContexts
 import cats.effect._
 import cats.implicits._
+import com.artkostm.posters.interfaces.event.{Comment, EventData, EventInfo}
+import com.artkostm.posters.interfaces.schedule._
 import doobie._
 import doobie.implicits._
 import doobie.hikari._
@@ -14,12 +18,14 @@ import doobie.postgres._
 import doobie.postgres.implicits._
 import org.postgresql.util.PGobject
 import com.github.plokhotnyuk.jsoniter_scala.core._
+import com.github.plokhotnyuk.jsoniter_scala.macros.{CodecMakerConfig, JsonCodecMaker}
 
 import scala.concurrent.ExecutionContext
 
 object Sql extends App {
 
-  implicit def jsonbMeta[A: JsonValueCodec]: doobie.Meta[A] =
+
+  implicit def jsonbMeta[A: Manifest: JsonValueCodec]: doobie.Meta[A] =
     doobie.Meta
       .other[PGobject]("jsonb")
       .xmap[A](
@@ -44,16 +50,51 @@ object Sql extends App {
 
   final case class Vis(date: Timestamp, event_name: String, vids: Array[String], uids: Array[String])
 
+  val eventInfo = EventData("description", List("photo1", "photo2"), List(Comment("author", "today", "text", Some("raiting1"))))
+
+  final case class Vv(link: String, eventsInfo: EventData)
+
+  implicit val eventInfoJsonValueCodec = JsonCodecMaker.make[EventData](CodecMakerConfig())
+
+//  val insert =
+//    sql"""insert into visitors (date, event_name, vids, uids) values ($date, $eventName, $vids, $uids)""".update
+//      .withUniqueGeneratedKeys[Vis]("date", "event_name", "vids", "uids")
+
   val insert =
-    sql"""insert into visitors (date, event_name, vids, uids) values ($date, $eventName, $vids, $uids)""".update
-      .withUniqueGeneratedKeys[Vis]("date", "event_name", "vids", "uids")
+    sql"""insert into info ("link", "eventsInfo") values ($eventName, $eventInfo)""".update
+      .withUniqueGeneratedKeys[Vv]("link", "eventsInfo")
+
+  val link = "ko ko"
+
+  val select = sql"""select "link", "eventsInfo" from info where link=$link"""
+    .query[EventInfo]
+    .option
+
+  val categs = List(Category("name", List(Event("name", Media("link", "image"), Description("descr", Some("ticket"), true)))))
+
+
+  val dateT = Instant.now().truncatedTo(ChronoUnit.DAYS)
+
+  implicit val categJsonValueCodec = JsonCodecMaker.make[List[Category]](CodecMakerConfig())
+  implicit val catJsonValueCodec = JsonCodecMaker.make[Category](CodecMakerConfig())
+
+  val insertCat =
+    sql"""insert into events ("date", "categories") values ($dateT, $categs)""".update
+      .withUniqueGeneratedKeys[Day]("date", "categories")
+
+  val selectCategories = sql"""select "date", "categories" from events where "date"=$dateT"""
+    .query[Day]
+    .option
+
+  val sc = sql"""SELECT j FROM events t, jsonb_array_elements(t.categories) j WHERE j->>'name' in('name8', 'name4')"""
+    .query[Category].to[List]
 
   (for {
     xa <- transactor
   } yield {
     val y = xa.yolo
     import y._
-    val vis = insert.transact(xa).unsafeRunSync()
+    val vis = sc.transact(xa).unsafeRunSync()
     println(vis)
   }).unsafeRunSync()
 }

@@ -1,7 +1,7 @@
 package com.artkostm.posters
 
-import doobie._
-import doobie.implicits._
+import doobiemeta._
+import doobiemeta.implicits._
 //import cats._
 import cats.effect._
 import cats.implicits._
