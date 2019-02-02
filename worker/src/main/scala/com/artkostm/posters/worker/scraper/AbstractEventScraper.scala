@@ -2,7 +2,7 @@ package com.artkostm.posters.worker.scraper
 
 import cats.effect.Sync
 import cats.syntax.functor._
-import com.artkostm.posters.interfaces.event.{Comment, EventInfo}
+import com.artkostm.posters.interfaces.event.{Comment, EventData}
 import com.artkostm.posters.interfaces.schedule._
 import com.artkostm.posters.worker.config.ScraperConfig
 import net.ruippeixotog.scalascraper.dsl.DSL._
@@ -45,13 +45,13 @@ abstract class AbstractEventScraper[F[_]: Sync](config: ScraperConfig) {
           )
         ))
 
-  def eventInfo(link: String): F[Option[EventInfo]] =
+  def eventInfo(link: String): F[Option[EventData]] =
     load(link) map { doc =>
       for {
         images              <- doc >?> extractor(config.tut.eventPhotoSelector, eventImagesExtractor)
         description: String = doc >> text(config.tut.eventDescriptionSelector)
         comments            <- doc >?> extractor(config.tut.commentsSelector, commentExtractor)
-      } yield EventInfo(description, images, comments)
+      } yield EventData(description, images, comments)
     }
 
   def event(day: DateTime): F[Day] =
