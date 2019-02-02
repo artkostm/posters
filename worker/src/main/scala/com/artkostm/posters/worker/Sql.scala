@@ -6,7 +6,7 @@ import java.sql.Timestamp
 import akka.dispatch.ExecutionContexts
 import cats.effect._
 import cats.implicits._
-import com.artkostm.posters.interfaces.event.{Comment, EventData}
+import com.artkostm.posters.interfaces.event.{Comment, EventData, EventInfo}
 import doobie._
 import doobie.implicits._
 import doobie.hikari._
@@ -61,12 +61,18 @@ object Sql extends App {
     sql"""insert into info ("link", "eventsInfo") values ($eventName, $eventInfo)""".update
       .withUniqueGeneratedKeys[Vv]("link", "eventsInfo")
 
+  val link = "ko ko"
+
+  val select = sql"""select "link", "eventsInfo" from info where link=$link"""
+    .query[EventInfo]
+    .option
+
   (for {
     xa <- transactor
   } yield {
     val y = xa.yolo
     import y._
-    val vis = insert.transact(xa).unsafeRunSync()
+    val vis = select.transact(xa).unsafeRunSync()
     println(vis)
   }).unsafeRunSync()
 }
