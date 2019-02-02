@@ -2,11 +2,14 @@ package com.artkostm.posters.worker
 
 import java.nio.charset.StandardCharsets
 import java.sql.Timestamp
+import java.time.Instant
+import java.time.temporal.{ChronoUnit, TemporalUnit}
 
 import akka.dispatch.ExecutionContexts
 import cats.effect._
 import cats.implicits._
 import com.artkostm.posters.interfaces.event.{Comment, EventData, EventInfo}
+import com.artkostm.posters.interfaces.schedule._
 import doobie._
 import doobie.implicits._
 import doobie.hikari._
@@ -67,12 +70,31 @@ object Sql extends App {
     .query[EventInfo]
     .option
 
+  val categs = List(Category("name", List(Event("name", Media("link", "image"), Description("descr", Some("ticket"), true)))))
+
+
+  val dateT = Instant.now().truncatedTo(ChronoUnit.DAYS)
+
+  implicit val categJsonValueCodec = JsonCodecMaker.make[List[Category]](CodecMakerConfig())
+  implicit val catJsonValueCodec = JsonCodecMaker.make[Category](CodecMakerConfig())
+
+  val insertCat =
+    sql"""insert into events ("date", "categories") values ($dateT, $categs)""".update
+      .withUniqueGeneratedKeys[Day]("date", "categories")
+
+  val selectCategories = sql"""select "date", "categories" from events where "date"=$dateT"""
+    .query[Day]
+    .option
+
+  val sc = sql"""SELECT j FROM events t, jsonb_array_elements(t.categories) j WHERE j->>'name' in('name8', 'name4')"""
+    .query[Category].to[List]
+
   (for {
     xa <- transactor
   } yield {
     val y = xa.yolo
     import y._
-    val vis = select.transact(xa).unsafeRunSync()
+    val vis = sc.transact(xa).unsafeRunSync()
     println(vis)
   }).unsafeRunSync()
 }
