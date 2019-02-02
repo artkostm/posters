@@ -1,4 +1,5 @@
 package com.artkostm.posters.algebra
+
 import com.artkostm.posters.interfaces.event.EventInfo
 
 trait InfoStore[F[_]] {

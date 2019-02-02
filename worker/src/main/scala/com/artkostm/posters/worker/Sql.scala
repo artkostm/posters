@@ -6,6 +6,7 @@ import java.time.Instant
 import java.time.temporal.{ChronoUnit, TemporalUnit}
 
 import akka.dispatch.ExecutionContexts
+import cats.data.NonEmptyList
 import cats.effect._
 import cats.implicits._
 import com.artkostm.posters.interfaces.event.{Comment, EventData, EventInfo}
@@ -19,11 +20,11 @@ import doobie.postgres.implicits._
 import org.postgresql.util.PGobject
 import com.github.plokhotnyuk.jsoniter_scala.core._
 import com.github.plokhotnyuk.jsoniter_scala.macros.{CodecMakerConfig, JsonCodecMaker}
+import doobie.util.fragments
 
 import scala.concurrent.ExecutionContext
 
 object Sql extends App {
-
 
   implicit def jsonbMeta[A: Manifest: JsonValueCodec]: doobie.Meta[A] =
     doobie.Meta
@@ -50,7 +51,8 @@ object Sql extends App {
 
   final case class Vis(date: Timestamp, event_name: String, vids: Array[String], uids: Array[String])
 
-  val eventInfo = EventData("description", List("photo1", "photo2"), List(Comment("author", "today", "text", Some("raiting1"))))
+  val eventInfo =
+    EventData("description", List("photo1", "photo2"), List(Comment("author", "today", "text", Some("raiting1"))))
 
   final case class Vv(link: String, eventsInfo: EventData)
 
@@ -70,13 +72,13 @@ object Sql extends App {
     .query[EventInfo]
     .option
 
-  val categs = List(Category("name", List(Event("name", Media("link", "image"), Description("descr", Some("ticket"), true)))))
-
+  val categs = List(
+    Category("name", List(Event("name", Media("link", "image"), Description("descr", Some("ticket"), true)))))
 
   val dateT = Instant.now().truncatedTo(ChronoUnit.DAYS)
 
   implicit val categJsonValueCodec = JsonCodecMaker.make[List[Category]](CodecMakerConfig())
-  implicit val catJsonValueCodec = JsonCodecMaker.make[Category](CodecMakerConfig())
+  implicit val catJsonValueCodec   = JsonCodecMaker.make[Category](CodecMakerConfig())
 
   val insertCat =
     sql"""insert into events ("date", "categories") values ($dateT, $categs)""".update
@@ -86,8 +88,12 @@ object Sql extends App {
     .query[Day]
     .option
 
-  val sc = sql"""SELECT j FROM events t, jsonb_array_elements(t.categories) j WHERE j->>'name' in('name8', 'name4')"""
-    .query[Category].to[List]
+  val sc = (
+    fr"""SELECT j FROM events t, jsonb_array_elements(t.categories) j WHERE """ ++ fragments.in(
+      fr"""j->>'name'""",
+      NonEmptyList.fromListUnsafe(List("name1", "name")))
+  ).query[Category]
+    .to[List]
 
   (for {
     xa <- transactor
