@@ -6,6 +6,7 @@ import java.sql.Timestamp
 import akka.dispatch.ExecutionContexts
 import cats.effect._
 import cats.implicits._
+import com.artkostm.posters.interfaces.event.{Comment, EventData}
 import doobie._
 import doobie.implicits._
 import doobie.hikari._
@@ -14,12 +15,14 @@ import doobie.postgres._
 import doobie.postgres.implicits._
 import org.postgresql.util.PGobject
 import com.github.plokhotnyuk.jsoniter_scala.core._
+import com.github.plokhotnyuk.jsoniter_scala.macros.{CodecMakerConfig, JsonCodecMaker}
 
 import scala.concurrent.ExecutionContext
 
 object Sql extends App {
 
-  implicit def jsonbMeta[A: JsonValueCodec]: doobie.Meta[A] =
+
+  implicit def jsonbMeta[A: Manifest: JsonValueCodec]: doobie.Meta[A] =
     doobie.Meta
       .other[PGobject]("jsonb")
       .xmap[A](
@@ -44,9 +47,19 @@ object Sql extends App {
 
   final case class Vis(date: Timestamp, event_name: String, vids: Array[String], uids: Array[String])
 
+  val eventInfo = EventData("description", List("photo1", "photo2"), List(Comment("author", "today", "text", Some("raiting1"))))
+
+  final case class Vv(link: String, eventsInfo: EventData)
+
+  implicit val eventInfoJsonValueCodec = JsonCodecMaker.make[EventData](CodecMakerConfig())
+
+//  val insert =
+//    sql"""insert into visitors (date, event_name, vids, uids) values ($date, $eventName, $vids, $uids)""".update
+//      .withUniqueGeneratedKeys[Vis]("date", "event_name", "vids", "uids")
+
   val insert =
-    sql"""insert into visitors (date, event_name, vids, uids) values ($date, $eventName, $vids, $uids)""".update
-      .withUniqueGeneratedKeys[Vis]("date", "event_name", "vids", "uids")
+    sql"""insert into info ("link", "eventsInfo") values ($eventName, $eventInfo)""".update
+      .withUniqueGeneratedKeys[Vv]("link", "eventsInfo")
 
   (for {
     xa <- transactor
