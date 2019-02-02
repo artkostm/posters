@@ -38,7 +38,8 @@ object AppConfiguration extends Configuration[AppConfig] {
   private val scraperConfig = ScraperConfig(
     TutScraper(
       url = "https://afisha.tut.by/day/",
-      format = DateTimeFormatter.ofPattern("yyyy/MM/dd")
+      format = DateTimeFormatter
+        .ofPattern("yyyy/MM/dd")
         .withLocale(Locale.ENGLISH)
         .withZone(ZoneId.of("Europe/Minsk")),
       blocksSelector = "#events-block .events-block",
