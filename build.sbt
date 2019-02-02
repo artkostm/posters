@@ -31,7 +31,8 @@ lazy val interface = (project in file("interface")).settings(
 lazy val internal = (project in file("internal"))
   .settings(
     commonSettings,
-    libraryDependencies ++= Dependencies.cirisDependencies
+    libraryDependencies ++= Dependencies.cirisDependencies,
+    libraryDependencies ++= Dependencies.internalM
   )
   .dependsOn(interface)
 
