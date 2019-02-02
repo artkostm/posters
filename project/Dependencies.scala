@@ -95,8 +95,9 @@ object Dependencies {
   )
 
   lazy val internalM = Seq(
-    "org.tpolecat"                          %% "doobie-core"         % versions.doobie   % Provided,
-    "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % versions.jsoniter % Provided,
-    "org.postgresql"                        % "postgresql"           % versions.postgres % Provided
+    "org.tpolecat"                          %% "doobie-core"           % versions.doobie   % Provided,
+    "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core"   % versions.jsoniter % Provided,
+    "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % versions.jsoniter % Provided,
+    "org.postgresql"                        % "postgresql"             % versions.postgres % Provided
   )
 }
