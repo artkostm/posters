@@ -8,7 +8,7 @@ import com.artkostm.posters.worker.migration.DoobieMigration
 import doobie.hikari.HikariTransactor
 
 class WorkerModule[F[_]: Effect](config: AppConfig, val xa: HikariTransactor[F]) {
-  private lazy val infoStore = new InfoStoreInterpreter()
+  private lazy val infoStore  = new InfoStoreInterpreter()
   private lazy val eventStore = new EventStoreInterpreter()
 }
 
