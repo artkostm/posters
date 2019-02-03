@@ -1,4 +1,5 @@
 package com.artkostm.posters.interfaces.schedule
+
 import java.time.Instant
 
 final case class Media(link: String, img: String)
