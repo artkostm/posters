@@ -22,4 +22,10 @@ class InfoStoreInterpreter extends InfoStore[ConnectionIO] {
         sql"""select "link", "eventsInfo" from info where link=$link"""
           .query[EventInfo]
           .option
+
+    override def deleteOld(): ConnectionIO[Int] =
+        sql"""
+             |DELETE FROM info
+             |WHERE NOT EXISTS (SELECT * FROM events WHERE categories::jsonb::text LIKE '%' || info.link || '%')
+             |""".stripMargin.update.run
 }
