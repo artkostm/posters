@@ -18,8 +18,7 @@ lazy val commonSettings = Seq(
     Resolver.bintrayRepo("jmcardon", "tsec"),
     "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
     "krasserm at bintray" at "http://dl.bintray.com/krasserm/maven"
-  ),
-  libraryDependencies ++= Dependencies.commonDependencies
+  )
 )
 
 lazy val root = (project in file(".")).aggregate(interface, internal, web, worker)
