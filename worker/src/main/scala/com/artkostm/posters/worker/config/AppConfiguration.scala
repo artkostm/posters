@@ -21,7 +21,7 @@ object AppConfiguration extends Configuration[IO, AppConfig] {
         loadConfig {
           AppConfig(version = Configuration.AppVersion,
                     scraper = scraperConfig,
-                    db = Configuration.buildDbConfig("url"))
+                    db = Configuration.buildDbConfig("jdbc:postgresql://localhost:5432/postgres"))
         }
       case Production | Heroku =>
         loadConfig(env[NonEmptyString]("JDBC_DATABASE_URL"),
