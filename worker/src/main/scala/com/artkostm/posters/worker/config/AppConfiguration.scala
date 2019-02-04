@@ -1,6 +1,7 @@
 package com.artkostm.posters.worker.config
 
-import cats.effect.IO
+import java.time.ZoneId
+
 import ciris._
 import ciris.refined._
 import ciris.enumeratum._
@@ -9,9 +10,10 @@ import com.artkostm.posters.Configuration.DatabaseConfig
 import com.artkostm.posters.environments.AppEnvironment
 import eu.timepit.refined.auto._
 import eu.timepit.refined.types.string.NonEmptyString
-import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
-object AppConfiguration extends Configuration[IO, AppConfig] {
+object AppConfiguration extends Configuration[AppConfig] {
 
   import com.artkostm.posters.environments.AppEnvironment._
 
@@ -36,7 +38,10 @@ object AppConfiguration extends Configuration[IO, AppConfig] {
   private val scraperConfig = ScraperConfig(
     TutScraper(
       url = "https://afisha.tut.by/day/",
-      format = DateTimeFormat.forPattern("yyyy/MM/dd"),
+      format = DateTimeFormatter
+        .ofPattern("yyyy/MM/dd")
+        .withLocale(Locale.ENGLISH)
+        .withZone(ZoneId.of("Europe/Minsk")),
       blocksSelector = "#events-block .events-block",
       blockTitleSelector = ".title_block",
       eventsSelector = ".lists__li",

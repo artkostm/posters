@@ -31,7 +31,8 @@ lazy val interface = (project in file("interface")).settings(
 lazy val internal = (project in file("internal"))
   .settings(
     commonSettings,
-    libraryDependencies ++= Dependencies.cirisDependencies
+    libraryDependencies ++= Dependencies.cirisDependencies,
+    libraryDependencies ++= Dependencies.internalM
   )
   .dependsOn(interface)
 
@@ -52,6 +53,7 @@ lazy val worker = (project in file("worker"))
     commonSettings,
     libraryDependencies ++= Dependencies.all,
     libraryDependencies ++= Dependencies.workerSpecificDependencies,
+    libraryDependencies ++= Dependencies.jsoniterDependencies,
     libraryDependencies ++= Dependencies.doobieDependencies,
     libraryDependencies += "com.github.alexandrnikitin" %% "bloom-filter" % "0.11.0"
   )

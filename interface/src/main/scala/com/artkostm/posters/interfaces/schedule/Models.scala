@@ -1,13 +1,13 @@
 package com.artkostm.posters.interfaces.schedule
 
-import org.joda.time.DateTime
+import java.time.Instant
 
-case class Media(link: String, img: String)
+final case class Media(link: String, img: String)
 
-case class Description(desc: String, ticket: Option[String], isFree: Boolean)
+final case class Description(desc: String, ticket: Option[String], isFree: Boolean)
 
-case class Event(media: Media, name: String, description: Description)
+final case class Event(name: String, media: Media, description: Description)
 
-case class Category(name: String, events: List[Event])
+final case class Category(name: String, events: List[Event])
 
-case class Day(events: List[Category], date: DateTime)
+final case class Day(date: Instant, categories: List[Category])
