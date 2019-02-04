@@ -32,6 +32,6 @@ class EventStoreInterpreter extends EventStore[ConnectionIO] {
     ).query[Category]
       .to[List]
 
-  override def delete(today: Instant): ConnectionIO[Int] =
+  override def deleteOld(today: Instant): ConnectionIO[Int] =
     sql"""DELETE FROM events WHERE date < $today""".update.run
 }

@@ -1,20 +1,21 @@
 package com.artkostm.posters.interfaces.dialog.v2
 
+import java.time.Instant
+
 import com.artkostm.posters.interfaces.schedule.Category
-import org.joda.time.DateTime
 
 // for request
-case class Period(endDate: DateTime, startDate: DateTime)
+final case class Period(endDate: Instant, startDate: Instant)
 
-case class Datetime(date: Option[DateTime], period: Option[Period])
+final case class Datetime(date: Option[Instant], period: Option[Period])
 
-case class Parameters(category: List[String], datetime: Datetime)
+final case class Parameters(category: List[String], datetime: Datetime)
 
-case class Intent(name: String, displayName: String)
+final case class Intent(name: String, displayName: String)
 
-case class DiagnosticInfo()
+final case class DiagnosticInfo()
 
-case class QueryResult(queryText: String,
+final case class QueryResult(queryText: String,
                        parameters: Parameters,
                        allRequiredParamsPresent: Boolean,
                        intent: Intent,
@@ -22,16 +23,16 @@ case class QueryResult(queryText: String,
                        diagnosticInfo: DiagnosticInfo,
                        languageCode: String)
 
-case class Payload()
+final case class Payload()
 
-case class OriginalDetectIntentRequest(payload: Payload)
+final case class OriginalDetectIntentRequest(payload: Payload)
 
-case class DialogflowRequest(responseId: String,
+final case class DialogflowRequest(responseId: String,
                              queryResult: QueryResult,
                              originalDetectIntentRequest: OriginalDetectIntentRequest,
                              session: String)
 
 // for response
-case class ResponsePayload(categories: Seq[Category])
+final case class ResponsePayload(categories: Seq[Category])
 
-case class DialogflowResponse(fulfillmentText: String, payload: ResponsePayload, source: String)
+final case class DialogflowResponse(fulfillmentText: String, payload: ResponsePayload, source: String)
