@@ -13,12 +13,11 @@ object Dependencies {
     val finatra_swagger = "18.4.0"
     val sangria         = "1.4.0"
     val tsecV           = "0.0.1-M11"
-    val ciris           = "0.10.0"
-    val doobie          = "0.5.3"
-    val http4s          = "0.18.14"
-    val jsoniter        = "0.29.2"
+    val ciris           = "0.12.1"
+    val doobie          = "0.6.0"
+    val http4s          = "0.18.21"
+    val jsoniter        = "0.39.0"
     val flyway          = "5.1.4"
-    val H2              = "1.4.196"
     val streamz         = "0.9.1"
   }
 
@@ -56,7 +55,7 @@ object Dependencies {
     "joda-time" % "joda-time" % "2.9.9"
   )
 
-  lazy val cirisDependencies = Seq(
+  lazy val ciris = Seq(
     "is.cir" %% "ciris-cats",
     "is.cir" %% "ciris-cats-effect",
     "is.cir" %% "ciris-core",
@@ -67,37 +66,34 @@ object Dependencies {
     "is.cir" %% "ciris-squants"
   ).map(_ % versions.ciris)
 
-  lazy val doobieDependencies = Seq(
+  lazy val doobie = Seq(
     "org.tpolecat" %% "doobie-core",
     "org.tpolecat" %% "doobie-hikari",
     "org.tpolecat" %% "doobie-postgres", // Postgres driver 42.2.2 + type mappings.
     "org.tpolecat" %% "doobie-scalatest"
   ).map(_ % versions.doobie)
 
-  lazy val http4sDependencies = Seq(
+  lazy val http4s = Seq(
     "org.http4s" %% "http4s-dsl",
     "org.http4s" %% "http4s-blaze-server"
   ).map(_ % versions.http4s)
 
-  lazy val jsoniterDependencies = Seq(
+  lazy val jsoniter = Seq(
     "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core"   % versions.jsoniter % Compile,
     "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % versions.jsoniter % Provided
   )
 
-  lazy val workerSpecificDependencies = Seq(
-    "com.typesafe.akka"   %% "akka-actor"        % versions.akka,
-    "net.ruippeixotog"    %% "scala-scraper"     % versions.scraper,
-    "org.flywaydb"        % "flyway-core"        % versions.flyway,
-    "com.h2database"      % "h2"                 % versions.H2,
-    "org.tpolecat"        %% "doobie-h2"         % versions.doobie,
-    "com.github.krasserm" %% "streamz-converter" % versions.streamz
+  lazy val workerSpecific = Seq(
+    "net.ruippeixotog" %% "scala-scraper" % versions.scraper,
+    "org.flywaydb"     % "flyway-core"    % versions.flyway,
+    "co.fs2"           %% "fs2-core"      % "1.0.3"
   )
 
   lazy val internalM = Seq(
-    "org.tpolecat"                          %% "doobie-core"           % versions.doobie   % Provided,
-    "org.tpolecat" %% "doobie-postgres" % versions.doobie   % Provided,
-    "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core"   % versions.jsoniter % Provided,
+    "org.tpolecat"                          %% "doobie-core" % versions.doobie % Provided,
+    "org.tpolecat"                          %% "doobie-postgres" % versions.doobie % Provided,
+    "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % versions.jsoniter % Provided,
     "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % versions.jsoniter % Provided,
-    "org.postgresql"                        % "postgresql"             % versions.postgres % Provided
-  )
+    "org.postgresql"                        % "postgresql" % versions.postgres % Provided
+  ) ++ ciris.map(_                          % Provided)
 }

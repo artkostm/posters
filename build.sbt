@@ -1,7 +1,7 @@
 name := "posters"
 
 lazy val commonSettings = Seq(
-  version := "0.5.0",
+  version := "3.0.0",
   scalaVersion := "2.12.7",
   scalacOptions := Seq(
     "-feature",
@@ -11,7 +11,8 @@ lazy val commonSettings = Seq(
     "-language:higherKinds",
     "-language:existentials",
     "-language:implicitConversions",
-    "-Ypartial-unification"
+    "-Ypartial-unification",
+    "-Xmacro-settings:print-codecs"
   ),
   resolvers ++= Seq(
     "Twitter Maven" at "https://maven.twttr.com",
@@ -30,7 +31,6 @@ lazy val interface = (project in file("interface")).settings(
 lazy val internal = (project in file("internal"))
   .settings(
     commonSettings,
-    libraryDependencies ++= Dependencies.cirisDependencies,
     libraryDependencies ++= Dependencies.internalM
   )
   .dependsOn(interface)
@@ -39,10 +39,9 @@ lazy val web = (project in file("web"))
   .settings(
     commonSettings,
     libraryDependencies ++= Dependencies.all,
-    libraryDependencies ++= Dependencies.doobieDependencies,
-    libraryDependencies ++= Dependencies.jsoniterDependencies,
-    libraryDependencies ++= Dependencies.http4sDependencies,
-    scalacOptions ++= Seq("-Xmacro-settings:print-codecs")
+    libraryDependencies ++= Dependencies.doobie,
+    libraryDependencies ++= Dependencies.jsoniter,
+    libraryDependencies ++= Dependencies.http4s
   )
   .dependsOn(internal)
 //.enablePlugins(JavaAppPackaging)
@@ -50,11 +49,10 @@ lazy val web = (project in file("web"))
 lazy val worker = (project in file("worker"))
   .settings(
     commonSettings,
-    libraryDependencies ++= Dependencies.all,
-    libraryDependencies ++= Dependencies.workerSpecificDependencies,
-    libraryDependencies ++= Dependencies.jsoniterDependencies,
-    libraryDependencies ++= Dependencies.doobieDependencies,
-    libraryDependencies += "com.github.alexandrnikitin" %% "bloom-filter" % "0.11.0"
+    libraryDependencies ++= Dependencies.jsoniter,
+    libraryDependencies ++= Dependencies.doobie,
+    libraryDependencies ++= Dependencies.ciris,
+    libraryDependencies ++= Dependencies.workerSpecific
   )
   .dependsOn(internal)
 //.enablePlugins(JavaAppPackaging)
