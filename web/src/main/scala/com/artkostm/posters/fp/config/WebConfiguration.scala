@@ -43,7 +43,7 @@ object WebConfiguration extends Configuration[AppConfig] {
                     db = Configuration.buildDbConfigForHeroku(dbUrl, user, password),
                     api = ApiConfig(apiKey, "token"))
         }
-    }
+    }.result
 }
 
 case class HttpConfig(port: UserPortNumber)

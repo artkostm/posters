@@ -33,7 +33,7 @@ object AppConfiguration extends Configuration[AppConfig] {
                     scraper = scraperConfig,
                     db = Configuration.buildDbConfigForHeroku(dbUrl, user, password))
         }
-    }
+    }.result
 
   private val scraperConfig = ScraperConfig(
     TutScraper(
