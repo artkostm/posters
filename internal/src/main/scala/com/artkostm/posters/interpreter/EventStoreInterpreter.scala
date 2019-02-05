@@ -24,11 +24,10 @@ class EventStoreInterpreter extends EventStore[ConnectionIO] {
   override def findByDate(day: Instant): ConnectionIO[Option[Day]] =
     sql"""SELECT "date", "categories" FROM events WHERE date=$day""".query[Day].option
 
-  override def findByName(names: List[String]): ConnectionIO[List[Category]] =
+  override def findByName(names: NonEmptyList[String]): ConnectionIO[List[Category]] =
     (
-      fr"""SELECT j FROM events t, jsonb_array_elements(t.categories) j WHERE """ ++ fragments.in(
-        fr"""j->>'name'""",
-        NonEmptyList.fromListUnsafe(names))
+      fr"""SELECT j FROM events t, jsonb_array_elements(t.categories) j WHERE """ ++ fragments.in(fr"""j->>'name'""",
+                                                                                                  names)
     ).query[Category]
       .to[List]
 
