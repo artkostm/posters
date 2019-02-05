@@ -17,14 +17,14 @@ import scala.concurrent.ExecutionContext
 trait DoobieMigration extends JdbcMigration {
   def migrate: ConnectionIO[_]
 
+  // need refactoring
   implicit val cs = IO.contextShift(ExecutionContext.global)
 
-  override def migrate(connection: Connection): Unit = {
+  override def migrate(connection: Connection): Unit =
     ExecutionContexts.cachedThreadPool[IO].use { implicit ec =>
       val xa = Transactor.fromConnection[IO](connection, ec)
       migrate.transact(xa)
     }
-  }
 }
 
 object DoobieMigration {
