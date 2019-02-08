@@ -4,7 +4,7 @@ import java.time.Instant
 
 import cats.effect.Sync
 import cats.syntax.functor._
-import com.artkostm.posters.interfaces.event.{Comment, EventData}
+import com.artkostm.posters.interfaces.event.{Comment, EventData, EventInfo}
 import com.artkostm.posters.interfaces.schedule._
 import com.artkostm.posters.worker.config.ScraperConfig
 import net.ruippeixotog.scalascraper.dsl.DSL._
@@ -46,13 +46,13 @@ abstract class AbstractEventScraper[F[_]: Sync](config: ScraperConfig) {
           )
         ))
 
-  def eventInfo(link: String): F[Option[EventData]] =
+  def eventInfo(link: String): F[Option[EventInfo]] =
     load(link) map { doc =>
       for {
         images              <- doc >?> extractor(config.tut.eventPhotoSelector, eventImagesExtractor)
         description: String = doc >> text(config.tut.eventDescriptionSelector)
         comments            <- doc >?> extractor(config.tut.commentsSelector, commentExtractor)
-      } yield EventData(description, images, comments)
+      } yield EventInfo(link, EventData(description, images, comments))
     }
 
   def event(day: Instant): F[Day] =
