@@ -1,18 +1,20 @@
 package com.artkostm.posters.worker
 
 import cats.implicits._
-import cats.effect.{ContextShift, Effect, Resource, Sync}
+import cats.effect._
 import com.artkostm.posters.interpreter.{EventStoreInterpreter, InfoStoreInterpreter, VisitorStoreInterpreter}
+import com.artkostm.posters.worker.collector.EventCollector
 import com.artkostm.posters.worker.config.{AppConfig, AppConfiguration}
 import com.artkostm.posters.worker.migration.DoobieMigration
 import com.artkostm.posters.worker.scraper.EventScraper
 import doobie.hikari.HikariTransactor
 
-class WorkerModule[F[_]: Effect](config: AppConfig, val xa: HikariTransactor[F]) {
+class WorkerModule[F[_]: Effect: Timer: Concurrent](config: AppConfig, val xa: HikariTransactor[F]) {
   lazy val scraper      = new EventScraper[F](config.scraper)
   private lazy val infoStore    = new InfoStoreInterpreter()
-  private lazy val eventStore   = new EventStoreInterpreter()
+   lazy val eventStore   = new EventStoreInterpreter()
   private lazy val visitorStore = new VisitorStoreInterpreter()
+  private lazy val collector    = new EventCollector[F](scraper, eventStore, infoStore)
 }
 
 object WorkerModule {
