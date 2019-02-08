@@ -13,12 +13,15 @@ object Main extends IOApp {
   override def run(args: List[String]): IO[ExitCode] =
     for {
       module <- WorkerModule.init[IO]
+      x <- module.eventStore.findByDate(Instant.now())
+      c = x
       _ <- test(module.scraper)
             .compile
             .drain
     } yield ExitCode.Success
 
   def test(scraper: EventScraper[IO]) = {
+
     val dayStream = Stream
       .range(-2, 31)
       .covary[IO]
@@ -30,7 +33,12 @@ object Main extends IOApp {
       .flatMap(day => Stream.emits(day.categories.flatMap(_.events)))
       .mapAsyncUnordered(4)(event => IO { println(s"save event: ${event.media.link}") })
 
-    insertDays.concurrently(saveEvents)
+    insertDays >> saveEvents
+    import scala.concurrent.duration._
+    //insertDays.concurrently(saveEvents)
+//    Stream.sleep_
+    val graph = Stream(insertDays, saveEvents).parJoin(2)
+    graph.merge(Stream.awakeEvery[IO](24 hours) >> graph)
   }
 }
 
