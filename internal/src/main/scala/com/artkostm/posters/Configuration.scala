@@ -18,7 +18,7 @@ trait Configuration[Conf] {
 object Configuration {
   val AppVersion = "3.0.0"
 
-  val buildDbConfig: NonEmptyString => DatabaseConfig =
+  val buildDbConfig: String => DatabaseConfig =
     DatabaseConfig(_,
                    driver = "org.postgresql.Driver",
                    user = "test",
@@ -27,7 +27,7 @@ object Configuration {
                    maxConnections = 15,
                    minConnections = 4)
 
-  val buildDbConfigForHeroku: (NonEmptyString, NonEmptyString, NonEmptyString) => DatabaseConfig =
+  val buildDbConfigForHeroku: (String, NonEmptyString, NonEmptyString) => DatabaseConfig =
     (url, user, password) =>
       DatabaseConfig(url,
                      driver = "org.postgresql.Driver",
@@ -38,7 +38,7 @@ object Configuration {
                      minConnections = 4)
 
   final case class DatabaseConfig(
-      url: NonEmptyString,
+      url: String,
       driver: NonEmptyString,
       user: String = "",
       password: String = "",
