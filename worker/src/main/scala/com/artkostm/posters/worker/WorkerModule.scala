@@ -17,7 +17,7 @@ class WorkerModule[F[_]: Timer: Concurrent](config: AppConfig, val xa: HikariTra
 }
 
 object WorkerModule {
-  def init[F[_]: ContextShift: Timer: Concurrent](implicit F: Sync[F]): Resource[F, WorkerModule[F]] =
+  def init[F[_]: ContextShift: Timer: Concurrent](): Resource[F, WorkerModule[F]] =
     for {
       config <- Resource.liftF(AppConfiguration.load[F])
       _      <- Resource.liftF(DoobieMigration.run[F](config))
