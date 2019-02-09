@@ -5,11 +5,11 @@ import com.artkostm.posters.interpreter.{EventStoreInterpreter, InfoStoreInterpr
 import com.artkostm.posters.worker.collector.EventCollector
 import com.artkostm.posters.worker.config.{AppConfig, AppConfiguration}
 import com.artkostm.posters.worker.migration.DoobieMigration
-import com.artkostm.posters.worker.scraper.EventScraper
+import com.artkostm.posters.worker.scraper.AfishaScraper
 import doobie.hikari.HikariTransactor
 
 class WorkerModule[F[_]: Timer: Concurrent](config: AppConfig, val xa: HikariTransactor[F]) {
-  private lazy val scraper      = new EventScraper[F](config.scraper)
+  private lazy val scraper      = new AfishaScraper[F](config.scraper)
   private lazy val infoStore    = new InfoStoreInterpreter(xa.trans)
   private lazy val eventStore   = new EventStoreInterpreter(xa.trans)
   private lazy val visitorStore = new VisitorStoreInterpreter(xa.trans)
