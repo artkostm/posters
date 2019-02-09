@@ -33,7 +33,7 @@ object DoobieMigration {
     val flyway   = new Flyway
     val location = classOf[V0001__CreateVisitors].getPackage.getName.replace(".", "/")
 
-    flyway.setDataSource(config.db.url.value, config.db.user, config.db.password)
+    flyway.setDataSource(config.db.url, config.db.user, config.db.password)
     flyway.setLocations(location)
     flyway.migrate()
   }
@@ -43,7 +43,7 @@ object DoobieMigration {
       ce <- ExecutionContexts.fixedThreadPool[F](32)
       te <- ExecutionContexts.cachedThreadPool[F]
       xa <- HikariTransactor.newHikariTransactor[F](driverClassName = dbConfig.driver.value,
-                                                    url = dbConfig.url.value,
+                                                    url = dbConfig.url,
                                                     user = dbConfig.user,
                                                     pass = dbConfig.password,
                                                     connectEC = ce,
