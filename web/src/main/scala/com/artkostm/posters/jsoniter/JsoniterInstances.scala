@@ -14,12 +14,12 @@ trait JsoniterInstances {
     EntityEncoder
       .byteArrayEncoder[F]
       .contramap[A](writeToArray(_))
-      .withContentType(`Content-Type`(MediaType.`application/json`))
+      .withContentType(`Content-Type`(MediaType.application.`json`))
 
   implicit def jsoniterEntityDecoder[F[_]: Sync, A: JsonValueCodec]: EntityDecoder[F, A] =
-    EntityDecoder.decodeBy(MediaType.`application/json`) { msg =>
+    EntityDecoder.decodeBy(MediaType.application.`json`) { msg =>
       EntityDecoder.collectBinary(msg).flatMap { segment =>
-        val bb = ByteBuffer.wrap(segment.force.toArray)
+        val bb = ByteBuffer.wrap(segment.toArray)
         if (bb.hasRemaining) {
           Try(readFromArray(bb.array())).toEither match {
             case Right(json) =>

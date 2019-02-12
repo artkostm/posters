@@ -18,6 +18,8 @@ class EventStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends EventStore[F] {
   implicit val categoriesJsonValueCodec = JsonCodecMaker.make[List[Category]](CodecMakerConfig())
   implicit val categoryJsonValueCodec   = JsonCodecMaker.make[Category](CodecMakerConfig())
 
+  implicit val han = LogHandler.jdkLogHandler
+
   override def save(day: Day): F[Day] =
     T(
       sql"""

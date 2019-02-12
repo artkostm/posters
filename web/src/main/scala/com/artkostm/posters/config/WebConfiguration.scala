@@ -1,12 +1,14 @@
-package com.artkostm.posters.fp.config
+package com.artkostm.posters.config
+
+import java.net.URI
 
 import ciris._
 import ciris.refined._
 import ciris.enumeratum._
 import com.artkostm.posters.Configuration
 import com.artkostm.posters.Configuration.DatabaseConfig
+import com.artkostm.posters.config.WebConfiguration.ApiKey
 import com.artkostm.posters.environments.AppEnvironment
-import com.artkostm.posters.fp.config.WebConfiguration.ApiKey
 import eu.timepit.refined.W
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.auto._
@@ -22,11 +24,12 @@ object WebConfiguration extends Configuration[AppConfig] {
   override protected def config =
     withValue(env[AppEnvironment]("APP_ENV").orElse(ConfigValue(Right(Local)))) {
       case Local =>
-        loadConfig {
+        loadConfig(env[Option[String]]("DOCKER_HOST")) { dockerHost =>
           AppConfig(
             version = Configuration.AppVersion,
             http = HttpConfig(8080),
-            db = Configuration.buildDbConfig("url"),
+            db = Configuration.buildDbConfig(
+              s"jdbc:postgresql://${dockerHost.map(URI.create).map(_.getHost).getOrElse("localhost")}:5432/postgres"),
             api = ApiConfig(Secret("uufdeddddd00d0d00d0d00d0d0"), "token")
           )
         }

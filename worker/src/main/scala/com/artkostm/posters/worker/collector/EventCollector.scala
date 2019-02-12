@@ -6,12 +6,12 @@ import java.time.temporal.ChronoUnit
 import cats.effect.{Concurrent, Timer}
 import com.artkostm.posters.algebra.{EventStore, InfoStore, VisitorStore}
 import com.artkostm.posters.interfaces.event.EventInfo
-import com.artkostm.posters.worker.scraper.EventScraper
+import com.artkostm.posters.worker.scraper.Scraper
 import fs2.Stream
 
 import scala.concurrent.duration._
 
-class EventCollector[F[_]: Timer](scraper: EventScraper[F],
+class EventCollector[F[_]: Timer](scraper: Scraper[F],
                                   eventStore: EventStore[F],
                                   infoStore: InfoStore[F],
                                   visitorStore: VisitorStore[F])(implicit F: Concurrent[F]) {
@@ -26,6 +26,10 @@ class EventCollector[F[_]: Timer](scraper: EventScraper[F],
     val saveEvents = dayStream
       .flatMap(day => Stream.emits(day.categories.flatMap(_.events)))
       .mapAsyncUnordered(4)(event => scraper.eventInfo(event.media.link))
+//      .filter {
+//        case Some(_) => true
+//        case _       => false
+//      }
       .mapAsync(4) {
         case Some(info) => infoStore.save(info)
         case None       => F.raiseError[EventInfo](new RuntimeException("cannot save empty event info"))

@@ -15,7 +15,7 @@ object Dependencies {
     val tsecV           = "0.0.1-M11"
     val ciris           = "0.12.1"
     val doobie          = "0.6.0"
-    val http4s          = "0.18.21"
+    val http4s          = "0.20.0-SNAPSHOT"
     val jsoniter        = "0.39.0"
     val flyway          = "5.1.4"
     val streamz         = "0.9.1"
@@ -51,29 +51,22 @@ object Dependencies {
                      tsec_jwt_sig,
                      tsec_jwt_mac)
 
-  lazy val commonDependencies = Seq(
-    "joda-time" % "joda-time" % "2.9.9"
-  )
-
   lazy val ciris = Seq(
     "is.cir" %% "ciris-cats",
-    "is.cir" %% "ciris-cats-effect",
     "is.cir" %% "ciris-core",
     "is.cir" %% "ciris-enumeratum",
     "is.cir" %% "ciris-generic",
     "is.cir" %% "ciris-refined",
-    "is.cir" %% "ciris-spire",
-    "is.cir" %% "ciris-squants"
   ).map(_ % versions.ciris)
 
   lazy val doobie = Seq(
     "org.tpolecat" %% "doobie-core",
     "org.tpolecat" %% "doobie-hikari",
-    "org.tpolecat" %% "doobie-postgres", // Postgres driver 42.2.2 + type mappings.
-    "org.tpolecat" %% "doobie-scalatest"
+    "org.tpolecat" %% "doobie-postgres"
   ).map(_ % versions.doobie)
 
   lazy val http4s = Seq(
+    "org.http4s" %% "http4s-core",
     "org.http4s" %% "http4s-dsl",
     "org.http4s" %% "http4s-blaze-server"
   ).map(_ % versions.http4s)

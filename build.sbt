@@ -1,3 +1,4 @@
+import Dependencies.versions
 name := "posters"
 
 lazy val commonSettings = Seq(
@@ -38,13 +39,15 @@ lazy val internal = (project in file("internal"))
 lazy val web = (project in file("web"))
   .settings(
     commonSettings,
-    libraryDependencies ++= Dependencies.all,
-    libraryDependencies ++= Dependencies.doobie,
     libraryDependencies ++= Dependencies.jsoniter,
-    libraryDependencies ++= Dependencies.http4s
+    libraryDependencies ++= Dependencies.doobie,
+    libraryDependencies ++= Dependencies.ciris,
+    libraryDependencies ++= Dependencies.http4s,
+    libraryDependencies ++= Seq("org.slf4j" % "slf4j-api" % "1.7.25", "org.slf4j" % "slf4j-simple" % "1.7.25"),
+    libraryDependencies += "org.postgresql"      % "postgresql"          % versions.postgres
   )
   .dependsOn(internal)
-//.enablePlugins(JavaAppPackaging)
+  .enablePlugins(JavaAppPackaging)
 
 lazy val worker = (project in file("worker"))
   .settings(
@@ -53,8 +56,7 @@ lazy val worker = (project in file("worker"))
     libraryDependencies ++= Dependencies.doobie,
     libraryDependencies ++= Dependencies.ciris,
     libraryDependencies ++= Dependencies.workerSpecific,
-    libraryDependencies ++= Seq("org.slf4j" % "slf4j-api" % "1.7.25",
-      "org.slf4j" % "slf4j-simple" % "1.7.25")
+    libraryDependencies ++= Seq("org.slf4j" % "slf4j-api" % "1.7.25", "org.slf4j" % "slf4j-simple" % "1.7.25")
   )
   .dependsOn(internal)
-//.enablePlugins(JavaAppPackaging)
+  .enablePlugins(JavaAppPackaging)

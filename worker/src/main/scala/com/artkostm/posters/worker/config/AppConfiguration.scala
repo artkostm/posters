@@ -1,5 +1,6 @@
 package com.artkostm.posters.worker.config
 
+import java.net.URI
 import java.time.ZoneId
 
 import ciris._
@@ -20,10 +21,13 @@ object AppConfiguration extends Configuration[AppConfig] {
   override protected def config =
     withValue(env[AppEnvironment]("APP_ENV").orElse(ConfigValue(Right(Local)))) {
       case Local =>
-        loadConfig {
-          AppConfig(version = Configuration.AppVersion,
-                    scraper = scraperConfig,
-                    db = Configuration.buildDbConfig("jdbc:postgresql://localhost:5432/postgres"))
+        loadConfig(env[Option[String]]("DOCKER_HOST")) { dockerHost =>
+          AppConfig(
+            version = Configuration.AppVersion,
+            scraper = scraperConfig,
+            db = Configuration.buildDbConfig(
+              s"jdbc:postgresql://${dockerHost.map(URI.create).map(_.getHost).getOrElse("localhost")}:5432/postgres")
+          )
         }
       case Production | Heroku =>
         loadConfig(env[NonEmptyString]("JDBC_DATABASE_URL"),
