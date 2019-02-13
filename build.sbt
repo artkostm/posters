@@ -44,7 +44,8 @@ lazy val web = (project in file("web"))
     libraryDependencies ++= Dependencies.ciris,
     libraryDependencies ++= Dependencies.http4s,
     libraryDependencies ++= Seq("org.slf4j" % "slf4j-api" % "1.7.25", "org.slf4j" % "slf4j-simple" % "1.7.25"),
-    libraryDependencies += "org.postgresql"      % "postgresql"          % versions.postgres
+    libraryDependencies += "org.postgresql"     % "postgresql"    % versions.postgres,
+    libraryDependencies += "io.github.jmcardon" %% "tsec-jwt-mac" % "0.1.0-M2"
   )
   .dependsOn(internal)
   .enablePlugins(JavaAppPackaging)
