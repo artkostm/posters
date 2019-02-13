@@ -19,7 +19,8 @@ class InfoEndpoint[F[_]: Effect](repository: InfoStore[F]) extends Http4sDsl[F] 
 
   implicit val eventInfoCodec: JsonValueCodec[EventInfo] = JsonCodecMaker.make[EventInfo](CodecMakerConfig())
 
-  implicit val eventInfoNotFoundCodec: JsonValueCodec[EventInfoNotFound] = JsonCodecMaker.make[EventInfoNotFound](CodecMakerConfig())
+  implicit val eventInfoNotFoundCodec: JsonValueCodec[EventInfoNotFound] =
+    JsonCodecMaker.make[EventInfoNotFound](CodecMakerConfig())
 
   private def getEventInfo(): HttpRoutes[F] = HttpRoutes.of[F] {
     case GET -> Root / "events" :? LinkMatcher(link) =>
@@ -35,4 +36,3 @@ class InfoEndpoint[F[_]: Effect](repository: InfoStore[F]) extends Http4sDsl[F] 
 object InfoEndpoint {
   def apply[F[_]: Effect](repository: InfoStore[F]): HttpRoutes[F] = new InfoEndpoint(repository).endpoints()
 }
-
