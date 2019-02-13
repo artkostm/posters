@@ -1,5 +1,6 @@
 package com.artkostm.posters
 
+import cats.implicits._
 import cats.effect._
 import cats.MonadError
 import ciris._
@@ -47,7 +48,7 @@ object Configuration {
   object DatabaseConfig {
     def transactor[F[_]: Async: ContextShift](dbConfig: DatabaseConfig): Resource[F, HikariTransactor[F]] =
       for {
-        ce <- ExecutionContexts.fixedThreadPool[F](dbConfig.numThreads)
+        ce <- ExecutionContexts.fixedThreadPool[F](dbConfig.numThreads.value)
         te <- ExecutionContexts.cachedThreadPool[F]
         xa <- HikariTransactor.newHikariTransactor[F](driverClassName = dbConfig.driver.value,
                                                       url = dbConfig.url,
