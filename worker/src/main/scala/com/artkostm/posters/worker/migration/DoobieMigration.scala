@@ -19,10 +19,13 @@ trait DoobieMigration extends JdbcMigration {
   implicit val cs = IO.contextShift(ExecutionContext.global)
 
   override def migrate(connection: Connection): Unit =
-    ExecutionContexts.cachedThreadPool[IO].use { implicit ec =>
-      val xa = Transactor.fromConnection[IO](connection, ec)
-      migrate.transact(xa)
-    }
+    ExecutionContexts
+      .cachedThreadPool[IO]
+      .use { implicit ec =>
+        val xa = Transactor.fromConnection[IO](connection, ec)
+        migrate.transact(xa)
+      }
+      .unsafeRunSync()
 }
 
 object DoobieMigration {
