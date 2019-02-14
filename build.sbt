@@ -36,6 +36,8 @@ lazy val internal = (project in file("internal"))
   )
   .dependsOn(interface)
 
+val monocleVersion = "1.5.0" // 1.5.0-cats based on cats 1.0.x
+
 lazy val web = (project in file("web"))
   .settings(
     commonSettings,
@@ -45,7 +47,10 @@ lazy val web = (project in file("web"))
     libraryDependencies ++= Dependencies.http4s,
     libraryDependencies ++= Seq("org.slf4j" % "slf4j-api" % "1.7.25", "org.slf4j" % "slf4j-simple" % "1.7.25"),
     libraryDependencies += "org.postgresql"     % "postgresql"    % versions.postgres,
-    libraryDependencies += "io.github.jmcardon" %% "tsec-jwt-mac" % "0.1.0-M2"
+    libraryDependencies += "io.github.jmcardon" %% "tsec-jwt-mac" % "0.1.0-M2",
+    libraryDependencies ++= Seq(
+      "com.github.julien-truffaut" %%  "monocle-core"  % monocleVersion
+    )
   )
   .dependsOn(internal)
   .enablePlugins(JavaAppPackaging)
