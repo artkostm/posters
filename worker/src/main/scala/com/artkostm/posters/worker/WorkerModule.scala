@@ -3,10 +3,10 @@ package com.artkostm.posters.worker
 import cats.effect._
 import com.artkostm.posters.Configuration.DatabaseConfig
 import com.artkostm.posters.interpreter.{EventStoreInterpreter, InfoStoreInterpreter, VisitorStoreInterpreter}
+import com.artkostm.posters.scraper.AfishaScraper
 import com.artkostm.posters.worker.collector.EventCollector
 import com.artkostm.posters.worker.config.{AppConfig, AppConfiguration}
 import com.artkostm.posters.worker.migration.DoobieMigration
-import com.artkostm.posters.worker.scraper.AfishaScraper
 import doobie.hikari.HikariTransactor
 
 class WorkerModule[F[_]: Timer: Concurrent](config: AppConfig, val xa: HikariTransactor[F]) {
