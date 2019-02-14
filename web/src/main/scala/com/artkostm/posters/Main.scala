@@ -9,6 +9,7 @@ import cats.effect._
 import com.artkostm.posters.Configuration.DatabaseConfig
 import com.artkostm.posters.config.WebConfiguration
 import com.artkostm.posters.endpoint.InfoEndpoint
+import com.artkostm.posters.interfaces.dialog.v2._
 import com.artkostm.posters.interpreter.InfoStoreInterpreter
 import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
@@ -59,4 +60,30 @@ object Main extends IOApp {
     } yield x)
       .use(_ => IO.never)
       .as(ExitCode.Success)
+}
+
+object testMonocle extends App {
+  val req = DialogflowRequest(
+    "respId",
+    QueryResult(
+      "query text",
+      Parameters(List("кино", "цирк"), Datetime(Some(Instant.now()), None)),
+      true,
+      Intent("name", "display name"),
+      1.0,
+      DiagnosticInfo(),
+      "language code"
+    ),
+    OriginalDetectIntentRequest(Payload()),
+    "session"
+  )
+
+  List() match {
+    case l @ _ :: _ => println(s"not empty: $l")
+    case _ => println("empty")
+  }
+
+//  val pr = monocle.Prism.partial[DialogflowRequest, List[String]] {
+//    case DialogflowRequest(_, QueryResult(_, Parameters(category, _), _, _, _, _, _), _, _) => category
+//  }
 }

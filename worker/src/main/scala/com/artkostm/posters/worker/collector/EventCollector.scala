@@ -6,7 +6,7 @@ import java.time.temporal.ChronoUnit
 import cats.effect.{Concurrent, Timer}
 import com.artkostm.posters.algebra.{EventStore, InfoStore, VisitorStore}
 import com.artkostm.posters.interfaces.event.EventInfo
-import com.artkostm.posters.worker.scraper.Scraper
+import com.artkostm.posters.scraper.Scraper
 import fs2.Stream
 
 import scala.concurrent.duration._
