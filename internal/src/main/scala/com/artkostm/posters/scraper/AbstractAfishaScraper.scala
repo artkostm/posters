@@ -1,12 +1,12 @@
-package com.artkostm.posters.worker.scraper
+package com.artkostm.posters.scraper
 
 import java.time.Instant
 
 import cats.effect.Sync
 import cats.syntax.functor._
+import com.artkostm.posters.Configuration.ScraperConfig
 import com.artkostm.posters.interfaces.event.{Comment, EventData, EventInfo}
 import com.artkostm.posters.interfaces.schedule._
-import com.artkostm.posters.worker.config.ScraperConfig
 import net.ruippeixotog.scalascraper.dsl.DSL._
 import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
 import net.ruippeixotog.scalascraper.model._

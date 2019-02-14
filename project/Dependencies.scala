@@ -77,16 +77,15 @@ object Dependencies {
   )
 
   lazy val workerSpecific = Seq(
-    "net.ruippeixotog" %% "scala-scraper" % versions.scraper,
-    "org.flywaydb"     % "flyway-core"    % versions.flyway,
-    "co.fs2"           %% "fs2-core"      % "1.0.3"
+    "org.flywaydb" % "flyway-core" % versions.flyway,
+    "co.fs2"       %% "fs2-core"   % "1.0.3"
   )
 
   lazy val internalM = Seq(
-    "org.tpolecat"                          %% "doobie-core" % versions.doobie % Provided,
-    "org.tpolecat"                          %% "doobie-postgres" % versions.doobie % Provided,
-    "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % versions.jsoniter % Provided,
-    "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % versions.jsoniter % Provided,
-    "org.postgresql"                        % "postgresql" % versions.postgres % Provided
-  ) ++ ciris.map(_                          % Provided)
+    "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core"    % versions.jsoniter % Provided,
+    "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros"  % versions.jsoniter % Provided,
+    "org.postgresql"                        % "postgresql"              % versions.postgres % Provided,
+    "net.ruippeixotog"                      %% "scala-scraper"          % versions.scraper,
+    "com.lihaoyi"                           %% "fastparse"              % "2.1.0"
+  ) ++ ciris.map(_                          % Provided) ++ doobie.map(_ % Provided)
 }

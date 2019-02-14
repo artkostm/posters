@@ -9,6 +9,7 @@ import cats.effect._
 import com.artkostm.posters.Configuration.DatabaseConfig
 import com.artkostm.posters.config.WebConfiguration
 import com.artkostm.posters.endpoint.InfoEndpoint
+import com.artkostm.posters.interfaces.dialog.v2._
 import com.artkostm.posters.interpreter.InfoStoreInterpreter
 import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
@@ -22,17 +23,6 @@ import org.http4s.server.Router
 import scala.concurrent.Future
 
 object Main extends IOApp {
-  def transactor[F[_]: Async: ContextShift](dbConfig: DatabaseConfig): Resource[F, HikariTransactor[F]] =
-    for {
-      ce <- ExecutionContexts.fixedThreadPool[F](32)
-      te <- ExecutionContexts.cachedThreadPool[F]
-      xa <- HikariTransactor.newHikariTransactor[F](driverClassName = dbConfig.driver.value,
-                                                    url = dbConfig.url,
-                                                    user = dbConfig.user,
-                                                    pass = dbConfig.password,
-                                                    connectEC = ce,
-                                                    transactEC = te)
-    } yield xa
 //  type ApiKey = String Refined MatchesRegex[W.`"[a-zA-Z0-9]{25,40}"`.T]
 //
 //  case class Personalities(info: String)
@@ -61,7 +51,7 @@ object Main extends IOApp {
   override def run(args: List[String]): IO[ExitCode] =
     (for {
       config    <- Resource.liftF(WebConfiguration.load[IO])
-      xa        <- transactor[IO](config.db)
+      xa        <- DatabaseConfig.transactor[IO](config.db)
       infoStore = new InfoStoreInterpreter(xa.trans)
       x <- BlazeServerBuilder[IO]
             .bindHttp(8080, "localhost")
@@ -70,4 +60,30 @@ object Main extends IOApp {
     } yield x)
       .use(_ => IO.never)
       .as(ExitCode.Success)
+}
+
+object testMonocle extends App {
+  val req = DialogflowRequest(
+    "respId",
+    QueryResult(
+      "query text",
+      Parameters(List("кино", "цирк"), Datetime(Some(Instant.now()), None)),
+      true,
+      Intent("name", "display name"),
+      1.0,
+      DiagnosticInfo(),
+      "language code"
+    ),
+    OriginalDetectIntentRequest(Payload()),
+    "session"
+  )
+
+  List() match {
+    case l @ _ :: _ => println(s"not empty: $l")
+    case _ => println("empty")
+  }
+
+//  val pr = monocle.Prism.partial[DialogflowRequest, List[String]] {
+//    case DialogflowRequest(_, QueryResult(_, Parameters(category, _), _, _, _, _, _), _, _) => category
+//  }
 }

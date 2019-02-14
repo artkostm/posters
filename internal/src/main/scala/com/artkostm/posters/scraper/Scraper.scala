@@ -1,4 +1,4 @@
-package com.artkostm.posters.worker.scraper
+package com.artkostm.posters.scraper
 
 import java.time.Instant
 

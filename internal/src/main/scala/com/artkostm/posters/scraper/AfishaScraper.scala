@@ -1,10 +1,10 @@
-package com.artkostm.posters.worker.scraper
+package com.artkostm.posters.scraper
 
 import java.time.Instant
 
 import cats.effect.Sync
 import cats.syntax.functor._
-import com.artkostm.posters.worker.config.ScraperConfig
+import com.artkostm.posters.Configuration.ScraperConfig
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser
 
 class AfishaScraper[F[_]](config: ScraperConfig)(implicit F: Sync[F]) extends AbstractAfishaScraper(config) {

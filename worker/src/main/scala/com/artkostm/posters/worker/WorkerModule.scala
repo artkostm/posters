@@ -1,11 +1,12 @@
 package com.artkostm.posters.worker
 
 import cats.effect._
+import com.artkostm.posters.Configuration.DatabaseConfig
 import com.artkostm.posters.interpreter.{EventStoreInterpreter, InfoStoreInterpreter, VisitorStoreInterpreter}
+import com.artkostm.posters.scraper.AfishaScraper
 import com.artkostm.posters.worker.collector.EventCollector
 import com.artkostm.posters.worker.config.{AppConfig, AppConfiguration}
 import com.artkostm.posters.worker.migration.DoobieMigration
-import com.artkostm.posters.worker.scraper.AfishaScraper
 import doobie.hikari.HikariTransactor
 
 class WorkerModule[F[_]: Timer: Concurrent](config: AppConfig, val xa: HikariTransactor[F]) {
@@ -21,6 +22,6 @@ object WorkerModule {
     for {
       config <- Resource.liftF(AppConfiguration.load[F])
       _      <- Resource.liftF(DoobieMigration.run[F](config))
-      xa     <- DoobieMigration.transactor(config.db)
+      xa     <- DatabaseConfig.transactor(config.db)
     } yield new WorkerModule[F](config, xa)
 }

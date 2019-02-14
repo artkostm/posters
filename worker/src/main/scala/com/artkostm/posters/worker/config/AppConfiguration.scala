@@ -1,18 +1,15 @@
 package com.artkostm.posters.worker.config
 
 import java.net.URI
-import java.time.ZoneId
 
 import ciris._
 import ciris.refined._
 import ciris.enumeratum._
 import com.artkostm.posters.Configuration
-import com.artkostm.posters.Configuration.DatabaseConfig
+import com.artkostm.posters.Configuration.{DatabaseConfig, ScraperConfig, TutScraper}
 import com.artkostm.posters.environments.AppEnvironment
 import eu.timepit.refined.auto._
 import eu.timepit.refined.types.string.NonEmptyString
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 object AppConfiguration extends Configuration[AppConfig] {
 
@@ -38,56 +35,6 @@ object AppConfiguration extends Configuration[AppConfig] {
                     db = Configuration.buildDbConfigForHeroku(dbUrl, user, password))
         }
     }.result
-
-  private val scraperConfig = ScraperConfig(
-    TutScraper(
-      url = "https://afisha.tut.by/day/",
-      format = DateTimeFormatter
-        .ofPattern("yyyy/MM/dd")
-        .withLocale(Locale.ENGLISH)
-        .withZone(ZoneId.of("Europe/Minsk")),
-      blocksSelector = "#events-block .events-block",
-      blockTitleSelector = ".title_block",
-      eventsSelector = ".lists__li",
-      mediaSelector = "a.media",
-      eventNameSelector = "a.name span",
-      descriptionSelector = "div.txt",
-      descriptionTextSelector = "p",
-      ticketSelector = "a.ticket",
-      freeEventSelector = "a.free-event",
-      hrefAttrSelector = "href",
-      srcAttrSelector = "src",
-      imgSelector = "img",
-      eventPhotoSelector = "#event-photos a",
-      eventDescriptionSelector = "#event-description",
-      commentsSelector = "#comments .comments__content",
-      commentAuthorSelector = ".head span.author",
-      commentDateSelector = ".head .date",
-      commentTextSelector = ".comment_txt",
-      commentRatingSelector = ".rating"
-    ))
 }
 
-case class TutScraper(url: String,
-                      format: DateTimeFormatter,
-                      blocksSelector: String,
-                      blockTitleSelector: String,
-                      eventsSelector: String,
-                      mediaSelector: String,
-                      eventNameSelector: String,
-                      descriptionSelector: String,
-                      descriptionTextSelector: String,
-                      ticketSelector: String,
-                      freeEventSelector: String,
-                      hrefAttrSelector: String,
-                      srcAttrSelector: String,
-                      imgSelector: String,
-                      eventPhotoSelector: String,
-                      eventDescriptionSelector: String,
-                      commentsSelector: String,
-                      commentAuthorSelector: String,
-                      commentDateSelector: String,
-                      commentTextSelector: String,
-                      commentRatingSelector: String)
-case class ScraperConfig(tut: TutScraper)
 case class AppConfig(version: String, scraper: ScraperConfig, db: DatabaseConfig)
