@@ -6,7 +6,7 @@ import ciris._
 import ciris.refined._
 import ciris.enumeratum._
 import com.artkostm.posters.Configuration
-import com.artkostm.posters.Configuration.DatabaseConfig
+import com.artkostm.posters.Configuration.{DatabaseConfig, ScraperConfig}
 import com.artkostm.posters.config.WebConfiguration.ApiKey
 import com.artkostm.posters.environments.AppEnvironment
 import eu.timepit.refined.W
@@ -30,7 +30,8 @@ object WebConfiguration extends Configuration[AppConfig] {
             http = HttpConfig(8080),
             db = Configuration.buildDbConfig(
               s"jdbc:postgresql://${dockerHost.map(URI.create).map(_.getHost).getOrElse("localhost")}:5432/postgres"),
-            api = ApiConfig(Secret("uufdeddddd00d0d00d0d00d0d0"), "token")
+            api = ApiConfig(Secret("uufdeddddd00d0d00d0d00d0d0"), "123token456"),
+            scraperConfig
           )
         }
       case Production | Heroku =>
@@ -41,14 +42,17 @@ object WebConfiguration extends Configuration[AppConfig] {
           env[NonEmptyString]("JDBC_DATABASE_USERNAME"),
           env[NonEmptyString]("JDBC_DATABASE_PASSWORD")
         ) { (apiKey, port, dbUrl, user, password) =>
-          AppConfig(version = Configuration.AppVersion,
-                    http = HttpConfig(port),
-                    db = Configuration.buildDbConfigForHeroku(dbUrl, user, password),
-                    api = ApiConfig(apiKey, "token"))
+          AppConfig(
+            version = Configuration.AppVersion,
+            http = HttpConfig(port),
+            db = Configuration.buildDbConfigForHeroku(dbUrl, user, password),
+            api = ApiConfig(apiKey, "token"),
+            scraperConfig
+          )
         }
     }.result
 }
 
 case class HttpConfig(port: UserPortNumber)
 case class ApiConfig(key: Secret[ApiKey], token: String)
-case class AppConfig(version: String, http: HttpConfig, db: DatabaseConfig, api: ApiConfig)
+case class AppConfig(version: String, http: HttpConfig, db: DatabaseConfig, api: ApiConfig, scraper: ScraperConfig)
