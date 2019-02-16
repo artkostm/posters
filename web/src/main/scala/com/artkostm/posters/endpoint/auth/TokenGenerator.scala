@@ -19,8 +19,8 @@ object ApiTokenGenerator extends IOApp {
 
 class TokenGenerator[F[_]](implicit F: Sync[F]) {
 
-  private val ApiToken = sys.env.get("SB_API_TOKEN")
-  private val ApiKey   = sys.env.get("SB_API_KEY")
+  private val ApiToken = sys.env.get("P_API_TOKEN")
+  private val ApiKey   = sys.env.get("P_API_KEY")
 
   private def generateJwtKey(token: String): F[MacSigningKey[HMACSHA256]] =
     F.catchNonFatal(HMACSHA256.unsafeBuildKey(token.getBytes))
@@ -33,7 +33,7 @@ class TokenGenerator[F[_]](implicit F: Sync[F]) {
   val tokenGenerator: F[String] = ApiToken.fold(ifEmpty) { apiToken =>
     for {
       jwtKey <- generateJwtKey(apiToken)
-      claims = JWTClaims(subject = ApiKey, expiration = None)
+      claims = JWTClaims(issuer = Some("issuer1"), subject = ApiKey, expiration = None)
       token  <- generateToken(claims, jwtKey)
     } yield token
   }
