@@ -54,7 +54,7 @@ object Main extends IOApp {
       config    <- Resource.liftF(WebConfiguration.load[IO])
       xa        <- DatabaseConfig.transactor[IO](config.db)
       infoStore = new InfoStoreInterpreter(xa.trans)
-      auth      <- Resource.liftF(JwtTokenAuthMiddleware[IO](Some("12345")))
+      auth      <- Resource.liftF(JwtTokenAuthMiddleware[IO](config.api))
       exit <- BlazeServerBuilder[IO]
                .bindHttp(8080, "localhost")
                .withHttpApp(Router("/" -> auth(InfoEndpoint(infoStore))).orNotFound)
