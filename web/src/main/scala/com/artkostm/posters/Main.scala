@@ -9,6 +9,7 @@ import cats.effect._
 import com.artkostm.posters.Configuration.DatabaseConfig
 import com.artkostm.posters.config.WebConfiguration
 import com.artkostm.posters.endpoint.InfoEndpoint
+import com.artkostm.posters.endpoint.auth.JwtTokenAuthMiddleware
 import com.artkostm.posters.interfaces.dialog.v2._
 import com.artkostm.posters.interpreter.InfoStoreInterpreter
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -53,11 +54,12 @@ object Main extends IOApp {
       config    <- Resource.liftF(WebConfiguration.load[IO])
       xa        <- DatabaseConfig.transactor[IO](config.db)
       infoStore = new InfoStoreInterpreter(xa.trans)
-      x <- BlazeServerBuilder[IO]
-            .bindHttp(8080, "localhost")
-            .withHttpApp(Router("/" -> InfoEndpoint(infoStore)).orNotFound)
-            .resource
-    } yield x)
+      auth      <- Resource.liftF(JwtTokenAuthMiddleware[IO](Some("12345")))
+      exit <- BlazeServerBuilder[IO]
+               .bindHttp(8080, "localhost")
+               .withHttpApp(Router("/" -> auth(InfoEndpoint(infoStore))).orNotFound)
+               .resource
+    } yield exit)
       .use(_ => IO.never)
       .as(ExitCode.Success)
 }
@@ -80,7 +82,7 @@ object testMonocle extends App {
 
   List() match {
     case l @ _ :: _ => println(s"not empty: $l")
-    case _ => println("empty")
+    case _          => println("empty")
   }
 
 //  val pr = monocle.Prism.partial[DialogflowRequest, List[String]] {
