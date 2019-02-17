@@ -18,6 +18,7 @@ object Main extends IOApp {
       module <- WebModule.init
       auth   <- Resource.liftF(JwtTokenAuthMiddleware[IO](module.config.api))
       exit <- BlazeServerBuilder[IO]
+               .withNio2(true)
                .bindHttp(8080, "localhost")
                .withHttpApp(Router("/" -> auth(module.endpoints)).orNotFound)
                .resource

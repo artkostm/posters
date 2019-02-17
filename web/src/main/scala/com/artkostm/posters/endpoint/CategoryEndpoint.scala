@@ -37,6 +37,7 @@ class CategoryEndpoint[F[_]: Effect](repository: EventStore[F]) extends Http4sDs
 
   private def getCategoryByName(): AuthedService[User, F] = AuthedService {
     case GET -> Root / "categories" / name :? DateMatcher(date) as _ =>
+      println(name)
       for {
         category <- EitherT
                      .fromOptionF(repository.findByNameAndDate(name, date),
