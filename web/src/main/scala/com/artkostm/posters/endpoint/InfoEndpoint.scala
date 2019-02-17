@@ -12,7 +12,7 @@ import com.github.plokhotnyuk.jsoniter_scala.macros.{CodecMakerConfig, JsonCodec
 import org.http4s.AuthedService
 import org.http4s.dsl.Http4sDsl
 
-class InfoEndpoint[F[_]: Effect](repository: InfoStore[F]) extends Http4sDsl[F] {
+class InfoEndpoint[F[_]: Effect](repository: InfoStore[F]) extends Http4sDsl[F] with EndpointsAware[F] {
   import com.artkostm.posters.jsoniter._
 
   /* Parses out link query param */
@@ -32,9 +32,9 @@ class InfoEndpoint[F[_]: Effect](repository: InfoStore[F]) extends Http4sDsl[F] 
       } yield resp
   }
 
-  def endpoints(): AuthedService[User, F] = getEventInfo()
+  override def endpoints: AuthedService[User, F] = getEventInfo()
 }
 
 object InfoEndpoint {
-  def apply[F[_]: Effect](repository: InfoStore[F]): AuthedService[User, F] = new InfoEndpoint(repository).endpoints()
+  def apply[F[_]: Effect](repository: InfoStore[F]): AuthedService[User, F] = new InfoEndpoint(repository).endpoints
 }
