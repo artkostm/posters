@@ -6,3 +6,4 @@ sealed trait ValidationError {
 }
 
 final case class EventInfoNotFound(msg: String, code: Int = 404) extends ValidationError
+final case class CategoryNotFound(msg: String, code: Int = 404) extends ValidationError
