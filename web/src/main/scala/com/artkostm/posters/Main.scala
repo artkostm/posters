@@ -1,7 +1,7 @@
 package com.artkostm.posters
 
 import java.time.format.DateTimeFormatterBuilder
-import java.time.{Instant, LocalDate, ZoneId}
+import java.time.{Instant, ZoneId}
 import java.time.temporal.{ChronoField, ChronoUnit, TemporalAccessor}
 
 import cats.effect._

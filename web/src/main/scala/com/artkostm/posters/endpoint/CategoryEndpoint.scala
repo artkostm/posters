@@ -1,8 +1,8 @@
 package com.artkostm.posters.endpoint
+
 import java.time.{Instant, ZoneId}
-import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder}
-import java.time.temporal.{ChronoField, TemporalAccessor, TemporalQuery}
-import java.util.Locale
+import java.time.format.DateTimeFormatterBuilder
+import java.time.temporal.{ChronoField, ChronoUnit, TemporalAccessor}
 
 import cats.data.EitherT
 import cats.implicits._
@@ -19,6 +19,8 @@ import org.http4s.dsl.Http4sDsl
 class CategoryEndpoint[F[_]: Effect](repository: EventStore[F]) extends Http4sDsl[F] with EndpointsAware[F] {
   import com.artkostm.posters.jsoniter._
 
+  val categories = Map("movie" -> "Кино")
+
   val FMT = new DateTimeFormatterBuilder()
     .appendPattern("yyyy/MM/dd")
     .parseDefaulting(ChronoField.NANO_OF_DAY, 0)
@@ -26,7 +28,8 @@ class CategoryEndpoint[F[_]: Effect](repository: EventStore[F]) extends Http4sDs
     .withZone(ZoneId.of("Europe/Minsk"))
 
   implicit val yearQueryParamDecoder: QueryParamDecoder[Instant] =
-    QueryParamDecoder[String].map(FMT.parse(_, (temporal: TemporalAccessor) => Instant.from(temporal)))
+    QueryParamDecoder[String].map(
+      FMT.parse(_, (temporal: TemporalAccessor) => Instant.from(temporal).truncatedTo(ChronoUnit.DAYS)))
 
   object DateMatcher extends QueryParamDecoderMatcher[Instant]("date")
 
@@ -40,7 +43,7 @@ class CategoryEndpoint[F[_]: Effect](repository: EventStore[F]) extends Http4sDs
       println(name)
       for {
         category <- EitherT
-                     .fromOptionF(repository.findByNameAndDate(name, date),
+                     .fromOptionF(repository.findByNameAndDate(categories(name.toLowerCase), date),
                                   CategoryNotFound(s"Cannot find '$name' category using date=$date"))
                      .value
         resp <- category.fold(NotFound(_), Ok(_))

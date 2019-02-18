@@ -15,7 +15,7 @@ object Dependencies {
     val tsecV           = "0.0.1-M11"
     val ciris           = "0.12.1"
     val doobie          = "0.6.0"
-    val http4s          = "0.20.0-SNAPSHOT"
+    val http4s          = "0.20.0-M5"
     val jsoniter        = "0.39.0"
     val flyway          = "5.1.4"
     val streamz         = "0.9.1"
