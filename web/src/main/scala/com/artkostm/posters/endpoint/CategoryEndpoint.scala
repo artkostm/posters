@@ -7,7 +7,6 @@ import java.time.temporal.{ChronoField, ChronoUnit, TemporalAccessor}
 import cats.data.EitherT
 import cats.implicits._
 import cats.effect.Effect
-import com.artkostm.posters.CategoryNotFound
 import com.artkostm.posters.algebra.EventStore
 import com.artkostm.posters.interfaces.auth.User
 import com.artkostm.posters.interfaces.schedule.Category
@@ -18,9 +17,9 @@ import org.http4s.dsl.Http4sDsl
 
 class CategoryEndpoint[F[_]: Effect](repository: EventStore[F]) extends Http4sDsl[F] with EndpointsAware[F] {
   import com.artkostm.posters.jsoniter._
+  import com.artkostm.posters.ValidationError._
 
-  val categories = Map("movie" -> "Кино")
-
+  // TODO: move into package at root
   val FMT = new DateTimeFormatterBuilder()
     .appendPattern("yyyy/MM/dd")
     .parseDefaulting(ChronoField.NANO_OF_DAY, 0)
@@ -33,17 +32,15 @@ class CategoryEndpoint[F[_]: Effect](repository: EventStore[F]) extends Http4sDs
 
   object DateMatcher extends QueryParamDecoderMatcher[Instant]("date")
 
+  // TODO: move codecs to appropriate places
   implicit val categoryCodec: JsonValueCodec[Category] = JsonCodecMaker.make[Category](CodecMakerConfig())
 
-  implicit val categoryNotFoundCodec: JsonValueCodec[CategoryNotFound] =
-    JsonCodecMaker.make[CategoryNotFound](CodecMakerConfig())
-
   private def getCategoryByName(): AuthedService[User, F] = AuthedService {
+    // TODO: add validation for the name (create enum and corresponding object with unapply)
     case GET -> Root / "categories" / name :? DateMatcher(date) as _ =>
-      println(name)
       for {
         category <- EitherT
-                     .fromOptionF(repository.findByNameAndDate(categories(name.toLowerCase), date),
+                     .fromOptionF(repository.findByNameAndDate(name, date),
                                   CategoryNotFound(s"Cannot find '$name' category using date=$date"))
                      .value
         resp <- category.fold(NotFound(_), Ok(_))
