@@ -3,7 +3,6 @@ package com.artkostm.posters.endpoint
 import cats.data.EitherT
 import cats.implicits._
 import cats.effect.Effect
-import com.artkostm.posters.EventInfoNotFound
 import com.artkostm.posters.algebra.InfoStore
 import com.artkostm.posters.interfaces.auth.User
 import com.artkostm.posters.interfaces.event.EventInfo
@@ -12,16 +11,14 @@ import com.github.plokhotnyuk.jsoniter_scala.macros.{CodecMakerConfig, JsonCodec
 import org.http4s.AuthedService
 import org.http4s.dsl.Http4sDsl
 
-class InfoEndpoint[F[_]: Effect](repository: InfoStore[F]) extends Http4sDsl[F] {
+class InfoEndpoint[F[_]: Effect](repository: InfoStore[F]) extends Http4sDsl[F] with EndpointsAware[F] {
   import com.artkostm.posters.jsoniter._
+  import com.artkostm.posters.ValidationError._
 
   /* Parses out link query param */
   object LinkMatcher extends QueryParamDecoderMatcher[String]("link")
 
   implicit val eventInfoCodec: JsonValueCodec[EventInfo] = JsonCodecMaker.make[EventInfo](CodecMakerConfig())
-
-  implicit val eventInfoNotFoundCodec: JsonValueCodec[EventInfoNotFound] =
-    JsonCodecMaker.make[EventInfoNotFound](CodecMakerConfig())
 
   private def getEventInfo(): AuthedService[User, F] = AuthedService {
     case GET -> Root / "events" :? LinkMatcher(link) as User(_, role) =>
@@ -32,9 +29,9 @@ class InfoEndpoint[F[_]: Effect](repository: InfoStore[F]) extends Http4sDsl[F] 
       } yield resp
   }
 
-  def endpoints(): AuthedService[User, F] = getEventInfo()
+  override def endpoints: AuthedService[User, F] = getEventInfo()
 }
 
 object InfoEndpoint {
-  def apply[F[_]: Effect](repository: InfoStore[F]): AuthedService[User, F] = new InfoEndpoint(repository).endpoints()
+  def apply[F[_]: Effect](repository: InfoStore[F]): AuthedService[User, F] = new InfoEndpoint(repository).endpoints
 }

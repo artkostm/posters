@@ -32,7 +32,7 @@ class EventStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends EventStore[F] {
   override def findByDate(day: Instant): F[Option[Day]] =
     T(sql"""SELECT "date", "categories" FROM events WHERE date=$day""".query[Day].option)
 
-  override def findByName(names: NonEmptyList[String]): F[List[Category]] =
+  override def findByNames(names: NonEmptyList[String]): F[List[Category]] =
     T(
       (
         fr"""SELECT j FROM events t, jsonb_array_elements(t.categories) j WHERE """ ++ fragments.in(fr"""j->>'name'""",
@@ -40,6 +40,13 @@ class EventStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends EventStore[F] {
       ).query[Category]
         .to[List])
 
+  override def findByNameAndDate(name: String, date: Instant): F[Option[Category]] =
+    T(
+      sql"""SELECT j FROM events t, jsonb_array_elements(t.categories) j WHERE j->>'name' = $name AND t.date = $date"""
+        .query[Category]
+        .option)
+
   override def deleteOld(today: Instant): F[Int] =
     T(sql"""DELETE FROM events WHERE date < $today""".update.run)
+
 }
