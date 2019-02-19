@@ -8,6 +8,7 @@ import cats.data.EitherT
 import cats.implicits._
 import cats.effect.Effect
 import com.artkostm.posters.algebra.EventStore
+import com.artkostm.posters.categories.CategoryVar
 import com.artkostm.posters.interfaces.auth.User
 import com.artkostm.posters.interfaces.schedule.Category
 import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
@@ -37,11 +38,11 @@ class CategoryEndpoint[F[_]: Effect](repository: EventStore[F]) extends Http4sDs
 
   private def getCategoryByName(): AuthedService[User, F] = AuthedService {
     // TODO: add validation for the name (create enum and corresponding object with unapply)
-    case GET -> Root / "categories" / name :? DateMatcher(date) as _ =>
+    case GET -> Root / "categories" / CategoryVar(categoryName) :? DateMatcher(date) as _ =>
       for {
         category <- EitherT
-                     .fromOptionF(repository.findByNameAndDate(name, date),
-                                  CategoryNotFound(s"Cannot find '$name' category using date=$date"))
+                     .fromOptionF(repository.findByNameAndDate(categoryName.entryName, date),
+                                  CategoryNotFound(s"Cannot find '$categoryName' category using date=$date"))
                      .value
         resp <- category.fold(NotFound(_), Ok(_))
       } yield resp
