@@ -1,4 +1,5 @@
 package com.artkostm.posters
+
 import com.artkostm.posters.interfaces.event.EventInfo
 import com.artkostm.posters.interfaces.schedule.Category
 import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
