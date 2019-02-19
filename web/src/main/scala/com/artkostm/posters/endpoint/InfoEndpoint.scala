@@ -13,12 +13,8 @@ import org.http4s.dsl.Http4sDsl
 
 class InfoEndpoint[F[_]: Effect](repository: InfoStore[F]) extends Http4sDsl[F] with EndpointsAware[F] {
   import com.artkostm.posters.jsoniter._
+  import ValueCodecs._
   import com.artkostm.posters.ValidationError._
-
-  /* Parses out link query param */
-  object LinkMatcher extends QueryParamDecoderMatcher[String]("link")
-
-  implicit val eventInfoCodec: JsonValueCodec[EventInfo] = JsonCodecMaker.make[EventInfo](CodecMakerConfig())
 
   private def getEventInfo(): AuthedService[User, F] = AuthedService {
     case GET -> Root / "events" :? LinkMatcher(link) as User(_, role) =>
