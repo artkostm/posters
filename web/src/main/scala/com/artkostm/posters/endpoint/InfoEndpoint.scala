@@ -5,9 +5,6 @@ import cats.implicits._
 import cats.effect.Effect
 import com.artkostm.posters.algebra.InfoStore
 import com.artkostm.posters.interfaces.auth.User
-import com.artkostm.posters.interfaces.event.EventInfo
-import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
-import com.github.plokhotnyuk.jsoniter_scala.macros.{CodecMakerConfig, JsonCodecMaker}
 import org.http4s.AuthedService
 import org.http4s.dsl.Http4sDsl
 
