@@ -13,8 +13,8 @@ class WebModule[F[_]: Effect](val config: AppConfig, val xa: HikariTransactor[F]
   private lazy val infoStore    = new InfoStoreInterpreter(xa.trans)
   private lazy val eventStore   = new EventStoreInterpreter(xa.trans)
   private lazy val visitorStore = new VisitorStoreInterpreter(xa.trans)
-  lazy val endpoints            = InfoEndpoint[F](infoStore) <+> CategoryEndpoint[F](eventStore)
   lazy val scraper: Scraper[F]  = new AfishaScraper[F](config.scraper)
+  lazy val endpoints            = InfoEndpoint[F](infoStore) <+> CategoryEndpoint[F](eventStore, scraper)
 }
 
 object WebModule {

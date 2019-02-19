@@ -11,3 +11,19 @@ trait VisitorStore[F[_]] {
   def asVolunteer(id: String, intent: Intent): F[Intent]
   def asPlainUser(id: String, intent: Intent): F[Intent]
 }
+
+//object testJson extends App {
+//  println(Instant.now)
+//  import com.github.plokhotnyuk.jsoniter_scala.core._
+//
+//  implicit val intentCodec: JsonValueCodec[Intent] = JsonCodecMaker.make[Intent](CodecMakerConfig())
+//
+//  val intent: Intent = readFromArray(
+//    """
+//      |{"date":"2019-02-19T13:56:24.678Z", "event_name":"event name"}
+//    """.stripMargin.getBytes)
+//
+//  println(intent)
+//
+//  println(new String(writeToArray(Intent(Instant.now, "event name"))))
+//}
