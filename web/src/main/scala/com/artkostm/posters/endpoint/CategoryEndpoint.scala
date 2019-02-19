@@ -16,6 +16,7 @@ class CategoryEndpoint[F[_]: Effect](repository: EventStore[F], scraper: Scraper
   import com.artkostm.posters.ValidationError._
 
   private def getCategoryByName(): AuthedService[User, F] = AuthedService {
+    // TODO: Add validation for date to not trace DateTimeParseException
     case GET -> Root / "categories" / CategoryVar(categoryName) :? DateMatcher(date) as _ =>
       for {
         category <- EitherT
@@ -26,7 +27,18 @@ class CategoryEndpoint[F[_]: Effect](repository: EventStore[F], scraper: Scraper
       } yield resp
   }
 
-  override def endpoints: AuthedService[User, F] = getCategoryByName()
+  private def getDay(): AuthedService[User, F] = AuthedService {
+    case GET -> Root / "categories" :? DateMatcher(date) as _ =>
+      for {
+        category <- EitherT
+          .fromOptionF(repository.findByDate(date),
+            CategoryNotFound(s"Cannot find categories using date=$date"))
+          .value
+        resp <- category.fold(NotFound(_), Ok(_))
+      } yield resp
+  }
+
+  override def endpoints: AuthedService[User, F] = getCategoryByName() <+> getDay()
 }
 
 object CategoryEndpoint {
