@@ -5,7 +5,7 @@ import cats.implicits._
 import cats.effect.Effect
 import com.artkostm.posters.algebra.VisitorStore
 import com.artkostm.posters.interfaces.auth.User
-import com.artkostm.posters.interfaces.intent.Intent
+import com.artkostm.posters.interfaces.intent.Intents
 import org.http4s.AuthedService
 import org.http4s.dsl.Http4sDsl
 
@@ -17,7 +17,7 @@ class VisitorEndpoint[F[_]: Effect](repository: VisitorStore[F]) extends Http4sD
   private def saveVisitors(): AuthedService[User, F] = AuthedService {
     case authed @ POST -> Root / "visitors" as _ =>
       for {
-        intent  <- authed.req.as[Intent]
+        intent  <- authed.req.as[Intents]
         created <- EitherT.liftF(repository.save(intent)).value
         resp    <- created.fold(BadRequest(_), Created(_))
       } yield resp
