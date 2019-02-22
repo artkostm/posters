@@ -4,9 +4,10 @@ import cats.data.{EitherT, Kleisli, OptionT}
 import cats.effect.Sync
 import cats.syntax.applicativeError._
 import cats.syntax.functor._
+import com.artkostm.posters.ValidationError
 import com.artkostm.posters.config.ApiConfig
 import com.artkostm.posters.endpoint.auth.JwtTokenAuthMiddleware.AuthConfig
-import com.artkostm.posters.interfaces.auth.User
+import com.artkostm.posters.interfaces.auth.{Roles, User}
 import org.http4s.Credentials.Token
 import org.http4s.{AuthScheme, AuthedService, Request}
 import org.http4s.dsl.Http4sDsl
@@ -39,10 +40,11 @@ class Middleware[F[_]](api: ApiConfig)(implicit F: Sync[F]) {
 }
 
 class JwtTokenAuthMiddleware[F[_]: Sync](config: AuthConfig, apiKey: String) extends Http4sDsl[F] {
+  import com.artkostm.posters.jsoniter._
+  import ValidationError._
 
-  // TODO: add error
   private val onFailure: AuthedService[String, F] =
-    Kleisli(_ => OptionT.liftF(Forbidden("Forbidden!")))
+    Kleisli(_ => OptionT.liftF(Forbidden(NoPermissions("Forbidden! You don't have enough permissions!"))))
 
   private def bearerTokenFromRequest(request: Request[F]): OptionT[F, String] =
     OptionT.fromOption[F] {
@@ -66,7 +68,10 @@ class JwtTokenAuthMiddleware[F[_]: Sync](config: AuthConfig, apiKey: String) ext
     Kleisli { request =>
       verifyToken(request, jwtKey).value
         .map { option =>
-          Either.cond[String, User](option.map(_.apiKey).contains(apiKey), option.get, "Unable to authorize token")
+          Either.cond[String, User](
+            option.exists(u => u.apiKey == apiKey && Roles.hasRole(u.role)),
+            option.get,
+            "Unable to authorize token")
         }
         .recoverWith {
           case MacVerificationError(msg) => EitherT.leftT(msg).value
