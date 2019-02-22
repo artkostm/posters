@@ -2,14 +2,14 @@ package com.artkostm.posters.algebra
 
 import java.time.Instant
 
-import com.artkostm.posters.interfaces.intent.Intents
+import com.artkostm.posters.interfaces.intent.{Intent, Intents}
 
 trait VisitorStore[F[_]] {
   def deleteOld(today: Instant): F[Int]
-  def save(intent: Intents): F[Intents]
+  def save(intent: Intent): F[Intents]
   def find(date: Instant, eventName: String): F[Option[Intents]]
-  def asVolunteer(id: String, intent: Intents): F[Intents]
-  def asPlainUser(id: String, intent: Intents): F[Intents]
+  def asVolunteer(intent: Intent): F[Intents]
+  def asPlainUser(intent: Intent): F[Intents]
 }
 
 //object testJson extends App {
