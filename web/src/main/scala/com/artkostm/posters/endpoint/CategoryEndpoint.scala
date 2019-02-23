@@ -10,32 +10,41 @@ import com.artkostm.posters.scraper.Scraper
 import org.http4s.AuthedService
 import org.http4s.dsl.Http4sDsl
 
-class CategoryEndpoint[F[_]: Effect](repository: EventStore[F], scraper: Scraper[F]) extends Http4sDsl[F] with EndpointsAware[F] {
+class CategoryEndpoint[F[_]: Effect](repository: EventStore[F], scraper: Scraper[F])
+    extends Http4sDsl[F]
+    with EndpointsAware[F] {
   import com.artkostm.posters.jsoniter._
   import ValueCodecs._
   import com.artkostm.posters.ValidationError._
 
   private def getCategoryByName(): AuthedService[User, F] = AuthedService {
-    // TODO: Add validation for date to not trace DateTimeParseException
-    case GET -> Root / "categories" / CategoryVar(categoryName) :? DateMatcher(date) as _ =>
-      for {
-        category <- EitherT
-                     .fromOptionF(repository.findByNameAndDate(categoryName.entryName, date),
-                                  CategoryNotFound(s"Cannot find '$categoryName' category using date=$date"))
-                     .value
-        resp <- category.fold(NotFound(_), Ok(_))
-      } yield resp
+    case GET -> Root / "categories" / CategoryVar(categoryName) :? DateMatcher(dateValidated) as _ =>
+      dateValidated.fold(
+        nelE => BadRequest(nelE.toList.map(_.sanitized).mkString("\n")),
+        date =>
+          for {
+            category <- EitherT
+                         .fromOptionF(repository.findByNameAndDate(categoryName.entryName, date),
+                                      CategoryNotFound(s"Cannot find '$categoryName' category using date=$date"))
+                         .value
+            resp <- category.fold(NotFound(_), Ok(_))
+          } yield resp
+      )
   }
 
   private def getDay(): AuthedService[User, F] = AuthedService {
-    case GET -> Root / "categories" :? DateMatcher(date) as _ =>
-      for {
-        category <- EitherT
-          .fromOptionF(repository.findByDate(date),
-            CategoryNotFound(s"Cannot find categories using date=$date"))
-          .value
-        resp <- category.fold(NotFound(_), Ok(_))
-      } yield resp
+    case GET -> Root / "categories" :? DateMatcher(dateValidated) as _ =>
+      dateValidated.fold(
+        nelE => BadRequest(nelE.toList.map(_.sanitized).mkString("\n")),
+        date =>
+          for {
+            category <- EitherT
+                         .fromOptionF(repository.findByDate(date),
+                                      CategoryNotFound(s"Cannot find categories using date=$date"))
+                         .value
+            resp <- category.fold(NotFound(_), Ok(_))
+          } yield resp
+      )
   }
 
   override def endpoints: AuthedService[User, F] = getCategoryByName() <+> getDay()
