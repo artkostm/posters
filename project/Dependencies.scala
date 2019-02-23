@@ -4,7 +4,7 @@ object Dependencies {
   val versions = new {
 //    val finatra         = "18.5.0"
 //    val logback         = "1.2.3"
-    val scraper         = "2.0.0"
+    val scraper         = "2.1.0"
 //    val akka            = "2.5.6"
 //    val slick           = "3.2.3"
 //    val slick_pg        = "0.16.1"
