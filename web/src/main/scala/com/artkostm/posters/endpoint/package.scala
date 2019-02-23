@@ -13,6 +13,11 @@ package object endpoint {
   object LinkMatcher extends QueryParamDecoderMatcher[String]("link")
 
   implicit val yearQueryParamDecoder: QueryParamDecoder[Instant] =
-    QueryParamDecoder[String].map(
-      FMT.parse(_, (temporal: TemporalAccessor) => Instant.from(temporal).truncatedTo(ChronoUnit.DAYS)))
+    QueryParamDecoder.fromUnsafeCast { qpv =>
+      FMT.parse(qpv.value, (temporal: TemporalAccessor) => Instant.from(temporal).truncatedTo(ChronoUnit.DAYS))
+    }("Instant")
+
+//  implicit val yearQueryParamDecoder: QueryParamDecoder[Instant] =
+//    QueryParamDecoder[String].map(
+//      FMT.parse(_, (temporal: TemporalAccessor) => Instant.from(temporal).truncatedTo(ChronoUnit.DAYS)))
 }

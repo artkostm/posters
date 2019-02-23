@@ -20,7 +20,7 @@ class CategoryEndpoint[F[_]: Effect](repository: EventStore[F], scraper: Scraper
   private def getCategoryByName(): AuthedService[User, F] = AuthedService {
     case GET -> Root / "categories" / CategoryVar(categoryName) :? DateMatcher(dateValidated) as _ =>
       dateValidated.fold(
-        nelE => BadRequest(nelE.toList.map(_.sanitized).mkString("\n")),
+        nelE => BadRequest(CategoryNotFound(nelE.toList.map(_.sanitized).mkString("\n"))),
         date =>
           for {
             category <- EitherT
