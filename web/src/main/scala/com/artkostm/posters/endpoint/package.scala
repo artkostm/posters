@@ -4,11 +4,11 @@ import java.time.Instant
 import java.time.temporal.{ChronoUnit, TemporalAccessor}
 
 import org.http4s.QueryParamDecoder
-import org.http4s.dsl.impl.QueryParamDecoderMatcher
+import org.http4s.dsl.impl.{QueryParamDecoderMatcher, ValidatingQueryParamDecoderMatcher}
 
 package object endpoint {
   /* Parses out date query param in format yyyy/MM/dd */
-  object DateMatcher extends QueryParamDecoderMatcher[Instant]("date")
+  object DateMatcher extends ValidatingQueryParamDecoderMatcher[Instant]("date")
   /* Parses out link query param */
   object LinkMatcher extends QueryParamDecoderMatcher[String]("link")
 

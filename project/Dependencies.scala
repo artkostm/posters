@@ -2,39 +2,24 @@ import sbt._
 
 object Dependencies {
   val versions = new {
-//    val finatra         = "18.5.0"
-//    val logback         = "1.2.3"
-    val scraper         = "2.0.0"
-//    val akka            = "2.5.6"
-//    val slick           = "3.2.3"
-//    val slick_pg        = "0.16.1"
-    val hikaricp        = "3.2.3"
-    val postgres        = "9.4.1208"
-//    val finatra_swagger = "18.4.0"
-//    val sangria         = "1.4.0"
-//    val tsecV           = "0.0.1-M11"
-    val ciris           = "0.12.1"
-    val doobie          = "0.6.0"
-    val http4s          = "0.20.0-M5"
-    val jsoniter        = "0.39.0"
-    val flyway          = "5.1.4"
-//    val streamz         = "0.9.1"
+    val scraper  = "2.1.0"
+    val hikaricp = "3.2.3"
+    val postgres = "9.4.1208"
+    val ciris    = "0.12.1"
+    val doobie   = "0.6.0"
+    val http4s   = "0.20.0-M6"
+    val jsoniter = "0.41.0"
+    val flyway   = "5.1.4"
+    val tsec     = "0.1.0-M2"
+    val fs2      = "1.0.3"
+    val monocle  = "1.5.0" // is it really needed???
+    val slf4j    = "1.7.25"
+
   }
 
-//  val finatra_http  = "com.twitter"         %% "finatra-http"       % versions.finatra
-//  val logback       = "ch.qos.logback"      % "logback-classic"     % versions.logback
-  val scraper       = "net.ruippeixotog"    %% "scala-scraper"      % versions.scraper
-//  val akka_actor    = "com.typesafe.akka"   % "akka-actor_2.12"     % versions.akka
-//  val slick         = "com.typesafe.slick"  %% "slick"              % versions.slick
-//  val slick_pg      = "com.github.tminglei" %% "slick-pg"           % versions.slick_pg
-//  val slick_pg_play = "com.github.tminglei" %% "slick-pg_play-json" % versions.slick_pg
-  val hikaricp      = "com.typesafe.slick"  %% "slick-hikaricp"     % versions.hikaricp
-  val postgres      = "org.postgresql"      % "postgresql"          % versions.postgres
-//  val akka_streams  = "com.typesafe.akka"   %% "akka-stream"        % versions.akka
-//  val swagger       = "com.jakehschwartz"   %% "finatra-swagger"    % versions.finatra_swagger
-//  val sangria       = "org.sangria-graphql" %% "sangria"            % versions.sangria
-//  val tsec_jwt_sig  = "io.github.jmcardon"  %% "tsec-jwt-sig"       % versions.tsecV
-//  val tsec_jwt_mac  = "io.github.jmcardon"  %% "tsec-jwt-mac"       % versions.tsecV
+  val scraper  = "net.ruippeixotog"   %% "scala-scraper"  % versions.scraper
+  val hikaricp = "com.typesafe.slick" %% "slick-hikaricp" % versions.hikaricp
+  val postgres = "org.postgresql"     % "postgresql"      % versions.postgres
 
   lazy val ciris = Seq(
     "is.cir" %% "ciris-core",
@@ -60,8 +45,9 @@ object Dependencies {
   )
 
   lazy val workerSpecific = Seq(
-    "org.flywaydb" % "flyway-core" % versions.flyway,
-    "co.fs2"       %% "fs2-core"   % "1.0.3"
+    "org.flywaydb"   % "flyway-core" % versions.flyway,
+    "co.fs2"         %% "fs2-core"   % versions.fs2,
+    "org.postgresql" % "postgresql"  % versions.postgres
   )
 
   lazy val internalM = Seq(
@@ -71,4 +57,15 @@ object Dependencies {
     "net.ruippeixotog"                      %% "scala-scraper"          % versions.scraper,
     "com.lihaoyi"                           %% "fastparse"              % "2.1.0"
   ) ++ ciris.map(_                          % Provided) ++ doobie.map(_ % Provided)
+
+  lazy val webSpecific = Seq(
+    "io.github.jmcardon"         %% "tsec-jwt-mac" % versions.tsec,
+    "org.postgresql"             % "postgresql"    % versions.postgres,
+    "com.github.julien-truffaut" %% "monocle-core" % versions.monocle
+  )
+
+  lazy val logging = Seq(
+    "org.slf4j" % "slf4j-api"    % versions.slf4j,
+    "org.slf4j" % "slf4j-simple" % versions.slf4j
+  )
 }
