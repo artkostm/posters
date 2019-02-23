@@ -33,7 +33,7 @@ class TokenGenerator[F[_]](implicit F: Sync[F]) {
   val tokenGenerator: F[String] = ApiToken.fold(ifEmpty) { apiToken =>
     for {
       jwtKey <- generateJwtKey(apiToken)
-      claims = JWTClaims(issuer = Some("issuer1"), subject = ApiKey, expiration = None)
+      claims = JWTClaims(issuer = Some("User"), subject = ApiKey, expiration = None)
       token  <- generateToken(claims, jwtKey)
     } yield token
   }

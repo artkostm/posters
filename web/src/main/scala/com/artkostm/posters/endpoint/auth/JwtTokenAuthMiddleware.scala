@@ -59,7 +59,7 @@ class JwtTokenAuthMiddleware[F[_]: Sync](config: AuthConfig, apiKey: String) ext
       token    <- bearerTokenFromRequest(request)
       verified <- OptionT.liftF(JWTMac.verifyAndParse[F, HMACSHA256](token, jwtKey))
       accessToken <- OptionT.fromOption[F](
-                      (verified.body.subject, verified.body.subject).bisequence.map(User.tupled)
+                      (verified.body.subject, verified.body.issuer).bisequence.map(User.tupled)
                     )
     } yield accessToken
   }
@@ -68,10 +68,9 @@ class JwtTokenAuthMiddleware[F[_]: Sync](config: AuthConfig, apiKey: String) ext
     Kleisli { request =>
       verifyToken(request, jwtKey).value
         .map { option =>
-          Either.cond[String, User](
-            option.exists(u => u.apiKey == apiKey && Roles.hasRole(u.role)),
-            option.get,
-            "Unable to authorize token")
+          Either.cond[String, User](option.exists(u => u.apiKey == apiKey && Roles.hasRole(u.role)),
+                                    option.get,
+                                    "Unable to authorize token")
         }
         .recoverWith {
           case MacVerificationError(msg) => EitherT.leftT(msg).value
