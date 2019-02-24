@@ -3,7 +3,7 @@ package com.artkostm.posters
 import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
 import com.github.plokhotnyuk.jsoniter_scala.macros.{CodecMakerConfig, JsonCodecMaker}
 
-sealed trait ValidationError {
+sealed trait ValidationError extends Exception {
   def code: Int
   def msg: String
 }
