@@ -7,9 +7,13 @@ import com.artkostm.posters.interpreter.{EventStoreInterpreter, InfoStoreInterpr
 import com.artkostm.posters.scraper.{AfishaScraper, Scraper}
 import doobie.hikari.HikariTransactor
 import cats.syntax.semigroupk._
+import cats.syntax.functor._
+import com.olegpy.meow.hierarchy._
 import com.artkostm.posters.Configuration.DatabaseConfig
+import com.artkostm.posters.endpoint.error.ApiHttpErrorHandler
 
 class WebModule[F[_]: Effect](val config: AppConfig, val xa: HikariTransactor[F]) {
+
   private lazy val infoStore    = new InfoStoreInterpreter(xa.trans)
   private lazy val eventStore   = new EventStoreInterpreter(xa.trans)
   private lazy val visitorStore = new VisitorStoreInterpreter(xa.trans)
