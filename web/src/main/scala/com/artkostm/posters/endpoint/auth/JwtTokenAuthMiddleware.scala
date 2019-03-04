@@ -44,7 +44,7 @@ class JwtTokenAuthMiddleware[F[_]: Sync](config: AuthConfig, apiKey: String) ext
   import ValidationError._
 
   private val onFailure: AuthedService[String, F] =
-    Kleisli(_ => OptionT.liftF(Forbidden(NoPermissions("Forbidden! You don't have enough permissions!"))))
+    Kleisli(_ => OptionT.liftF(Forbidden(ApiError("Forbidden! You don't have enough permissions!", 403))))
 
   private def bearerTokenFromRequest(request: Request[F]): OptionT[F, String] =
     OptionT.fromOption[F] {
