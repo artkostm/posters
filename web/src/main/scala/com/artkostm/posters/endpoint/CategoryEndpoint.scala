@@ -3,7 +3,6 @@ package com.artkostm.posters.endpoint
 import cats.data.EitherT
 import cats.implicits._
 import cats.effect.Effect
-import com.artkostm.posters.ValidationError
 import com.artkostm.posters.algebra.EventStore
 import com.artkostm.posters.categories.CategoryVar
 import com.artkostm.posters.endpoint.error.HttpErrorHandler
@@ -24,7 +23,7 @@ class CategoryEndpoint[F[_]: Effect](repository: EventStore[F], scraper: Scraper
       for {
         category <- EitherT
                      .fromOptionF(repository.findByNameAndDate(categoryName.entryName, date),
-                                  CategoryNotFound(s"Cannot find '$categoryName' category using date=$date"))
+                                  ApiError(s"Cannot find '$categoryName' category using date=$date", 404))
                      .value
         resp <- category.fold(NotFound(_), Ok(_))
       } yield resp
@@ -35,7 +34,7 @@ class CategoryEndpoint[F[_]: Effect](repository: EventStore[F], scraper: Scraper
       for {
         category <- EitherT
                      .fromOptionF(repository.findByDate(date),
-                                  CategoryNotFound(s"Cannot find categories using date=$date"))
+                                  ApiError(s"Cannot find categories using date=$date", 404))
                      .value
         resp <- category.fold(NotFound(_), Ok(_))
       } yield resp
