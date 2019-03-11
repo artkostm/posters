@@ -11,21 +11,24 @@ import fs2.Stream
 
 import scala.concurrent.duration._
 
-class EventCollector[F[_]: Timer](scraper: Scraper[F],
+class EventCollector[F[_]: Timer](scraper: Stream[F, Scraper[F]],
                                   eventStore: EventStore[F],
                                   infoStore: InfoStore[F],
                                   visitorStore: VisitorStore[F])(implicit F: Concurrent[F]) {
   def collect() = {
+    val scr: Stream[F, Scraper[F]] = ???
+
     val dayStream = Stream
       .range(-2, 31)
       .covary[F]
       .map(Instant.now().plus(_, ChronoUnit.DAYS).truncatedTo(ChronoUnit.DAYS))
-      .mapAsyncUnordered(4)(scraper.event)
+      .flatMap(i => scr.mapAsyncUnordered(4)(_.event(i)))
+//      .mapAsyncUnordered(4)(scraper.event)
 
     val insertDays = dayStream.mapAsyncUnordered(4)(eventStore.save)
     val saveEvents = dayStream
       .flatMap(day => Stream.emits(day.categories.flatMap(_.events)))
-      .mapAsyncUnordered(4)(event => scraper.eventInfo(event.media.link))
+      .flatMap(event => scraper.mapAsyncUnordered(4)(_.eventInfo(event.media.link)))
 //      .filter {
 //        case Some(_) => true
 //        case _       => false
