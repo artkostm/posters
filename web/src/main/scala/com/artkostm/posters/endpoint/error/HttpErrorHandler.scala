@@ -32,8 +32,7 @@ class ApiHttpErrorHandler[F[_]: MonadError[?[_], ValidationError]]
   import ValidationError._
 
   private val handler: ValidationError => F[Response[F]] = {
-    case error: EventInfoNotFound => NotFound(error)
-    case error: CategoryNotFound  => NotFound(error)
+    case error: ApiError => NotFound(error)
   }
 
   override def handle(routes: HttpRoutes[F]): HttpRoutes[F] =
