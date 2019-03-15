@@ -12,7 +12,7 @@ final class V0002__CreateInfo extends DoobieMigration {
             link varchar NOT NULL
               CONSTRAINT pk_info
                 PRIMARY KEY,
-            "eventsInfo" jsonb NOT NULL
+            "eventInfo" jsonb NOT NULL
          )
     """.update.run
 }
