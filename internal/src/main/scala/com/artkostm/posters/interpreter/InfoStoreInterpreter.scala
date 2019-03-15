@@ -1,6 +1,7 @@
 package com.artkostm.posters.interpreter
 
 import cats.~>
+import cats.implicits._
 import com.artkostm.posters.doobiemeta
 import com.artkostm.posters.algebra.InfoStore
 import com.artkostm.posters.interfaces.event.{EventData, EventInfo}
@@ -16,15 +17,15 @@ class InfoStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends InfoStore[F] {
   override def save(info: EventInfo): F[EventInfo] =
     T(
       sql"""
-           |INSERT INTO info ("link", "eventsInfo") VALUES (${info.link}, ${info.eventInfo})
+           |INSERT INTO info ("link", "eventInfo") VALUES (${info.link}, ${info.eventInfo})
            |ON CONFLICT ON CONSTRAINT pk_info
            |DO
-           |UPDATE SET "eventsInfo"=${info.eventInfo}""".stripMargin.update
+           |UPDATE SET "eventInfo"=${info.eventInfo}""".stripMargin.update
         .withUniqueGeneratedKeys[EventInfo]("link", "eventsInfo"))
 
   override def find(link: String): F[Option[EventInfo]] =
     T(
-      sql"""select "link", "eventsInfo" from info where link=$link"""
+      sql"""select "link", "eventInfo" from info where link=$link"""
         .query[EventInfo]
         .option)
 
@@ -33,4 +34,12 @@ class InfoStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends InfoStore[F] {
              |DELETE FROM info
              |WHERE NOT EXISTS (SELECT * FROM events WHERE categories::jsonb::text LIKE '%' || info.link || '%')
              |""".stripMargin.update.run)
+
+  override def save(info: List[EventInfo]): F[Int] = T{
+    Update[(String, EventData, EventData)]("""
+       INSERT INTO info ("link", "eventInfo") VALUES (?, ?)
+       ON CONFLICT ON CONSTRAINT pk_info
+       DO
+       UPDATE SET "eventInfo"=?
+    """).updateMany(info.map(event => (event.link, event.eventInfo, event.eventInfo)))}
 }
