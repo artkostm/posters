@@ -12,7 +12,7 @@ import com.artkostm.posters.worker.migration.DoobieMigration
 import doobie.hikari.HikariTransactor
 
 class WorkerModule[F[_]: Timer: Concurrent](config: AppConfig, val xa: HikariTransactor[F]) {
-  private lazy val scraper      = Scraper(config.scraper)
+  private lazy val scraper      = new AfishaScraper[F](config.scraper)
   private lazy val infoStore    = new InfoStoreInterpreter(xa.trans)
   private lazy val eventStore   = new EventStoreInterpreter(xa.trans)
   private lazy val visitorStore = new VisitorStoreInterpreter(xa.trans)
@@ -28,17 +28,17 @@ object WorkerModule {
     } yield new WorkerModule[F](config, xa)
 }
 
-class ISI[F[_]: Sync] extends InfoStore[F] {
-  override def deleteOld(): F[Int] = Sync[F].delay {
-    println("deleting old event info")
-    0
-  }
-  override def save(info: EventInfo): F[EventInfo] = Sync[F].delay {
-    println(s"saving event info $info")
-    info
-  }
-  override def find(link: String): F[Option[EventInfo]] = Sync[F].delay {
-    println(s"searching event info using $link")
-    None
-  }
-}
+//class ISI[F[_]: Sync] extends InfoStore[F] {
+//  override def deleteOld(): F[Int] = Sync[F].delay {
+//    println("deleting old event info")
+//    0
+//  }
+//  override def save(info: EventInfo): F[EventInfo] = Sync[F].delay {
+//    println(s"saving event info $info")
+//    info
+//  }
+//  override def find(link: String): F[Option[EventInfo]] = Sync[F].delay {
+//    println(s"searching event info using $link")
+//    None
+//  }
+//}
