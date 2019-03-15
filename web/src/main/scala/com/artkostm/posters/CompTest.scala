@@ -18,5 +18,9 @@ object CompTest extends App {
     fibAlgebra.gather(Gather.histo),
     natCoalgebra.scatter(Scatter.ana))
 
-  println(fib(1365))
+  println(fib(1366))
+
+  for (_ <- 10000) {
+
+  }
 }
