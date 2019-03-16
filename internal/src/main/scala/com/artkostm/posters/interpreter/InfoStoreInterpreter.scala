@@ -1,7 +1,6 @@
 package com.artkostm.posters.interpreter
 
-import cats.~>
-import cats.implicits._
+import cats.{Foldable, ~>}
 import com.artkostm.posters.doobiemeta
 import com.artkostm.posters.algebra.InfoStore
 import com.artkostm.posters.interfaces.event.{EventData, EventInfo}
@@ -35,11 +34,13 @@ class InfoStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends InfoStore[F] {
              |WHERE NOT EXISTS (SELECT * FROM events WHERE categories::jsonb::text LIKE '%' || info.link || '%')
              |""".stripMargin.update.run)
 
-  override def save(info: List[EventInfo]): F[Int] = T{
-    Update[(String, EventData, EventData)]("""
-       INSERT INTO info ("link", "eventInfo") VALUES (?, ?)
-       ON CONFLICT ON CONSTRAINT pk_info
-       DO
-       UPDATE SET "eventInfo"=?
-    """).updateMany(info.map(event => (event.link, event.eventInfo, event.eventInfo)))}
+  override def save[K[_]: Foldable](info: K[(String, EventData, EventData)]): F[Int] =
+    T(
+      Update[(String, EventData, EventData)](
+        """
+           INSERT INTO info ("link", "eventInfo") VALUES (?, ?)
+           ON CONFLICT ON CONSTRAINT pk_info
+           DO
+           UPDATE SET "eventInfo"=?"""
+      ).updateMany(info))
 }
