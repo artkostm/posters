@@ -26,11 +26,21 @@ class VisitorStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends VisitorStore[F
 
   override def asVolunteer(intent: Intent): F[Intents] =
     T(
-      sql"""UPDATE visitors SET vids = array_append(vids, ${intent.userId}) WHERE event_name = ${intent.eventName} AND "date" = ${intent.date}""".update
+      sql"""
+           |INSERT INTO visitors ("date", "event_name", "vids", "uids") (${intent.date}, ${intent.eventName}, '{${intent.userId}}', '{}')
+           |ON CONFLICT ON CONSTRAINT pk_visitors
+           |DO
+           |UPDATE visitors SET vids = array_append(vids, ${intent.userId}) WHERE event_name = ${intent.eventName} AND "date" = ${intent.date}
+           |""".stripMargin.update
         .withUniqueGeneratedKeys[Intents]("date", "event_name", "vids", "uids"))
 
   override def asPlainUser(intent: Intent): F[Intents] =
     T(
-      sql"""UPDATE visitors SET uids = array_append(uids, ${intent.userId}) WHERE event_name = ${intent.eventName} AND "date" = ${intent.date}""".update
+      sql"""
+           |INSERT INTO visitors ("date", "event_name", "vids", "uids") (${intent.date}, ${intent.eventName}, '{}', '{${intent.userId}}')
+           |ON CONFLICT ON CONSTRAINT pk_visitors
+           |DO
+           |UPDATE visitors SET uids = array_append(uids, ${intent.userId}) WHERE event_name = ${intent.eventName} AND "date" = ${intent.date}
+           |""".stripMargin.update
         .withUniqueGeneratedKeys[Intents]("date", "event_name", "vids", "uids"))
 }
