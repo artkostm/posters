@@ -10,11 +10,11 @@ final class V0001__CreateVisitors extends DoobieMigration {
          CREATE TABLE IF NOT EXISTS visitors
          (
             date timestamp NOT NULL,
-            event_name varchar NOT NULL,
+            eventName varchar NOT NULL,
             vids text[] NOT NULL,
             uids text[] NOT NULL,
             CONSTRAINT pk_visitors
-              PRIMARY KEY (date, event_name)
+              PRIMARY KEY (date, eventName)
          )
     """.update.run
 }
