@@ -40,6 +40,14 @@ class EventStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends EventStore[F] {
       ).query[Category]
         .to[List])
 
+  override def findByNamesAndPeriod(names: NonEmptyList[String], start: Instant, end: Instant): F[List[Category]] =
+    T(
+      (
+        fr"""SELECT j FROM events t, jsonb_array_elements(t.categories) j WHERE t.date > $start AND t.date < $end AND""" ++ fragments
+          .in(fr"""j->>'name'""", names)
+      ).query[Category]
+        .to[List])
+
   override def findByNameAndDate(name: String, date: Instant): F[Option[Category]] =
     T(
       sql"""SELECT j FROM events t, jsonb_array_elements(t.categories) j WHERE j->>'name' = $name AND t.date = $date"""
