@@ -1,7 +1,7 @@
 package com.artkostm.posters.interpreter
 
 import cats.{Foldable, ~>}
-import com.artkostm.posters.doobiemeta
+import com.artkostm.posters.doobiemeta._
 import com.artkostm.posters.algebra.InfoStore
 import com.artkostm.posters.interfaces.event.{EventData, EventInfo}
 import com.github.plokhotnyuk.jsoniter_scala.macros.{CodecMakerConfig, JsonCodecMaker}
@@ -9,38 +9,42 @@ import doobie._
 import doobie.implicits._
 
 class InfoStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends InfoStore[F] {
-  import doobiemeta._
+  import InfoSQL._
 
-  implicit val eventInfoJsonValueCodec = JsonCodecMaker.make[EventData](CodecMakerConfig())
+  implicit val eventInfoCodec = eventInfoJsonValueCodec
 
   override def save(info: EventInfo): F[EventInfo] =
-    T(
-      sql"""
-           |INSERT INTO info ("link", "eventInfo") VALUES (${info.link}, ${info.eventInfo})
-           |ON CONFLICT ON CONSTRAINT pk_info
-           |DO
-           |UPDATE SET "eventInfo"=${info.eventInfo}""".stripMargin.update
-        .withUniqueGeneratedKeys[EventInfo]("link", "eventsInfo"))
+    T(saveInfo(info).withUniqueGeneratedKeys[EventInfo]("link", "eventInfo"))
 
   override def find(link: String): F[Option[EventInfo]] =
-    T(
-      sql"""select "link", "eventInfo" from info where link=$link"""
-        .query[EventInfo]
-        .option)
+    T(findByLink(link).option)
 
   override def deleteOld(): F[Int] =
-    T(sql"""
-             |DELETE FROM info
-             |WHERE NOT EXISTS (SELECT * FROM events WHERE categories::jsonb::text LIKE '%' || info.link || '%')
-             |""".stripMargin.update.run)
+    T(deleteOldInfo().run)
 
   override def save[K[_]: Foldable](info: K[(String, EventData, EventData)]): F[Int] =
-    T(
-      Update[(String, EventData, EventData)](
-        """
-           INSERT INTO info ("link", "eventInfo") VALUES (?, ?)
-           ON CONFLICT ON CONSTRAINT pk_info
-           DO
-           UPDATE SET "eventInfo"=?"""
-      ).updateMany(info))
+    T(Update[(String, EventData, EventData)](bulkUpsert).updateMany(info))
+}
+
+private object InfoSQL {
+  implicit val eventDataJsonValueCodec = JsonCodecMaker.make[EventData](CodecMakerConfig())
+  implicit val eventInfoJsonValueCodec = JsonCodecMaker.make[EventInfo](CodecMakerConfig())
+
+  def saveInfo(info: EventInfo): Update0 =
+    sql"""
+         INSERT INTO info ("link", "eventInfo") VALUES (${info.link}, ${info.eventInfo})
+         ON CONFLICT ON CONSTRAINT pk_info DO
+         UPDATE SET "eventInfo"=${info.eventInfo}""".update
+
+  def findByLink(link: String): Query0[EventInfo] =
+    sql"""SELECT "link", "eventInfo" FROM info WHERE link=$link"""
+      .query[EventInfo]
+
+  def deleteOldInfo(): Update0 =
+    sql"""DELETE FROM info
+         WHERE NOT EXISTS (SELECT * FROM events WHERE categories::jsonb::text LIKE '%' || info.link || '%')""".update
+
+  val bulkUpsert =
+    """INSERT INTO info ("link", "eventInfo") VALUES (?, ?)
+      ON CONFLICT ON CONSTRAINT pk_info DO UPDATE SET "eventInfo"=?"""
 }
