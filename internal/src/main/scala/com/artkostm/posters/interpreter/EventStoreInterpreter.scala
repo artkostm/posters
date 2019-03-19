@@ -4,7 +4,7 @@ import java.time.Instant
 
 import cats.data._
 import cats.~>
-import com.artkostm.posters.doobiemeta
+import com.artkostm.posters.doobiemeta._
 import com.artkostm.posters.algebra.EventStore
 import com.artkostm.posters.interfaces.schedule.{Category, Day}
 import com.github.plokhotnyuk.jsoniter_scala.macros.{CodecMakerConfig, JsonCodecMaker}
@@ -13,21 +13,12 @@ import doobie.implicits._
 import doobie.util.fragments
 
 class EventStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends EventStore[F] {
-  import doobiemeta._
+  import EventStoreInterpreter._
 
-  implicit val categoriesJsonValueCodec = JsonCodecMaker.make[List[Category]](CodecMakerConfig())
-  implicit val categoryJsonValueCodec   = JsonCodecMaker.make[Category](CodecMakerConfig())
-
-  implicit val han = LogHandler.jdkLogHandler
+  implicit val dayCodec = dayJsonValueCodec
 
   override def save(day: Day): F[Day] =
-    T(
-      sql"""
-           |INSERT INTO events ("date", "categories") VALUES (${day.date}, ${day.categories}) 
-           |ON CONFLICT ON CONSTRAINT pk_events
-           |DO 
-           |UPDATE SET "categories"=${day.categories} """.stripMargin.update
-        .withUniqueGeneratedKeys[Day]("date", "categories"))
+    T(saveEvents(day).withUniqueGeneratedKeys[Day]("date", "categories"))
 
   override def findByDate(day: Instant): F[Option[Day]] =
     T(sql"""SELECT "date", "categories" FROM events WHERE date=$day""".query[Day].option)
@@ -57,4 +48,16 @@ class EventStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends EventStore[F] {
   override def deleteOld(today: Instant): F[Int] =
     T(sql"""DELETE FROM events WHERE date < $today""".update.run)
 
+}
+
+private object EventStoreInterpreter {
+  implicit val categoriesJsonValueCodec = JsonCodecMaker.make[List[Category]](CodecMakerConfig())
+  implicit val categoryJsonValueCodec   = JsonCodecMaker.make[Category](CodecMakerConfig())
+  implicit val dayJsonValueCodec        = JsonCodecMaker.make[Day](CodecMakerConfig())
+
+  implicit val han = LogHandler.jdkLogHandler
+
+  def saveEvents(day: Day): Update0 =
+    sql"""INSERT INTO events ("date", "categories") VALUES (${day.date}, ${day.categories})
+         ON CONFLICT ON CONSTRAINT pk_events DO UPDATE SET "categories"=${day.categories} """.update
 }
