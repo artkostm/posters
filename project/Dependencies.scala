@@ -2,19 +2,22 @@ import sbt._
 
 object Dependencies {
   val versions = new {
-    val scraper  = "2.1.0"
-    val hikaricp = "3.2.3"
-    val postgres = "9.4.1208"
-    val ciris    = "0.12.1"
-    val doobie   = "0.6.0"
-    val http4s   = "0.20.0-M6"
-    val jsoniter = "0.41.0"
-    val flyway   = "5.1.4"
-    val tsec     = "0.1.0-M2"
-    val fs2      = "1.0.3"
-    val monocle  = "1.5.0" // is it really needed???
-    val slf4j    = "1.7.25"
-
+    val scraper          = "2.1.0"
+    val hikaricp         = "3.2.3"
+    val postgres         = "9.4.1208"
+    val ciris            = "0.12.1"
+    val doobie           = "0.6.0"
+    val http4s           = "0.20.0-M6"
+    val jsoniter         = "0.41.0"
+    val flyway           = "5.1.4"
+    val tsec             = "0.1.0-M2"
+    val fs2              = "1.0.3"
+    val monocle          = "1.5.0" // is it really needed???
+    val slf4j            = "1.7.25"
+    val cats_mtl         = "0.4.0"
+    val kindProjector    = "0.9.9"
+    val betterMonadicFor = "0.3.0-M4"
+    val catsMeowMtl      = "0.2.0"
   }
 
   val scraper  = "net.ruippeixotog"   %% "scala-scraper"  % versions.scraper
@@ -59,13 +62,18 @@ object Dependencies {
   ) ++ ciris.map(_                          % Provided) ++ doobie.map(_ % Provided)
 
   lazy val webSpecific = Seq(
-    "io.github.jmcardon"         %% "tsec-jwt-mac" % versions.tsec,
-    "org.postgresql"             % "postgresql"    % versions.postgres,
-    "com.github.julien-truffaut" %% "monocle-core" % versions.monocle
+    "io.github.jmcardon"         %% "tsec-jwt-mac"  % versions.tsec,
+    "org.postgresql"             % "postgresql"     % versions.postgres,
+    "com.github.julien-truffaut" %% "monocle-core"  % versions.monocle,
+    "org.typelevel"              %% "cats-mtl-core" % versions.cats_mtl,
+    "com.olegpy"                 %% "meow-mtl"      % versions.catsMeowMtl
   )
 
   lazy val logging = Seq(
     "org.slf4j" % "slf4j-api"    % versions.slf4j,
     "org.slf4j" % "slf4j-simple" % versions.slf4j
   )
+
+  lazy val kindProjector    = "org.spire-math" %% "kind-projector"     % versions.kindProjector
+  lazy val betterMonadicFor = "com.olegpy"     %% "better-monadic-for" % versions.betterMonadicFor
 }

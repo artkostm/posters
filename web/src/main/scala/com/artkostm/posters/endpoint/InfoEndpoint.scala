@@ -17,7 +17,7 @@ class InfoEndpoint[F[_]: Effect](repository: InfoStore[F]) extends Http4sDsl[F] 
     case GET -> Root / "events" :? LinkMatcher(link) as User(_, role) =>
       println(role)
       for {
-        info <- EitherT.fromOptionF(repository.find(link), EventInfoNotFound(s"Cannot find event using $link")).value
+        info <- EitherT.fromOptionF(repository.find(link), ApiError(s"Cannot find event using $link", 404)).value
         resp <- info.fold(NotFound(_), Ok(_))
       } yield resp
   }

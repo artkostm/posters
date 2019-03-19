@@ -18,7 +18,7 @@ class VisitorEndpoint[F[_]: Effect](repository: VisitorStore[F]) extends Http4sD
     case authed @ POST -> Root / "visitors" as User(_, role) =>
       for {
         intent  <- authed.req.as[Intent]
-        created <- EitherT.liftF(repository.save(intent)).value
+        created <- EitherT.liftF[F, Unit, Intents](repository.save(intent)).value
         resp    <- created.fold(BadRequest(_), Created(_))
       } yield resp
   }

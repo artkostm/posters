@@ -44,7 +44,7 @@ class JwtTokenAuthMiddleware[F[_]: Sync](config: AuthConfig, apiKey: String) ext
   import ValidationError._
 
   private val onFailure: AuthedService[String, F] =
-    Kleisli(_ => OptionT.liftF(Forbidden(NoPermissions("Forbidden! You don't have enough permissions!"))))
+    Kleisli(_ => OptionT.liftF(Forbidden(ApiError("Forbidden! You don't have enough permissions!", 403))))
 
   private def bearerTokenFromRequest(request: Request[F]): OptionT[F, String] =
     OptionT.fromOption[F] {
@@ -59,7 +59,7 @@ class JwtTokenAuthMiddleware[F[_]: Sync](config: AuthConfig, apiKey: String) ext
       token    <- bearerTokenFromRequest(request)
       verified <- OptionT.liftF(JWTMac.verifyAndParse[F, HMACSHA256](token, jwtKey))
       accessToken <- OptionT.fromOption[F](
-                      (verified.body.subject, verified.body.subject).bisequence.map(User.tupled)
+                      (verified.body.subject, verified.body.issuer).bisequence.map(User.tupled)
                     )
     } yield accessToken
   }
@@ -68,10 +68,9 @@ class JwtTokenAuthMiddleware[F[_]: Sync](config: AuthConfig, apiKey: String) ext
     Kleisli { request =>
       verifyToken(request, jwtKey).value
         .map { option =>
-          Either.cond[String, User](
-            option.exists(u => u.apiKey == apiKey && Roles.hasRole(u.role)),
-            option.get,
-            "Unable to authorize token")
+          Either.cond[String, User](option.exists(u => u.apiKey == apiKey && Roles.hasRole(u.role)),
+                                    option.get,
+                                    "Unable to authorize token")
         }
         .recoverWith {
           case MacVerificationError(msg) => EitherT.leftT(msg).value

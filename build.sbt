@@ -43,7 +43,10 @@ lazy val web = (project in file("web"))
     libraryDependencies ++= Dependencies.ciris,
     libraryDependencies ++= Dependencies.http4s,
     libraryDependencies ++= Dependencies.webSpecific,
-    libraryDependencies ++= Dependencies.logging
+    libraryDependencies ++= Dependencies.logging,
+    libraryDependencies += "io.higherkindness" %% "droste-core" % "0.6.0",
+    addCompilerPlugin(Dependencies.kindProjector),
+    addCompilerPlugin(Dependencies.betterMonadicFor)
   )
   .dependsOn(internal)
   .enablePlugins(JavaAppPackaging)

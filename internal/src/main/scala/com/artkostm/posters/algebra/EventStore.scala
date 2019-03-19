@@ -10,4 +10,5 @@ trait EventStore[F[_]] {
   def findByDate(day: Instant): F[Option[Day]]
   def findByNames(names: NonEmptyList[String]): F[List[Category]]
   def findByNameAndDate(name: String, date: Instant): F[Option[Category]]
+  def findByNamesAndPeriod(names: NonEmptyList[String], start: Instant, end: Instant): F[List[Category]]
 }
