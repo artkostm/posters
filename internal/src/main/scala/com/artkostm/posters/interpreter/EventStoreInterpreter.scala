@@ -5,9 +5,9 @@ import java.time.Instant
 import cats.data._
 import cats.~>
 import com.artkostm.posters.doobiemeta._
+import com.artkostm.posters.jsoniter.codecs._
 import com.artkostm.posters.algebra.EventStore
 import com.artkostm.posters.interfaces.schedule.{Category, Day}
-import com.github.plokhotnyuk.jsoniter_scala.macros.{CodecMakerConfig, JsonCodecMaker}
 import doobie._
 import doobie.implicits._
 import doobie.util.fragments
@@ -15,7 +15,7 @@ import doobie.util.fragments
 class EventStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends EventStore[F] {
   import EventStoreInterpreter._
 
-  implicit val dayCodec = dayJsonValueCodec
+  //implicit val dayJsonValueCodec = dayCodec
 
   override def save(day: Day): F[Day] =
     T(saveEvents(day).withUniqueGeneratedKeys[Day]("date", "categories"))
@@ -51,10 +51,6 @@ class EventStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends EventStore[F] {
 }
 
 private object EventStoreInterpreter {
-  implicit val categoriesJsonValueCodec = JsonCodecMaker.make[List[Category]](CodecMakerConfig())
-  implicit val categoryJsonValueCodec   = JsonCodecMaker.make[Category](CodecMakerConfig())
-  implicit val dayJsonValueCodec        = JsonCodecMaker.make[Day](CodecMakerConfig())
-
   implicit val han = LogHandler.jdkLogHandler
 
   def saveEvents(day: Day): Update0 =
