@@ -11,7 +11,7 @@ import org.http4s.dsl.Http4sDsl
 
 class VisitorEndpoint[F[_]: Effect](repository: VisitorStore[F]) extends Http4sDsl[F] {
   import com.artkostm.posters.jsoniter._
-  import ValueCodecs._
+  import codecs._
   import com.artkostm.posters.ValidationError._
 
   private def saveVisitors(): AuthedService[User, F] = AuthedService {
