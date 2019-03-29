@@ -2,16 +2,16 @@ package com.artkostm.posters.interpreter
 
 import cats.{Foldable, ~>}
 import com.artkostm.posters.doobiemeta._
+import com.artkostm.posters.jsoniter.codecs._
 import com.artkostm.posters.algebra.InfoStore
 import com.artkostm.posters.interfaces.event.{EventData, EventInfo}
-import com.github.plokhotnyuk.jsoniter_scala.macros.{CodecMakerConfig, JsonCodecMaker}
 import doobie._
 import doobie.implicits._
 
 class InfoStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends InfoStore[F] {
   import InfoSQL._
 
-  implicit val eventInfoCodec = eventInfoJsonValueCodec
+  //implicit val eventInfoJsonValueCodec = eventInfoCodec
 
   override def save(info: EventInfo): F[EventInfo] =
     T(saveInfo(info).withUniqueGeneratedKeys[EventInfo]("link", "eventInfo"))
@@ -27,8 +27,6 @@ class InfoStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends InfoStore[F] {
 }
 
 private object InfoSQL {
-  implicit val eventDataJsonValueCodec = JsonCodecMaker.make[EventData](CodecMakerConfig())
-  implicit val eventInfoJsonValueCodec = JsonCodecMaker.make[EventInfo](CodecMakerConfig())
 
   def saveInfo(info: EventInfo): Update0 =
     sql"""
