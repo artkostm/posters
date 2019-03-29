@@ -4,6 +4,7 @@ import com.artkostm.posters.worker.migration.DoobieMigration
 import doobie._
 import doobie.implicits._
 
+// TODO: change timestamp to date type
 final class V0001__CreateVisitors extends DoobieMigration {
   override def migrate: ConnectionIO[_] =
     sql"""
