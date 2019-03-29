@@ -32,7 +32,7 @@ class Middleware[F[_]](api: ApiConfig)(implicit F: Sync[F]) {
     F.catchNonFatal(HMACSHA256.unsafeBuildKey(token.getBytes))
 
   val middleware: F[AuthMiddleware[F, User]] = Option(api.token).fold(ifEmpty) { token =>
-    generateJwtKey(token).map { jwtKey =>
+    generateJwtKey(token.value).map { jwtKey =>
       val config = AuthConfig(jwtKey)
       new JwtTokenAuthMiddleware[F](config, api.key.value).middleware
     }
