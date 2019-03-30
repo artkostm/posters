@@ -15,7 +15,7 @@ class CategoryEndpoint[F[_]: Effect](repository: EventStore[F], scraper: Scraper
     extends Http4sDsl[F]
     with EndpointsAware[F] {
   import com.artkostm.posters.jsoniter._
-  import ValueCodecs._
+  import com.artkostm.posters.jsoniter.codecs._
   import com.artkostm.posters.ValidationError._
 
   private def getCategoryByName(): AuthedService[User, F] = AuthedService {

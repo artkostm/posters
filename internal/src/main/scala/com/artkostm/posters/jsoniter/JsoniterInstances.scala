@@ -1,8 +1,9 @@
 package com.artkostm.posters.jsoniter
 
+import java.nio.ByteBuffer
+
 import cats._
 import cats.effect._
-import java.nio.ByteBuffer
 import com.github.plokhotnyuk.jsoniter_scala.core._
 import org.http4s.{DecodeResult, EntityDecoder, EntityEncoder, MalformedMessageBodyFailure, MediaType}
 import org.http4s.headers.`Content-Type`

@@ -1,6 +1,6 @@
 package com.artkostm.posters.worker.collector
 
-import java.time.Instant
+import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
 import cats.effect.{Concurrent, Timer}
@@ -18,7 +18,7 @@ class EventCollector[F[_]: Timer](scraper: Scraper[F],
     val dayStream = Stream
       .range(-2, 31)
       .covary[F]
-      .map(Instant.now().plus(_, ChronoUnit.DAYS).truncatedTo(ChronoUnit.DAYS))
+      .map(LocalDate.now().plus(_, ChronoUnit.DAYS))
       .mapAsyncUnordered(4)(scraper.event)
 
     val insertDays = dayStream.mapAsyncUnordered(4)(eventStore.save)
@@ -32,9 +32,9 @@ class EventCollector[F[_]: Timer](scraper: Scraper[F],
         })
       )
 
-    Stream.eval(eventStore.deleteOld(Instant.now())) >>
+    Stream.eval(eventStore.deleteOld(LocalDate.now())) >>
       Stream.eval(infoStore.deleteOld()) >>
-      Stream.eval(visitorStore.deleteOld(Instant.now())) >>
+      Stream.eval(visitorStore.deleteOld(LocalDate.now())) >>
       Stream(insertDays, saveEvents).parJoin(2)
   }
 }

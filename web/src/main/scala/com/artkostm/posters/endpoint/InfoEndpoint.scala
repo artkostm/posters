@@ -10,7 +10,7 @@ import org.http4s.dsl.Http4sDsl
 
 class InfoEndpoint[F[_]: Effect](repository: InfoStore[F]) extends Http4sDsl[F] with EndpointsAware[F] {
   import com.artkostm.posters.jsoniter._
-  import ValueCodecs._
+  import com.artkostm.posters.jsoniter.codecs._
   import com.artkostm.posters.ValidationError._
 
   private def getEventInfo(): AuthedService[User, F] = AuthedService {

@@ -24,7 +24,7 @@ object WorkerModule {
     for {
       config <- Resource.liftF(AppConfiguration.load[F])
       _      <- Resource.liftF(DoobieMigration.run[F](config))
-      xa     <- DatabaseConfig.transactor(config.db)
+      xa     <- DatabaseConfig.transactor[F](config.db): Resource[F, HikariTransactor[F]]
     } yield new WorkerModule[F](config, xa)
 }
 

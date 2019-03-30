@@ -59,7 +59,7 @@ object Dependencies {
     "org.postgresql"                        % "postgresql"              % versions.postgres % Provided,
     "net.ruippeixotog"                      %% "scala-scraper"          % versions.scraper,
     "com.lihaoyi"                           %% "fastparse"              % "2.1.0"
-  ) ++ ciris.map(_                          % Provided) ++ doobie.map(_ % Provided)
+  ) ++ ciris.map(_                          % Provided) ++ doobie.map(_ % Provided) ++ http4s.map(_ % Provided)
 
   lazy val webSpecific = Seq(
     "io.github.jmcardon"         %% "tsec-jwt-mac"  % versions.tsec,
