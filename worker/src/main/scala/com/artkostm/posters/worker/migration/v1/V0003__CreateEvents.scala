@@ -9,10 +9,10 @@ class V0003__CreateEvents extends DoobieMigration {
     sql"""
          CREATE TABLE IF NOT EXISTS events
          (
-         	date timestamp NOT NULL
+         	eventdate DATE NOT NULL
          		CONSTRAINT pk_events
          			PRIMARY KEY,
-         	categories jsonb NOT NULL
+         	categories JSONB NOT NULL
          )
        """.update.run
 }

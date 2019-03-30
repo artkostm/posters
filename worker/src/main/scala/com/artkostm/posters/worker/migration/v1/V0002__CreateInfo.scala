@@ -9,10 +9,10 @@ final class V0002__CreateInfo extends DoobieMigration {
     sql"""
          CREATE TABLE IF NOT EXISTS info
          (
-            link varchar NOT NULL
+            link VARCHAR NOT NULL
               CONSTRAINT pk_info
                 PRIMARY KEY,
-            "eventInfo" jsonb NOT NULL
+            "eventInfo" JSONB NOT NULL
          )
     """.update.run
 }
