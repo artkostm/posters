@@ -9,9 +9,7 @@ import doobie._
 import doobie.implicits._
 
 class InfoStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends InfoStore[F] {
-  import InfoSQL._
-
-  //implicit val eventInfoJsonValueCodec = eventInfoCodec
+  import InfoStoreInterpreter._
 
   override def save(info: EventInfo): F[EventInfo] =
     T(saveInfo(info).withUniqueGeneratedKeys[EventInfo]("link", "eventInfo"))
@@ -26,7 +24,10 @@ class InfoStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends InfoStore[F] {
     T(Update[(String, EventData, EventData)](bulkUpsert).updateMany(info))
 }
 
-private object InfoSQL {
+private object InfoStoreInterpreter {
+  implicit val han = LogHandler.jdkLogHandler
+
+  implicit val eventInfoJsonValueCodec = eventInfoCodec
 
   def saveInfo(info: EventInfo): Update0 =
     sql"""
