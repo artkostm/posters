@@ -9,9 +9,9 @@ import com.artkostm.posters.interfaces.intent.{Intent, Intents}
 import org.http4s.AuthedService
 import org.http4s.dsl.Http4sDsl
 
-class VisitorEndpoint[F[_]: Effect](repository: VisitorStore[F]) extends Http4sDsl[F] {
+class VisitorEndpoint[F[_]: Effect](repository: VisitorStore[F]) extends Http4sDsl[F] with EndpointsAware[F] {
   import com.artkostm.posters.jsoniter._
-  import codecs._
+  import com.artkostm.posters.jsoniter.codecs._
   import com.artkostm.posters.ValidationError._
 
   private def saveVisitors(): AuthedService[User, F] = AuthedService {
@@ -22,4 +22,11 @@ class VisitorEndpoint[F[_]: Effect](repository: VisitorStore[F]) extends Http4sD
         resp    <- created.fold(BadRequest(_), Created(_))
       } yield resp
   }
+
+  override def endpoints: AuthedService[User, F] = saveVisitors()
+}
+
+object VisitorEndpoint {
+  def apply[F[_]: Effect](repository: VisitorStore[F]): AuthedService[User, F] =
+    new VisitorEndpoint(repository).endpoints
 }
