@@ -12,6 +12,11 @@ import doobie._
 import doobie.implicits._
 import doobie.util.fragments
 
+/**
+  * Doobie interpreter for EventStore
+  * @param T is a functor transformation from `ConnectionIO` to `F`
+  * @tparam F
+  */
 class EventStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends EventStore[F] {
   import EventStoreInterpreter._
 
@@ -37,8 +42,13 @@ class EventStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends EventStore[F] {
 
 }
 
+/**
+  * Companion object with sql staff
+  */
 private object EventStoreInterpreter {
   implicit val han = LogHandler.jdkLogHandler
+
+  implicit val dayJsonValueCodec = dayCodec
 
   def saveEvents(day: Day): Update0 =
     sql"""INSERT INTO events ("eventdate", "categories") VALUES (${day.eventDate}, ${day.categories})
