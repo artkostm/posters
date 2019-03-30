@@ -1,10 +1,10 @@
 package com.artkostm.posters.interfaces.intent
 
-import java.time.Instant
+import java.time.LocalDate
 
-final case class Intents(date: Instant,
+final case class Intents(eventDate: LocalDate,
                          eventName: String,
                          vids: List[String] = List.empty,
                          uids: List[String] = List.empty)
 
-final case class Intent(date: Instant, eventName: String, userId: String)
+final case class Intent(eventDate: LocalDate, eventName: String, userId: String)
