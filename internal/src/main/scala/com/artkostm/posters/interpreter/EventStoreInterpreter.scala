@@ -21,32 +21,19 @@ class EventStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends EventStore[F] {
     T(saveEvents(day).withUniqueGeneratedKeys[Day]("eventdate", "categories"))
 
   override def findByDate(day: LocalDate): F[Option[Day]] =
-    T(sql"""SELECT "eventdate", "categories" FROM events e WHERE e.eventdate=$day""".query[Day].option)
+    T(findByDay(day).option)
 
   override def findByNames(names: NonEmptyList[String]): F[List[Category]] =
-    T(
-      (
-        fr"""SELECT j FROM events t, jsonb_array_elements(t.categories) j WHERE """ ++ fragments.in(fr"""j->>'name'""",
-                                                                                                    names)
-      ).query[Category]
-        .to[List])
+    T(findCategoriesByNames(names).to[List])
 
   override def findByNamesAndPeriod(names: NonEmptyList[String], start: LocalDate, end: LocalDate): F[List[Category]] =
-    T(
-      (
-        fr"""SELECT j FROM events t, jsonb_array_elements(t.categories) j WHERE t.eventdate > $start AND t.eventdate < $end AND""" ++ fragments
-          .in(fr"""j->>'name'""", names)
-      ).query[Category]
-        .to[List])
+    T(findCategoriesByNamesAndPeriod(names, start, end).to[List])
 
   override def findByNameAndDate(name: String, date: LocalDate): F[Option[Category]] =
-    T(
-      sql"""SELECT j FROM events t, jsonb_array_elements(t.categories) j WHERE j->>'name' = $name AND t.eventdate = $date"""
-        .query[Category]
-        .option)
+    T(findCategoryByNameAndDate(name, date).option)
 
   override def deleteOld(today: LocalDate): F[Int] =
-    T(sql"""DELETE FROM events WHERE events.eventdate < $today""".update.run)
+    T(deleteOldEvents(today).run)
 
 }
 
@@ -56,4 +43,22 @@ private object EventStoreInterpreter {
   def saveEvents(day: Day): Update0 =
     sql"""INSERT INTO events ("eventdate", "categories") VALUES (${day.eventDate}, ${day.categories})
          ON CONFLICT ON CONSTRAINT pk_events DO UPDATE SET categories=${day.categories} """.update
+
+  def findByDay(day: LocalDate): Query0[Day] =
+    sql"""SELECT "eventdate", "categories" FROM events e WHERE e.eventdate=$day""".query[Day]
+
+  def findCategories(where: Fragment): Query0[Category] =
+    (fr"""SELECT j FROM events t, jsonb_array_elements(t.categories) j WHERE""" ++ where).query[Category]
+
+  def findCategoriesByNames(names: NonEmptyList[String]): Query0[Category] =
+    findCategories(fragments.in(fr"""j->>'name'""", names))
+
+  def findCategoriesByNamesAndPeriod(names: NonEmptyList[String], start: LocalDate, end: LocalDate): Query0[Category] =
+    findCategories(fr"t.eventdate > $start AND t.eventdate < $end AND" ++ fragments.in(fr"""j->>'name'""", names))
+
+  def findCategoryByNameAndDate(name: String, date: LocalDate): Query0[Category] =
+    findCategories(fr"j->>'name' = $name AND t.eventdate = $date")
+
+  def deleteOldEvents(today: LocalDate): Update0 =
+    sql"""DELETE FROM events WHERE events.eventdate < $today""".update
 }
