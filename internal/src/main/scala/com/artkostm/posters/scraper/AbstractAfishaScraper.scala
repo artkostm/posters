@@ -1,6 +1,6 @@
 package com.artkostm.posters.scraper
 
-import java.time.Instant
+import java.time.LocalDate
 
 import cats.effect.Sync
 import cats.syntax.functor._
@@ -55,7 +55,7 @@ abstract class AbstractAfishaScraper[F[_]: Sync](config: ScraperConfig) extends 
       } yield EventInfo(link, EventData(description, images, comments))
     }
 
-  def event(day: Instant): F[Day] =
+  def event(day: LocalDate): F[Day] =
     load(day) map { doc =>
       val categories = doc >> elementList(config.tut.blocksSelector) map { block =>
         Category(block >> text(config.tut.blockTitleSelector), eventExtractor(block).flatten)
@@ -63,6 +63,6 @@ abstract class AbstractAfishaScraper[F[_]: Sync](config: ScraperConfig) extends 
       Day(day, categories)
     }
 
-  protected def load(day: Instant): F[Document]
+  protected def load(day: LocalDate): F[Document]
   protected def load(link: String): F[Document]
 }
