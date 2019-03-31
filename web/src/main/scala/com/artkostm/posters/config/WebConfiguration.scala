@@ -2,6 +2,8 @@ package com.artkostm.posters.config
 
 import java.net.URI
 
+import cats.effect.Sync
+import ciris.cats.effect._
 import ciris._
 import ciris.refined._
 import ciris.enumeratum._
@@ -17,13 +19,14 @@ import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.net.UserPortNumber
 import eu.timepit.refined.types.string.NonEmptyString
 
-object WebConfiguration extends Configuration[AppConfig] {
-  type ApiKey = String Refined MatchesRegex[W.`"[a-zA-Z0-9]{25,40}"`.T]
+private[config] class WebConfiguration[F[_]](implicit F: Sync[F]) extends Configuration[F, AppConfig] {
 
   override protected def config =
-    withValue(env[AppEnvironment]("APP_ENV").orElse(ConfigValue(Right(Local)))) {
+    withValue(
+      envF[F, AppEnvironment]("APP_ENV").orElse(ConfigValue.applyF[F, AppEnvironment](F.pure(Right(Local))))
+    ) {
       case Local =>
-        loadConfig(env[Option[String]]("DOCKER_HOST")) { dockerHost =>
+        loadConfig(envF[F, Option[String]]("DOCKER_HOST")) { dockerHost =>
           AppConfig(
             version = Configuration.AppVersion,
             http = HttpConfig(8080),
@@ -35,12 +38,12 @@ object WebConfiguration extends Configuration[AppConfig] {
         }
       case Production | Heroku =>
         loadConfig(
-          env[Secret[ApiKey]]("API_KEY").orElse(prop("api.key")),
-          env[Secret[String]]("API_TOKEN"),
-          env[UserPortNumber]("PORT"),
-          env[NonEmptyString]("JDBC_DATABASE_URL"),
-          env[NonEmptyString]("JDBC_DATABASE_USERNAME"),
-          env[NonEmptyString]("JDBC_DATABASE_PASSWORD"),
+          envF[F, Secret[ApiKey]]("API_KEY").orElse(propF("api.key")),
+          envF[F, Secret[String]]("API_TOKEN"),
+          envF[F, UserPortNumber]("PORT"),
+          envF[F, NonEmptyString]("JDBC_DATABASE_URL"),
+          envF[F, NonEmptyString]("JDBC_DATABASE_USERNAME"),
+          envF[F, NonEmptyString]("JDBC_DATABASE_PASSWORD"),
         ) { (apiKey, apiToken, port, dbUrl, user, password) =>
           AppConfig(
             version = Configuration.AppVersion,
@@ -51,6 +54,12 @@ object WebConfiguration extends Configuration[AppConfig] {
           )
         }
     }.result
+}
+
+object WebConfiguration {
+  type ApiKey = String Refined MatchesRegex[W.`"[a-zA-Z0-9]{25,40}"`.T]
+
+  def load[F[_]: Sync]() = new WebConfiguration[F]().load
 }
 
 case class HttpConfig(port: UserPortNumber)
