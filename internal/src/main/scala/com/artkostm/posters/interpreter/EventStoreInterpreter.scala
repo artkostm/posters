@@ -2,15 +2,16 @@ package com.artkostm.posters.interpreter
 
 import java.time.LocalDate
 
+import doobie._
+import doobie.implicits._
+import doobie.util.fragments
 import cats.data._
 import cats.~>
 import com.artkostm.posters.doobiemeta._
 import com.artkostm.posters.jsoniter.codecs._
 import com.artkostm.posters.algebra.EventStore
 import com.artkostm.posters.interfaces.schedule.{Category, Day}
-import doobie._
-import doobie.implicits._
-import doobie.util.fragments
+import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
 
 /**
   * Doobie interpreter for EventStore
@@ -20,7 +21,7 @@ import doobie.util.fragments
 class EventStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends EventStore[F] {
   import EventStoreInterpreter._
 
-  implicit val dayJsonValueCodec = dayCodec
+  implicit val dayJsonValueCodec: JsonValueCodec[Day] = dayCodec
 
   override def save(day: Day): F[Day] =
     T(saveEvents(day).withUniqueGeneratedKeys[Day]("eventdate", "categories"))
@@ -39,7 +40,6 @@ class EventStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends EventStore[F] {
 
   override def deleteOld(today: LocalDate): F[Int] =
     T(deleteOldEvents(today).run)
-
 }
 
 /**
@@ -48,7 +48,7 @@ class EventStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends EventStore[F] {
 private object EventStoreInterpreter {
   implicit val han = LogHandler.jdkLogHandler
 
-  implicit val dayJsonValueCodec = dayCodec
+  implicit val readDay = Read[(LocalDate, List[Category])].map { case (date, categories) => Day(date, categories) }
 
   def saveEvents(day: Day): Update0 =
     sql"""INSERT INTO events ("eventdate", "categories") VALUES (${day.eventDate}, ${day.categories})
