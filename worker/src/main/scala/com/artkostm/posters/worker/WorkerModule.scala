@@ -13,8 +13,8 @@ import doobie.hikari.HikariTransactor
 
 class WorkerModule[F[_]: Timer: Concurrent](config: AppConfig, val xa: HikariTransactor[F]) {
   private lazy val scraper      = new AfishaScraper[F](config.scraper)
-  private lazy val infoStore    = new InfoStoreInterpreter(xa.trans)
-  private lazy val eventStore   = new EventStoreInterpreter(xa.trans)
+   lazy val infoStore    = new InfoStoreInterpreter(xa.trans)
+  lazy val eventStore   = new EventStoreInterpreter(xa.trans)
   private lazy val visitorStore = new VisitorStoreInterpreter(xa.trans)
   lazy val collector            = new EventCollector[F](scraper, eventStore, infoStore, visitorStore)
 }
