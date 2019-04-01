@@ -5,5 +5,6 @@ import cats.implicits._
 
 object Main extends IOApp {
   override def run(args: List[String]): IO[ExitCode] =
-    WorkerModule.init[IO].use(_.collector.collect().compile.drain.as(ExitCode.Success))
+//    WorkerModule.init[IO].use(_.collector.collect().compile.drain.as(ExitCode.Success))
+  WorkerModule.init[IO].use(_.test().map(println).as(ExitCode.Success))
 }

@@ -1,5 +1,8 @@
 package com.artkostm.posters.worker
 
+import java.time.LocalDate
+
+import cats.data.NonEmptyList
 import cats.effect._
 import com.artkostm.posters.Configuration.DatabaseConfig
 import com.artkostm.posters.algebra.InfoStore
@@ -17,6 +20,8 @@ class WorkerModule[F[_]: Timer: Concurrent](config: AppConfig, val xa: HikariTra
   private lazy val eventStore   = new EventStoreInterpreter(xa.trans)
   private lazy val visitorStore = new VisitorStoreInterpreter(xa.trans)
   lazy val collector            = new EventCollector[F](scraper, eventStore, infoStore, visitorStore)
+
+  def test() = eventStore.findByNamesAndPeriod(NonEmptyList.of("Кино"), LocalDate.now().plusDays(3), LocalDate.now().plusDays(6))
 }
 
 object WorkerModule {
