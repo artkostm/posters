@@ -4,6 +4,7 @@ import cats.data.EitherT
 import cats.implicits._
 import cats.effect.Effect
 import com.artkostm.posters.algebra.VisitorStore
+import com.artkostm.posters.endpoint.auth.role.Role
 import com.artkostm.posters.interfaces.auth.User
 import com.artkostm.posters.interfaces.intent.{Intent, Intents}
 import org.http4s.AuthedService
@@ -18,7 +19,7 @@ class VisitorEndpoint[F[_]: Effect](repository: VisitorStore[F]) extends Http4sD
     case authed @ POST -> Root / "visitors" as User(_, role) =>
       for {
         intent  <- authed.req.as[Intent]
-        created <- EitherT.liftF[F, Unit, Intents](repository.save(intent)).value
+        created <- Role.on[F, Intents](role, repository.asPlainUser(intent), repository.asVolunteer(intent)).value
         resp    <- created.fold(BadRequest(_), Created(_))
       } yield resp
   }
