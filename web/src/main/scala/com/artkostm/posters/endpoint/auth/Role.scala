@@ -1,11 +1,5 @@
 package com.artkostm.posters.endpoint.auth
 
-import cats.Applicative
-import cats.data.EitherT
-import cats.implicits._
-import com.artkostm.posters.ValidationError
-import com.artkostm.posters.ValidationError.ApiError
-
 import scala.collection.immutable
 
 object role {
@@ -20,15 +14,5 @@ object role {
     override def values: immutable.IndexedSeq[Role] = findValues
 
     def exists(role: String): Boolean = Role.withNameInsensitiveOption(role).isDefined
-
-    // TODO: change error type
-    def on[F[_]: Applicative, T](role: String,
-                                 userAction: => F[T],
-                                 volunteerAction: => F[T]): EitherT[F, ApiError, T] =
-      Role.withNameInsensitiveOption(role) match {
-        case Some(User)      => EitherT.liftF(userAction())
-        case Some(Volunteer) => EitherT.liftF(volunteerAction())
-        case _               => EitherT.leftT(Applicative[F].pure(ApiError(s"There is no $role.", 400)))
-      }
   }
 }
