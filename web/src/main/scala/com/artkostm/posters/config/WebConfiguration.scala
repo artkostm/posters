@@ -21,7 +21,7 @@ import eu.timepit.refined.types.string.NonEmptyString
 
 private[config] class WebConfiguration[F[_]](implicit F: Sync[F]) extends Configuration[F, AppConfig] {
 
-  override protected def config =
+  override protected lazy val config =
     withValue(
       envF[F, AppEnvironment]("APP_ENV").orElse(ConfigValue.applyF[F, AppEnvironment](F.pure(Right(Local))))
     ) {
@@ -31,6 +31,7 @@ private[config] class WebConfiguration[F[_]](implicit F: Sync[F]) extends Config
             version = Configuration.AppVersion,
             http = HttpConfig(8080),
             db = Configuration.buildDbConfig(
+              // for Docker in VirtualBox (e.g. on Windows 7)
               s"jdbc:postgresql://${dockerHost.map(URI.create).map(_.getHost).getOrElse("localhost")}:5432/postgres"),
             api = ApiConfig(Secret("uufdeddddd00d0d00d0d00d0d0"), Secret("123token456")),
             scraperConfig

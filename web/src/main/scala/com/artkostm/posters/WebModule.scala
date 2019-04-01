@@ -10,7 +10,6 @@ import cats.syntax.semigroupk._
 import cats.syntax.functor._
 import com.olegpy.meow.hierarchy._
 import com.artkostm.posters.Configuration.DatabaseConfig
-import com.artkostm.posters.endpoint.error.ApiHttpErrorHandler
 
 class WebModule[F[_]: Effect](val config: AppConfig, val xa: HikariTransactor[F]) {
 
