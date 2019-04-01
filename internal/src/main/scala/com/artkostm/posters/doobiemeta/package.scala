@@ -6,8 +6,10 @@ import org.postgresql.util.PGobject
 import com.github.plokhotnyuk.jsoniter_scala.core._
 import doobie.Meta.Advanced
 
+import scala.reflect.runtime.universe.TypeTag
+
 package object doobiemeta {
-  implicit def jsonbMeta[A: Manifest: JsonValueCodec]: doobie.Meta[A] =
+  implicit def jsonbMeta[A: JsonValueCodec: TypeTag]: doobie.Meta[A] =
     Advanced
       .other[PGobject]("jsonb")
       .timap[A] { pgObject =>

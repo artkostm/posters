@@ -16,9 +16,9 @@ import eu.timepit.refined.types.string.NonEmptyString
 import eu.timepit.refined.auto._
 
 trait Configuration[F[_], Conf] {
-  def load(implicit me: MonadError[F, Throwable]): F[Conf] = config flatMap {
-    case Right(c)     => me.pure(c)
-    case Left(errors) => me.raiseError(errors.toException)
+  def load(implicit F: MonadError[F, Throwable]): F[Conf] = config flatMap {
+    case Right(c)     => F.pure(c)
+    case Left(errors) => F.raiseError(errors.toException)
   }
 
   protected def config: F[Either[ConfigErrors, Conf]]
