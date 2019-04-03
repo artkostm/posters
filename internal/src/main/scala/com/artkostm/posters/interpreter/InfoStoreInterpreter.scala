@@ -24,7 +24,7 @@ class InfoStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends InfoStore[F] {
     T(Update[(String, EventData, EventData)](bulkUpsert).updateMany(info))
 }
 
-private object InfoStoreInterpreter {
+object InfoStoreInterpreter {
   implicit val han = LogHandler.jdkLogHandler
 
   implicit val eventInfoJsonValueCodec = eventInfoCodec

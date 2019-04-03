@@ -28,6 +28,7 @@ object Dependencies {
     "is.cir" %% "ciris-core",
     "is.cir" %% "ciris-enumeratum",
     "is.cir" %% "ciris-refined",
+    "is.cir" %% "ciris-cats-effect",
   ).map(_ % versions.ciris)
 
   lazy val doobie = Seq(

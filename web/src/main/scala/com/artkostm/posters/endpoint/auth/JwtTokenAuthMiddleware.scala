@@ -7,7 +7,8 @@ import cats.syntax.functor._
 import com.artkostm.posters.ValidationError
 import com.artkostm.posters.config.ApiConfig
 import com.artkostm.posters.endpoint.auth.JwtTokenAuthMiddleware.AuthConfig
-import com.artkostm.posters.interfaces.auth.{Roles, User}
+import com.artkostm.posters.endpoint.auth.role.Role
+import com.artkostm.posters.interfaces.auth.User
 import org.http4s.Credentials.Token
 import org.http4s.{AuthScheme, AuthedService, Request}
 import org.http4s.dsl.Http4sDsl
@@ -68,7 +69,7 @@ class JwtTokenAuthMiddleware[F[_]: Sync](config: AuthConfig, apiKey: String) ext
     Kleisli { request =>
       verifyToken(request, jwtKey).value
         .map { option =>
-          Either.cond[String, User](option.exists(u => u.apiKey == apiKey && Roles.hasRole(u.role)),
+          Either.cond[String, User](option.exists(u => u.apiKey == apiKey && Role.exists(u.role)),
                                     option.get,
                                     "Unable to authorize token")
         }

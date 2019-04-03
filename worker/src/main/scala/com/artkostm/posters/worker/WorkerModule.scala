@@ -2,8 +2,6 @@ package com.artkostm.posters.worker
 
 import cats.effect._
 import com.artkostm.posters.Configuration.DatabaseConfig
-import com.artkostm.posters.algebra.InfoStore
-import com.artkostm.posters.interfaces.event.EventInfo
 import com.artkostm.posters.interpreter.{EventStoreInterpreter, InfoStoreInterpreter, VisitorStoreInterpreter}
 import com.artkostm.posters.scraper.{AfishaScraper, Scraper}
 import com.artkostm.posters.worker.collector.EventCollector
