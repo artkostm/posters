@@ -34,7 +34,7 @@ class EventCollector[F[_]: Timer](scraper: Scraper[F],
 
     Stream.eval(eventStore.deleteOld(LocalDate.now())) >>
       Stream.eval(infoStore.deleteOld()) >>
-      Stream.eval(visitorStore.deleteOld(LocalDate.now())) >>
+      Stream.eval(visitorStore.deleteOlderThan(LocalDate.now())) >>
       Stream(insertDays, saveEvents).parJoin(2)
   }
 }

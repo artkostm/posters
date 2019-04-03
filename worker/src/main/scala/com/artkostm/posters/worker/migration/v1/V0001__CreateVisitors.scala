@@ -13,8 +13,8 @@ final class V0001__CreateVisitors extends DoobieMigration {
          (
             eventdate DATE NOT NULL,
             eventname VARCHAR NOT NULL,
-            vids text[] NOT NULL,
-            uids text[] NOT NULL,
+            vids TEXT[] NOT NULL,
+            uids TEXT[] NOT NULL,
             CONSTRAINT pk_visitors
               PRIMARY KEY (eventdate, eventname)
          )
