@@ -1,12 +1,7 @@
 package com.artkostm.posters.worker
 
-import java.time.LocalDate
-
-import cats.data.NonEmptyList
 import cats.effect._
 import com.artkostm.posters.Configuration.DatabaseConfig
-import com.artkostm.posters.algebra.InfoStore
-import com.artkostm.posters.interfaces.event.EventInfo
 import com.artkostm.posters.interpreter.{EventStoreInterpreter, InfoStoreInterpreter, VisitorStoreInterpreter}
 import com.artkostm.posters.scraper.{AfishaScraper, Scraper}
 import com.artkostm.posters.worker.collector.EventCollector
@@ -16,12 +11,14 @@ import doobie.hikari.HikariTransactor
 
 class WorkerModule[F[_]: Timer: Concurrent](config: AppConfig, val xa: HikariTransactor[F]) {
   private lazy val scraper      = new AfishaScraper[F](config.scraper)
-   lazy val infoStore    = new InfoStoreInterpreter(xa.trans)
-  lazy val eventStore   = new EventStoreInterpreter(xa.trans)
+  private lazy val infoStore    = new InfoStoreInterpreter(xa.trans)
+  private lazy val eventStore   = new EventStoreInterpreter(xa.trans)
   private lazy val visitorStore = new VisitorStoreInterpreter(xa.trans)
   lazy val collector            = new EventCollector[F](scraper, eventStore, infoStore, visitorStore)
 
-  def test() = eventStore.findByNamesAndPeriod(NonEmptyList.of("Кино"), LocalDate.now().plusDays(3), LocalDate.now().plusDays(6))
+//  val y = xa.yolo
+//  import y._
+//  VisitorStoreInterpreter.volunteer(Intent(LocalDate.now().minusDays(4), "testEvent", "12")).check
 }
 
 object WorkerModule {
