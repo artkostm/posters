@@ -12,7 +12,7 @@ import doobie.postgres.implicits._
 class VisitorStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends VisitorStore[F] {
   import VisitorStoreInterpreter._
 
-  override def deleteOld(today: LocalDate): F[Int] =
+  override def deleteOlderThan(today: LocalDate): F[Int] =
     T(deleteOldIntents(today).run)
 
   override def save(intent: Intent): F[Intents] =
@@ -31,7 +31,7 @@ class VisitorStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends VisitorStore[F
     T(leaveEvent(intent).withUniqueGeneratedKeys[Intents]("eventdate", "eventname", "vids", "uids"))
 }
 
-private object VisitorStoreInterpreter {
+object VisitorStoreInterpreter {
   implicit val han = LogHandler.jdkLogHandler
 
   def findByDateAndName(date: LocalDate, eventName: String): Query0[Intents] =
@@ -49,24 +49,28 @@ private object VisitorStoreInterpreter {
   def leaveEvent(intent: Intent): Update0 =
     sql"""
          UPDATE visitors
-         SET uids = array_remove(uids, ${intent.userId}), vids = array_remove(vids, ${intent.userId})
-         WHERE eventname = ${intent.eventName} AND eventdate = ${intent.eventDate}
+         SET uids=array_remove(uids, ${intent.userId}::text), vids=array_remove(vids, ${intent.userId}::text)
+         WHERE eventname=${intent.eventName} AND eventdate=${intent.eventDate}
          """.update
 
-  def whereFr(intent: Intent) = fr"""WHERE eventname = ${intent.eventName} AND eventdate = ${intent.eventDate}"""
+  def whereFr(intent: Intent) =
+    fr"""WHERE visitors.eventdate=${intent.eventDate} AND visitors.eventname=${intent.eventName}"""
 
   def createOrUpdate(intent: Intent, insertFr: Fragment, updateFr: Fragment): Fragment =
-    fr"""INSERT INTO visitors ("eventdate", "eventname", "vids", "uids")""" ++ insertFr ++
-      fr"ON CONFLICT ON CONSTRAINT pk_visitors DO UPDATE visitors SET" ++ updateFr ++
-      whereFr(intent)
+    fr"""INSERT INTO visitors ("eventdate", "eventname", "vids", "uids") VALUES""" ++ insertFr ++
+      fr"""ON CONFLICT ON CONSTRAINT pk_visitors DO UPDATE SET""" ++ updateFr ++ whereFr(intent)
 
   def volunteer(intent: Intent): Update0 =
-    createOrUpdate(intent,
-      fr"(${intent.eventDate}, ${intent.eventName}, '{${intent.userId}}', '{}')",
-      fr"vids = array_append(vids, ${intent.userId})").update
+    createOrUpdate(
+      intent,
+      fr"(${intent.eventDate}, ${intent.eventName}, string_to_array(${intent.userId}, ',', ''), '{}')",
+      fr"vids=visitors.vids || ${intent.userId}::text"
+    ).update
 
   def plainUser(intent: Intent): Update0 =
-    createOrUpdate(intent,
-      fr"(${intent.eventDate}, ${intent.eventName}, '{}', '{${intent.userId}}')",
-      fr"uids = array_append(uids, ${intent.userId})").update
+    createOrUpdate(
+      intent,
+      fr"(${intent.eventDate}, ${intent.eventName}, '{}', string_to_array(${intent.userId}, ',', ''))",
+      fr"uids=visitors.uids || ${intent.userId}::text"
+    ).update
 }
