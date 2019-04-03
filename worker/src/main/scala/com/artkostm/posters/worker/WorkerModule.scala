@@ -15,10 +15,6 @@ class WorkerModule[F[_]: Timer: Concurrent](config: AppConfig, val xa: HikariTra
   private lazy val eventStore   = new EventStoreInterpreter(xa.trans)
   private lazy val visitorStore = new VisitorStoreInterpreter(xa.trans)
   lazy val collector            = new EventCollector[F](scraper, eventStore, infoStore, visitorStore)
-
-//  val y = xa.yolo
-//  import y._
-//  VisitorStoreInterpreter.volunteer(Intent(LocalDate.now().minusDays(4), "testEvent", "12")).check
 }
 
 object WorkerModule {
