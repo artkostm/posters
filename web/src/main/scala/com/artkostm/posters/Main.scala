@@ -5,26 +5,27 @@ import java.time.{Instant, ZoneId}
 import java.time.temporal.{ChronoField, ChronoUnit, TemporalAccessor}
 
 import cats.effect._
+import org.http4s.server.blaze._
+import org.http4s.implicits._
+import cats.implicits._
 import com.artkostm.posters.endpoint.auth.JwtTokenAuthMiddleware
 import com.artkostm.posters.interfaces.dialog.v2._
-import org.http4s.server.Router
+import org.http4s.server.{Router, Server}
 
 object Main extends IOApp {
-  import org.http4s.server.blaze._
-  import org.http4s.implicits._
-  import cats.implicits._
   override def run(args: List[String]): IO[ExitCode] =
-    (for {
+    server.use(_ => IO.never).as(ExitCode.Success)
+
+  def server(): Resource[IO, Server[IO]] =
+    for {
       module <- WebModule.init
       auth   <- Resource.liftF(JwtTokenAuthMiddleware[IO](module.config.api))
-      exit <- BlazeServerBuilder[IO]
-               .withNio2(true)
-               .bindHttp(module.config.http.port.value, "0.0.0.0")
-               .withHttpApp(Router("/" -> auth(module.endpoints)).orNotFound)
-               .resource
-    } yield exit)
-      .use(_ => IO.never)
-      .as(ExitCode.Success)
+      server <- BlazeServerBuilder[IO]
+                 .withNio2(true)
+                 .bindHttp(module.config.http.port.value, "0.0.0.0")
+                 .withHttpApp(Router("/" -> auth(module.endpoints)).orNotFound)
+                 .resource
+    } yield server
 }
 
 object testMonocle extends App {
@@ -54,7 +55,6 @@ object testMonocle extends App {
 //    case DialogflowRequest(_, QueryResult(_, Parameters(category, _), _, _, _, _, _), _, _) => category
 //  }
 }
-
 
 object dateTest extends App {
   val FMT = new DateTimeFormatterBuilder()

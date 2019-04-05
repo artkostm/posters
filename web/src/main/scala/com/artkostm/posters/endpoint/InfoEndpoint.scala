@@ -3,22 +3,25 @@ package com.artkostm.posters.endpoint
 import cats.data.EitherT
 import cats.implicits._
 import cats.effect.Effect
+import com.artkostm.posters.ValidationError.EventInfoNotFoundError
 import com.artkostm.posters.algebra.InfoStore
+import com.artkostm.posters.endpoint.error.HttpErrorHandler
+import com.artkostm.posters.jsoniter._
+import com.artkostm.posters.jsoniter.codecs._
 import com.artkostm.posters.interfaces.auth.User
 import org.http4s.AuthedService
 import org.http4s.dsl.Http4sDsl
 
-class InfoEndpoint[F[_]: Effect](repository: InfoStore[F]) extends Http4sDsl[F] with EndpointsAware[F] {
-  import com.artkostm.posters.jsoniter._
-  import com.artkostm.posters.jsoniter.codecs._
-  import com.artkostm.posters.ValidationError._
+class InfoEndpoint[F[_]: Effect](repository: InfoStore[F])(implicit H: HttpErrorHandler[F])
+    extends Http4sDsl[F]
+    with EndpointsAware[F] {
 
   private def getEventInfo(): AuthedService[User, F] = AuthedService {
-    case GET -> Root / "events" :? LinkMatcher(link) as User(_, role) =>
+    case GET -> Root / ApiVersion / "events" :? LinkMatcher(link) as User(_, role) =>
       println(role)
       for {
-        info <- EitherT.fromOptionF(repository.find(link), ApiError(s"Cannot find event using $link", 404)).value
-        resp <- info.fold(NotFound(_), Ok(_))
+        info <- EitherT.fromOptionF(repository.find(link), EventInfoNotFoundError(link)).value
+        resp <- info.fold(H.handle, Ok(_))
       } yield resp
   }
 
@@ -26,5 +29,6 @@ class InfoEndpoint[F[_]: Effect](repository: InfoStore[F]) extends Http4sDsl[F] 
 }
 
 object InfoEndpoint {
-  def apply[F[_]: Effect](repository: InfoStore[F]): AuthedService[User, F] = new InfoEndpoint(repository).endpoints
+  def apply[F[_]: Effect: HttpErrorHandler](repository: InfoStore[F]): AuthedService[User, F] =
+    new InfoEndpoint(repository).endpoints
 }
