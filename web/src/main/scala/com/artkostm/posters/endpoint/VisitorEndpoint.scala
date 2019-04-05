@@ -3,6 +3,8 @@ package com.artkostm.posters.endpoint
 import cats.implicits._
 import cats.effect.Effect
 import com.artkostm.posters.endpoint.error.HttpErrorHandler
+import com.artkostm.posters.jsoniter._
+import com.artkostm.posters.jsoniter.codecs._
 import com.artkostm.posters.interfaces.auth.User
 import com.artkostm.posters.interfaces.intent.Intent
 import com.artkostm.posters.service.VisitorsService
@@ -12,8 +14,6 @@ import org.http4s.dsl.Http4sDsl
 class VisitorEndpoint[F[_]: Effect](service: VisitorsService[F])(implicit H: HttpErrorHandler[F])
     extends Http4sDsl[F]
     with EndpointsAware[F] {
-  import com.artkostm.posters.jsoniter._
-  import com.artkostm.posters.jsoniter.codecs._
 
   private def saveVisitors(): AuthedService[User, F] = AuthedService {
     case authed @ POST -> Root / ApiVersion / "visitors" as User(_, role) =>
