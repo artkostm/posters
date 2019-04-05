@@ -16,20 +16,20 @@ class VisitorEndpoint[F[_]: Effect](service: VisitorsService[F])(implicit H: Htt
   import com.artkostm.posters.jsoniter.codecs._
 
   private def saveVisitors(): AuthedService[User, F] = AuthedService {
-    case authed @ POST -> Root / "visitors" as User(_, role) =>
+    case authed @ POST -> Root / ApiVersion / "visitors" as User(_, role) =>
       for {
         intent  <- authed.req.as[Intent]
         created <- service.saveOrUpdateIntent(role, intent).value
-        resp    <- created.fold(H.handler, Created(_))
+        resp    <- created.fold(H.handle, Created(_))
       } yield resp
   }
 
   private def leaveEvent(): AuthedService[User, F] = AuthedService {
-    case authed @ DELETE -> Root / "visitors" as _ =>
+    case authed @ DELETE -> Root / ApiVersion / "visitors" as _ =>
       for {
         intent  <- authed.req.as[Intent]
         updated <- service.leaveEvent(intent).value
-        resp    <- updated.fold(H.handler, Ok(_))
+        resp    <- updated.fold(H.handle, Ok(_))
       } yield resp
   }
 
