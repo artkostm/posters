@@ -11,6 +11,7 @@ import com.artkostm.posters.interfaces.auth.User
 import com.artkostm.posters.interfaces.intent.{Intent, Intents}
 
 class VisitorsService[F[_]: Monad](repository: VisitorStore[F], validator: VisitorValidationAlgebra[F]) {
+  
   def saveOrUpdateIntent(role: String, intent: Intent): EitherT[F, RoleDoesNotExistError, Intents] =
     on[RoleDoesNotExistError, Intents](role) {
       EitherT.liftF(repository.asPlainUser(intent))
@@ -19,17 +20,12 @@ class VisitorsService[F[_]: Monad](repository: VisitorStore[F], validator: Visit
     } {
       EitherT.leftT(RoleDoesNotExistError(role))
     }
-//    Role.withNameInsensitiveOption(role) match {
-//      case Some(User)      => EitherT.liftF(repository.asPlainUser(intent))
-//      case Some(Volunteer) => EitherT.liftF(repository.asVolunteer(intent))
-//      case _               => EitherT.leftT(RoleDoesNotExistError(role))
-//    }
 
   def leaveEvent(intent: Intent, user: User): EitherT[F, ValidationError, Intents] =
     for {
       intents <- validator.exists(intent)
-      role = user.role
-      userId = "" // TODO: add user id
+      role    = user.role
+      userId  = "" // TODO: add user id
       _ <- on[ValidationError, Unit](role)(canLeave(userId, intents.uids))(canLeave(userId, intents.vids)) {
             EitherT.leftT(RoleDoesNotExistError(role))
           }
@@ -45,6 +41,8 @@ class VisitorsService[F[_]: Monad](repository: VisitorStore[F], validator: Visit
     }
 
   private def canLeave(userId: String, ids: List[String]): EitherT[F, ValidationError, Unit] =
-    if (ids.contains(userId)) EitherT.rightT(())
-    else EitherT.leftT(LeaveEventError)
+    ids.contains(userId) match {
+      case true  => EitherT.rightT(())
+      case false => EitherT.leftT(LeaveEventError)
+    }
 }
