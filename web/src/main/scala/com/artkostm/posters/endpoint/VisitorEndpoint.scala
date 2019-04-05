@@ -25,10 +25,10 @@ class VisitorEndpoint[F[_]: Effect](service: VisitorsService[F])(implicit H: Htt
   }
 
   private def leaveEvent(): AuthedService[User, F] = AuthedService {
-    case authed @ DELETE -> Root / ApiVersion / "visitors" as _ =>
+    case authed @ DELETE -> Root / ApiVersion / "visitors" as user =>
       for {
         intent  <- authed.req.as[Intent]
-        updated <- service.leaveEvent(intent).value
+        updated <- service.leaveEvent(intent, user).value
         resp    <- updated.fold(H.handle, Ok(_))
       } yield resp
   }
