@@ -4,6 +4,7 @@ import cats.effect.{ExitCode, IO, IOApp, Sync}
 import tsec.mac.jca.{HMACSHA256, MacSigningKey}
 import cats.syntax.flatMap._
 import cats.syntax.functor._
+import io.circe.Json
 import tsec.jws.mac.JWSMacCV.genSigner
 import tsec.jws.mac.JWTMac
 import tsec.jwt.JWTClaims
@@ -33,8 +34,11 @@ class TokenGenerator[F[_]](implicit F: Sync[F]) {
   val tokenGenerator: F[String] = ApiToken.fold(ifEmpty) { apiToken =>
     for {
       jwtKey <- generateJwtKey(apiToken)
-      claims = JWTClaims(issuer = Some("User"), subject = ApiKey, expiration = None)
-      token  <- generateToken(claims, jwtKey)
+      claims = JWTClaims(issuer = Some("User"),
+                         subject = ApiKey,
+                         expiration = None,
+                         customFields = Seq(("id", Json.fromString("2"))))
+      token <- generateToken(claims, jwtKey)
     } yield token
   }
 }
