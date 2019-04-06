@@ -16,24 +16,32 @@ class VisitorEndpoint[F[_]: Effect](service: VisitorsService[F])(implicit H: Htt
     with EndpointsAware[F] {
 
   private def saveVisitors(): AuthedService[User, F] = AuthedService {
-    case authed @ POST -> Root / ApiVersion / "visitors" as User(_, role) =>
+    case authed @ POST -> Root / ApiVersion / "visitors" as User(_, role, _) =>
       for {
         intent  <- authed.req.as[Intent]
         created <- service.saveOrUpdateIntent(role, intent).value
-        resp    <- created.fold(H.handle, Created(_))
+        resp    <- created.fold(H.handle, Ok(_))
       } yield resp
   }
 
   private def leaveEvent(): AuthedService[User, F] = AuthedService {
-    case authed @ DELETE -> Root / ApiVersion / "visitors" as _ =>
+    case authed @ DELETE -> Root / ApiVersion / "visitors" as user =>
       for {
         intent  <- authed.req.as[Intent]
-        updated <- service.leaveEvent(intent).value
+        updated <- service.leaveEvent(intent, user).value
         resp    <- updated.fold(H.handle, Ok(_))
       } yield resp
   }
 
-  override def endpoints: AuthedService[User, F] = saveVisitors() <+> leaveEvent()
+  private def findEvent(): AuthedService[User, F] = AuthedService {
+    case GET -> Root / ApiVersion / "visitors" :? EventNameMatcher(eventName) & DateMatcher(date) as _ =>
+      for {
+        intents <- service.findIntent(eventName, date).value
+        resp    <- intents.fold(H.handle, Ok(_))
+      } yield resp
+  }
+
+  override def endpoints: AuthedService[User, F] = saveVisitors() <+> leaveEvent() <+> findEvent()
 }
 
 object VisitorEndpoint {
