@@ -10,6 +10,7 @@ import org.http4s.dsl.Http4sDsl
 
 class HttpErrorHandler[F[_]: Monad] extends Http4sDsl[F] {
 
+  // TODO: update api codes
   val handle: ValidationError => F[Response[F]] = {
     case CategoryNotFoundError(name, date)   => NotFound(ApiError(s"Cannot find '$name' category using date=$date", 404))
     case CategoriesNotFoundError(date)       => NotFound(ApiError(s"Cannot find categories using date=$date", 404))

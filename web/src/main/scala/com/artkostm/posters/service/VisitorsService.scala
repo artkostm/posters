@@ -1,9 +1,11 @@
 package com.artkostm.posters.service
 
+import java.time.LocalDate
+
 import cats.Monad
 import cats.data.EitherT
 import com.artkostm.posters.ValidationError
-import com.artkostm.posters.ValidationError.{LeaveEventError, RoleDoesNotExistError}
+import com.artkostm.posters.ValidationError.{IntentDoesNotExistError, LeaveEventError, RoleDoesNotExistError}
 import com.artkostm.posters.algebra.{VisitorStore, VisitorValidationAlgebra}
 import com.artkostm.posters.endpoint.auth.role.Role
 import com.artkostm.posters.endpoint.auth.role.Role.{Volunteer, User => UserRole}
@@ -11,6 +13,9 @@ import com.artkostm.posters.interfaces.auth.User
 import com.artkostm.posters.interfaces.intent.{Intent, Intents}
 
 class VisitorsService[F[_]: Monad](repository: VisitorStore[F], validator: VisitorValidationAlgebra[F]) {
+
+  def findIntent(eventName: String, date: LocalDate): EitherT[F, IntentDoesNotExistError, Intents] =
+    EitherT.fromOptionF(repository.find(date, eventName), IntentDoesNotExistError(eventName, date))
   
   def saveOrUpdateIntent(role: String, intent: Intent): EitherT[F, RoleDoesNotExistError, Intents] =
     on[RoleDoesNotExistError, Intents](role) {
@@ -25,7 +30,7 @@ class VisitorsService[F[_]: Monad](repository: VisitorStore[F], validator: Visit
     for {
       intents <- validator.exists(intent)
       role    = user.role
-      userId  = "" // TODO: add user id
+      userId  = user.id
       _ <- on[ValidationError, Unit](role)(canLeave(userId, intents.uids))(canLeave(userId, intents.vids)) {
             EitherT.leftT(RoleDoesNotExistError(role))
           }
