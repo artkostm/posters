@@ -13,6 +13,8 @@ package object endpoint {
   object DateMatcher extends QueryParamDecoderMatcher[LocalDate]("date")
   /* Parses out link query param */
   object LinkMatcher extends QueryParamDecoderMatcher[String]("link")
+  /* Parses out eventName query param */
+  object EventNameMatcher extends QueryParamDecoderMatcher[String]("eventName")
 
   implicit val yearQueryParamDecoder: QueryParamDecoder[LocalDate] =
     QueryParamDecoder.fromUnsafeCast { qpv =>
