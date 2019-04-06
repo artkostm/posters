@@ -53,16 +53,18 @@ class JwtTokenAuthMiddleware[F[_]: Sync](config: AuthConfig, apiKey: String) ext
       }
     }
 
-  private def verifyToken(request: Request[F], jwtKey: MacSigningKey[HMACSHA256]): OptionT[F, User] = {
-    import cats.implicits._
+  private def verifyToken(request: Request[F], jwtKey: MacSigningKey[HMACSHA256]): OptionT[F, User] =
     for {
       token    <- bearerTokenFromRequest(request)
       verified <- OptionT.liftF(JWTMac.verifyAndParse[F, HMACSHA256](token, jwtKey))
-      accessToken <- OptionT.fromOption[F](
-                      (verified.body.subject, verified.body.issuer).bisequence.map(User.tupled)
-                    )
+      accessToken <- OptionT.fromOption[F] {
+                      for {
+                        apiKey <- verified.body.subject
+                        role   <- verified.body.issuer
+                        id     <- verified.body.getCustom[String]("id").toOption
+                      } yield User(apiKey, role, id)
+                    }
     } yield accessToken
-  }
 
   private def authUser(jwtKey: MacSigningKey[HMACSHA256]): Kleisli[F, Request[F], Either[String, User]] =
     Kleisli { request =>
