@@ -17,8 +17,7 @@ class InfoEndpoint[F[_]: Effect](repository: InfoStore[F])(implicit H: HttpError
     with EndpointsAware[F] {
 
   private def getEventInfo(): AuthedService[User, F] = AuthedService {
-    case GET -> Root / ApiVersion / "events" :? LinkMatcher(link) as User(_, role) =>
-      println(role)
+    case GET -> Root / ApiVersion / "events" :? LinkMatcher(link) as User(_, role, _) =>
       for {
         info <- EitherT.fromOptionF(repository.find(link), EventInfoNotFoundError(link)).value
         resp <- info.fold(H.handle, Ok(_))

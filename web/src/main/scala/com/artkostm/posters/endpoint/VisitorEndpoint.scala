@@ -10,6 +10,7 @@ import com.artkostm.posters.interfaces.intent.Intent
 import com.artkostm.posters.service.VisitorsService
 import org.http4s.AuthedService
 import org.http4s.dsl.Http4sDsl
+import org.http4s.implicits._
 
 class VisitorEndpoint[F[_]: Effect](service: VisitorsService[F])(implicit H: HttpErrorHandler[F])
     extends Http4sDsl[F]
@@ -34,7 +35,7 @@ class VisitorEndpoint[F[_]: Effect](service: VisitorsService[F])(implicit H: Htt
   }
 
   private def findEvent(): AuthedService[User, F] = AuthedService {
-    case GET -> Root / ApiVersion / "visitors" :? EventNameMatcher(eventName) & DateMatcher(date) as _ =>
+    case GET -> Root / ApiVersion / "visitors" :? EventNameMatcher(eventName) +& DateMatcher(date) as _ =>
       for {
         intents <- service.findIntent(eventName, date).value
         resp    <- intents.fold(H.handle, Ok(_))
