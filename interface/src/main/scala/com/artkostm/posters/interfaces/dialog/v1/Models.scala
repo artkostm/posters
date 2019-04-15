@@ -1,10 +1,12 @@
 package com.artkostm.posters.interfaces.dialog.v1
 
-import java.time.Instant
+import java.time.LocalDate
 
 import com.artkostm.posters.interfaces.schedule.Category
 
-final case class Datetime(date: Option[Instant], period: Option[String])
+final case class Period(endDate: LocalDate, startDate: LocalDate)
+
+final case class Datetime(date: Option[LocalDate], period: Option[Period])
 
 final case class Parameters(category: List[String], datetime: Datetime)
 
