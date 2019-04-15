@@ -8,7 +8,6 @@ import cats.effect._
 import org.http4s.server.blaze._
 import org.http4s.implicits._
 import cats.implicits._
-import com.artkostm.posters.endpoint.auth.JwtTokenAuthMiddleware
 import com.artkostm.posters.interfaces.dialog.v1._
 import com.github.plokhotnyuk.jsoniter_scala.macros.{CodecMakerConfig, JsonCodecMaker}
 import org.http4s.server.{Router, Server}
@@ -20,11 +19,10 @@ object Main extends IOApp {
   def server(): Resource[IO, Server[IO]] =
     for {
       module <- WebModule.init
-      auth   <- Resource.liftF(JwtTokenAuthMiddleware[IO](module.config.api))
       server <- BlazeServerBuilder[IO]
                  .withNio2(true)
                  .bindHttp(module.config.http.port.value, "0.0.0.0")
-                 .withHttpApp(Router("/" -> auth(module.endpoints)).orNotFound)
+                 .withHttpApp(Router("/" -> module.endpoints).orNotFound)
                  .resource
     } yield server
 }

@@ -3,17 +3,25 @@ package com.artkostm.posters
 import cats.effect._
 import com.artkostm.posters.config.{AppConfig, WebConfiguration}
 import com.artkostm.posters.endpoint.{CategoryEndpoint, InfoEndpoint, VisitorEndpoint}
-import com.artkostm.posters.interpreter.{EventStoreInterpreter, InfoStoreInterpreter, VisitorStoreInterpreter, VisitorValidationInterpreter}
+import com.artkostm.posters.interpreter.{
+  EventStoreInterpreter,
+  InfoStoreInterpreter,
+  VisitorStoreInterpreter,
+  VisitorValidationInterpreter
+}
 import com.artkostm.posters.scraper.{AfishaScraper, Scraper}
 import doobie.hikari.HikariTransactor
 import cats.syntax.semigroupk._
 import cats.syntax.functor._
 import com.olegpy.meow.hierarchy._
 import com.artkostm.posters.Configuration.DatabaseConfig
+import com.artkostm.posters.endpoint.auth.JwtTokenAuthMiddleware
 import com.artkostm.posters.endpoint.error.HttpErrorHandler
+import com.artkostm.posters.interfaces.auth.User
 import com.artkostm.posters.service.VisitorsService
+import org.http4s.server.AuthMiddleware
 
-class WebModule[F[_]: Effect](val config: AppConfig, val xa: HikariTransactor[F]) {
+class WebModule[F[_]: Effect](val config: AppConfig, val xa: HikariTransactor[F], auth: AuthMiddleware[F, User]) {
 
   private lazy val infoStore    = new InfoStoreInterpreter(xa.trans)
   private lazy val eventStore   = new EventStoreInterpreter(xa.trans)
@@ -25,8 +33,13 @@ class WebModule[F[_]: Effect](val config: AppConfig, val xa: HikariTransactor[F]
 
   lazy val scraper: Scraper[F] = new AfishaScraper[F](config.scraper)
 
-  lazy val endpoints = InfoEndpoint[F](infoStore) <+> CategoryEndpoint[F](eventStore, scraper) <+> VisitorEndpoint[F](
-    visitorService)
+  lazy val visitorEndpoint = VisitorEndpoint[F](visitorService)
+
+  lazy val endpoints = auth(
+    InfoEndpoint[F](infoStore) <+>
+      CategoryEndpoint[F](eventStore, scraper) <+>
+      visitorEndpoint.endpoints <+>
+      visitorEndpoint.throttled)
 }
 
 object WebModule {
@@ -34,5 +47,6 @@ object WebModule {
     for {
       config <- Resource.liftF(WebConfiguration.load)
       xa     <- DatabaseConfig.transactor(config.db)
-    } yield new WebModule[F](config, xa)
+      auth   <- Resource.liftF(JwtTokenAuthMiddleware[F](config.api))
+    } yield new WebModule[F](config, xa, auth)
 }
