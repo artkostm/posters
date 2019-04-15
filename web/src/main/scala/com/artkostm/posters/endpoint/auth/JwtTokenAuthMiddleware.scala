@@ -30,7 +30,8 @@ class Middleware[F[_]](api: ApiConfig)(implicit F: Sync[F]) {
   private val ifEmpty = F.raiseError[AuthMiddleware[F, User]](new Exception("Api Token not found"))
 
   private def generateJwtKey(token: String): F[MacSigningKey[HMACSHA256]] =
-    F.catchNonFatal(HMACSHA256.unsafeBuildKey(token.getBytes))
+  // F.catchNonFatal(HMACSHA256.unsafeBuildKey(token.getBytes))
+    HMACSHA256.buildKey(token.getBytes)
 
   val middleware: F[AuthMiddleware[F, User]] = Option(api.token).fold(ifEmpty) { token =>
     generateJwtKey(token.value).map { jwtKey =>
