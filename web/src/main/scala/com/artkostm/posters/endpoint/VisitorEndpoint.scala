@@ -1,19 +1,15 @@
 package com.artkostm.posters.endpoint
 
 import cats.implicits._
-import cats.effect.{Clock, Effect}
+import cats.effect.Effect
 import com.artkostm.posters.endpoint.error.HttpErrorHandler
 import com.artkostm.posters.jsoniter._
 import com.artkostm.posters.jsoniter.codecs._
 import com.artkostm.posters.interfaces.auth.User
 import com.artkostm.posters.interfaces.intent.Intent
 import com.artkostm.posters.service.VisitorsService
-import org.http4s.{AuthedService, Http}
+import org.http4s.AuthedService
 import org.http4s.dsl.Http4sDsl
-import org.http4s.implicits._
-import org.http4s.server.middleware.Throttle
-
-import scala.concurrent.duration._
 
 class VisitorEndpoint[F[_]: Effect](service: VisitorsService[F])(implicit H: HttpErrorHandler[F])
     extends Http4sDsl[F]
