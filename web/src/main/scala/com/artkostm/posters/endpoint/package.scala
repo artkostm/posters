@@ -3,10 +3,13 @@ package com.artkostm.posters
 import java.time.LocalDate
 import java.time.temporal.TemporalAccessor
 
-import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
+import com.artkostm.posters.interfaces.dialog.v1.Period
+import com.github.plokhotnyuk.jsoniter_scala.core.{JsonReader, JsonValueCodec, JsonWriter}
 import com.github.plokhotnyuk.jsoniter_scala.macros.{CodecMakerConfig, JsonCodecMaker}
 import org.http4s.QueryParamDecoder
 import org.http4s.dsl.impl.QueryParamDecoderMatcher
+
+import scala.runtime.Nothing$
 
 package object endpoint {
   /* Parses out date query param in format yyyy/MM/dd */
@@ -34,4 +37,20 @@ package object endpoint {
 
   implicit val apiErrorCodec: JsonValueCodec[ApiError] =
     JsonCodecMaker.make[ApiError](CodecMakerConfig())
+
+  implicit val periodV1JsonValueCodec = new JsonValueCodec[Period] {
+    override def decodeValue(in: JsonReader, default: Period): Period = {
+      in.readString("").split("/") match {
+        case Array(start, end) =>
+          if (start > end) in.readNullOrError(null, "Incorrect Period format, start of period can't be after end of period")
+          else Period(LocalDate.parse(start), LocalDate.parse(end))
+        case _ => in.readNullOrError(null, "Incorrect Period format, should be yyyy-MM-dd/yyyy-MM-dd")
+      }
+    }
+
+    override def encodeValue(x: Period, out: JsonWriter): Unit =
+      out.writeVal(s"${x.startDate}/${x.endDate}")
+
+    override def nullValue: Period = null
+  }
 }

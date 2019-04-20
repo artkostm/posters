@@ -34,17 +34,19 @@ class VisitorEndpoint[F[_]: Effect](service: VisitorsService[F])(implicit H: Htt
   }
 
   private def findEvent(): AuthedService[User, F] = AuthedService {
-    case GET -> Root / ApiVersion / "visitors" :? EventNameMatcher(eventName) & DateMatcher(date) as _ =>
+    case GET -> Root / ApiVersion / "visitors" :? EventNameMatcher(eventName) +& DateMatcher(date) as _ =>
       for {
         intents <- service.findIntent(eventName, date).value
         resp    <- intents.fold(H.handle, Ok(_))
       } yield resp
   }
 
-  override def endpoints: AuthedService[User, F] = saveVisitors() <+> leaveEvent() <+> findEvent()
+  override def endpoints: AuthedService[User, F] = findEvent()
+
+  def throttled: AuthedService[User, F] = saveVisitors() <+> leaveEvent()
 }
 
 object VisitorEndpoint {
-  def apply[F[_]: Effect: HttpErrorHandler](service: VisitorsService[F]): AuthedService[User, F] =
-    new VisitorEndpoint(service).endpoints
+  def apply[F[_]: Effect: HttpErrorHandler](service: VisitorsService[F]): VisitorEndpoint[F] =
+    new VisitorEndpoint(service)
 }
