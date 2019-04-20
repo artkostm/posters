@@ -1,16 +1,19 @@
 package com.artkostm.posters.endpoint
 
 import cats.implicits._
-import cats.effect.Effect
+import cats.effect.{Clock, Effect}
 import com.artkostm.posters.endpoint.error.HttpErrorHandler
 import com.artkostm.posters.jsoniter._
 import com.artkostm.posters.jsoniter.codecs._
 import com.artkostm.posters.interfaces.auth.User
 import com.artkostm.posters.interfaces.intent.Intent
 import com.artkostm.posters.service.VisitorsService
-import org.http4s.AuthedService
+import org.http4s.{AuthedService, Http}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.implicits._
+import org.http4s.server.middleware.Throttle
+
+import scala.concurrent.duration._
 
 class VisitorEndpoint[F[_]: Effect](service: VisitorsService[F])(implicit H: HttpErrorHandler[F])
     extends Http4sDsl[F]
@@ -42,10 +45,12 @@ class VisitorEndpoint[F[_]: Effect](service: VisitorsService[F])(implicit H: Htt
       } yield resp
   }
 
-  override def endpoints: AuthedService[User, F] = saveVisitors() <+> leaveEvent() <+> findEvent()
+  override def endpoints: AuthedService[User, F] = findEvent()
+
+  def throttled: AuthedService[User, F] = saveVisitors() <+> leaveEvent()
 }
 
 object VisitorEndpoint {
-  def apply[F[_]: Effect: HttpErrorHandler](service: VisitorsService[F]): AuthedService[User, F] =
-    new VisitorEndpoint(service).endpoints
+  def apply[F[_]: Effect: HttpErrorHandler](service: VisitorsService[F]): VisitorEndpoint[F] =
+    new VisitorEndpoint(service)
 }
