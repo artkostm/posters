@@ -28,6 +28,6 @@ class InfoEndpoint[F[_]: Effect](repository: InfoStore[F])(implicit H: HttpError
 }
 
 object InfoEndpoint {
-  def apply[F[_]: Effect: HttpErrorHandler](repository: InfoStore[F]): AuthedService[User, F] =
-    new InfoEndpoint(repository).endpoints
+  def apply[F[_]: Effect: HttpErrorHandler](repository: InfoStore[F]): InfoEndpoint[F] =
+    new InfoEndpoint(repository)
 }

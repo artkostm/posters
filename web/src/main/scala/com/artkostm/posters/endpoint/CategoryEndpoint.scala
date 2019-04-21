@@ -43,6 +43,6 @@ class CategoryEndpoint[F[_]: Effect](repository: EventStore[F], scraper: Scraper
 }
 
 object CategoryEndpoint {
-  def apply[F[_]: Effect: HttpErrorHandler](repository: EventStore[F], scraper: Scraper[F]): AuthedService[User, F] =
-    new CategoryEndpoint(repository, scraper).endpoints
+  def apply[F[_]: Effect: HttpErrorHandler](repository: EventStore[F], scraper: Scraper[F]): CategoryEndpoint[F] =
+    new CategoryEndpoint(repository, scraper)
 }
