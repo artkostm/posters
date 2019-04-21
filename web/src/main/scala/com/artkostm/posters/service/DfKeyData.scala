@@ -12,14 +12,16 @@ trait DfKeyData[DfRequest] {
   def date(request: DfRequest): Option[LocalDate]
   def period(request: DfRequest): Option[Period]
   def hasAllCategory(request: DfRequest): Boolean
+  def incomplete(request: DfRequest): Boolean
 }
 
 object DfKeyData {
-  implicit class DfKeyDataOps[DfRequest: DfKeyData](response: DfRequest) {
-    def categories: List[String]                    = implicitly[DfKeyData[DfRequest]].categories(response)
-    def date: Option[LocalDate]                     = implicitly[DfKeyData[DfRequest]].date(response)
-    def period: Option[DfKeyData[DfRequest]#Period] = implicitly[DfKeyData[DfRequest]].period(response)
-    def hasAllCategory: Boolean                     = implicitly[DfKeyData[DfRequest]].hasAllCategory(response)
+  implicit class DfKeyDataOps[DfRequest: DfKeyData](request: DfRequest) {
+    def categories: List[String]                    = implicitly[DfKeyData[DfRequest]].categories(request)
+    def date: Option[LocalDate]                     = implicitly[DfKeyData[DfRequest]].date(request)
+    def period: Option[DfKeyData[DfRequest]#Period] = implicitly[DfKeyData[DfRequest]].period(request)
+    def hasAllCategory: Boolean                     = implicitly[DfKeyData[DfRequest]].hasAllCategory(request)
+    def incomplete: Boolean                         = implicitly[DfKeyData[DfRequest]].incomplete(request)
   }
 
   implicit val df1KeyData: DfKeyData[DFR1] = new DfKeyData[DFR1] {
@@ -32,6 +34,8 @@ object DfKeyData {
     override def period(request: DFR1): Option[Period] = request.result.parameters.datetime.period
 
     override def hasAllCategory(request: DFR1): Boolean = categories(request).contains(Category.All.entryName)
+
+    override def incomplete(request: DFR1): Boolean = request.result.actionIncomplete
   }
 
   implicit val df2KeyData: DfKeyData[DFR2] = new DfKeyData[DFR2] {
@@ -44,5 +48,7 @@ object DfKeyData {
     override def period(request: DFR2): Option[Period] = request.queryResult.parameters.datetime.period
 
     override def hasAllCategory(request: DFR2): Boolean = categories(request).contains(Category.All.entryName)
+
+    override def incomplete(request: DFR2): Boolean = !request.queryResult.allRequiredParamsPresent
   }
 }
