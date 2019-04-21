@@ -40,10 +40,12 @@ class WebModule[F[_]: Effect](val config: AppConfig, val xa: HikariTransactor[F]
 
   implicit val throttlerClock = Clock.create[F]
 
-  lazy val endpoints = Throttle(10, 5 minutes)(auth(visitorEndpoint.throttled)).map { throttled =>
+  lazy val endpoints = Throttle(10, 5 minutes)(
+    auth(visitorEndpoint.throttled)
+  ).map { throttled =>
     auth(
-      InfoEndpoint[F](infoStore) <+>
-        CategoryEndpoint[F](eventStore, scraper) <+>
+      InfoEndpoint[F](infoStore).endpoints <+>
+        CategoryEndpoint[F](eventStore, scraper).endpoints <+>
         visitorEndpoint.endpoints) <+> throttled
   }
 }
