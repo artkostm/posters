@@ -36,7 +36,7 @@ class EventStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends EventStore[F] {
     T(findCategoriesByNamesAndPeriod(names, start, end).to[List])
 
   override def findByNamesAndDate(names: NonEmptyList[String], date: LocalDate): F[List[Category]] =
-    T(findCategoryByNameAndDate(names, date).to[List])
+    T(findCategoriesByNamesAndDate(names, date).to[List])
 
   override def deleteOld(today: LocalDate): F[Int] =
     T(deleteOldEvents(today).run)
@@ -66,7 +66,7 @@ object EventStoreInterpreter {
   def findCategoriesByNamesAndPeriod(names: NonEmptyList[String], start: LocalDate, end: LocalDate): Query0[Category] =
     findCategories(fr"t.eventdate > $start AND t.eventdate < $end AND" ++ fragments.in(fr"""j->>'name'""", names))
 
-  def findCategoryByNameAndDate(names: NonEmptyList[String], date: LocalDate): Query0[Category] =
+  def findCategoriesByNamesAndDate(names: NonEmptyList[String], date: LocalDate): Query0[Category] =
     findCategories(fr"t.eventdate = $date AND" ++ fragments.in(fr"""j->>'name'""", names))
 
   def deleteOldEvents(today: LocalDate): Update0 =
