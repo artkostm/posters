@@ -26,6 +26,7 @@ object sqlchecker extends IOApp {
       _ <- ES.findCategoriesByNames(NonEmptyList.of("Party")).check
       _ <- ES.findCategoriesByNamesAndPeriod(NonEmptyList.of("Party"), now(), now.plusDays(1)).check
       _ <- ES.saveEvents(Day(now, List())).check
+      _ <- ES.findByDays(now(), now.plusDays(1)).check
     } yield ()
   }
 

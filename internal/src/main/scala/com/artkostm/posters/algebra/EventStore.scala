@@ -8,6 +8,7 @@ trait EventStore[F[_]] {
   def deleteOld(today: LocalDate): F[Int]
   def save(day: Day): F[Day]
   def findByDate(day: LocalDate): F[Option[Day]]
+  def findByPeriod(start: LocalDate, end: LocalDate): F[List[Day]]
   def findByNames(names: NonEmptyList[String]): F[List[Category]]
   def findByNamesAndDate(name: NonEmptyList[String], date: LocalDate): F[List[Category]]
   def findByNamesAndPeriod(names: NonEmptyList[String], start: LocalDate, end: LocalDate): F[List[Category]]
