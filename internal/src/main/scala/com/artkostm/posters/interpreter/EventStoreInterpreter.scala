@@ -40,6 +40,9 @@ class EventStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends EventStore[F] {
 
   override def deleteOld(today: LocalDate): F[Int] =
     T(deleteOldEvents(today).run)
+
+  override def findByPeriod(start: LocalDate, end: LocalDate): F[List[Day]] =
+    T(findByDays(start, end).to[List])
 }
 
 /**
@@ -56,6 +59,9 @@ object EventStoreInterpreter {
 
   def findByDay(day: LocalDate): Query0[Day] =
     sql"""SELECT "eventdate", "categories" FROM events e WHERE e.eventdate=$day""".query[Day]
+
+  def findByDays(start: LocalDate, end: LocalDate): Query0[Day] =
+    sql"""SELECT "eventdate", "categories" FROM events e WHERE e.eventdate > $start AND e.eventdate < $end""".query[Day]
 
   def findCategories(where: Fragment): Query0[Category] =
     (fr"""SELECT j FROM events t, jsonb_array_elements(t.categories) j WHERE""" ++ where).query[Category]

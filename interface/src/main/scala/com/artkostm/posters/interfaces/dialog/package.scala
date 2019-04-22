@@ -8,7 +8,7 @@ package object dialog {
 
   final case class ResponsePayload(categories: Seq[Category])
 
-  trait Periodical {
+  trait DateRange {
     def startDate: LocalDate
     def endDate: LocalDate
   }
