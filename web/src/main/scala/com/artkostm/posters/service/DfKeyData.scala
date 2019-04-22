@@ -3,11 +3,12 @@ package com.artkostm.posters.service
 import java.time.LocalDate
 
 import com.artkostm.posters.categories.Category
+import com.artkostm.posters.interfaces.dialog.Periodical
 import com.artkostm.posters.interfaces.dialog.v1.{DialogflowRequest => DFR1, Period => P1}
 import com.artkostm.posters.interfaces.dialog.v2.{DialogflowRequest => DFR2, Period => P2}
 
 trait DfKeyData[DfRequest] {
-  type Period
+  type Period <: Periodical
   def categories(request: DfRequest): List[String]
   def date(request: DfRequest): Option[LocalDate]
   def period(request: DfRequest): Option[Period]
