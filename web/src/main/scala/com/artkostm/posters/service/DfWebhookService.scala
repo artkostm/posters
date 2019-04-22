@@ -8,6 +8,12 @@ import com.artkostm.posters.algebra.EventStore
 import com.artkostm.posters.interfaces.dialog.ResponsePayload
 import com.artkostm.posters.service.DfKeyData._
 
+/**
+  * Service to process webhook requests from Dialogflow
+  * @param repository - a thing that knows how and where to find event data
+  * @param `monad$F`
+  * @tparam F - effect
+  */
 class DfWebhookService[F[_]: Monad](repository: EventStore[F]) {
 
   def processRequest[DfRequest: DfKeyData](request: DfRequest): ET[F, DfWebhookError, ResponsePayload] =
@@ -15,7 +21,7 @@ class DfWebhookService[F[_]: Monad](repository: EventStore[F]) {
       (request.date, request.period) match {
         case (Some(date), _) =>
           if (request.hasAllCategory) {
-            ET.fromOptionF(repository.findByDate(date).map(day => day.map(ResponsePayload(_))),
+            ET.fromOptionF(repository.findByDate(date).map(o => o.map(day => ResponsePayload(day.categories))),
                            DfWebhookError(s"Cannot find event day using date=$date"))
           } else {
             ET.liftF(

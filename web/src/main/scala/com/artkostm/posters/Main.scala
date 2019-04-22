@@ -50,7 +50,7 @@ object testMonocle extends App {
 
   import com.github.plokhotnyuk.jsoniter_scala.core._
 
-  implicit val dd = endpoint.periodV1JsonValueCodec
+//  implicit val dd = endpoint.periodV1JsonValueCodec
 
   implicit val codec = JsonCodecMaker.make[DialogflowRequest](CodecMakerConfig())
 
