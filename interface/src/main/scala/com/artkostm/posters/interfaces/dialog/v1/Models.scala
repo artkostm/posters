@@ -2,9 +2,9 @@ package com.artkostm.posters.interfaces.dialog.v1
 
 import java.time.LocalDate
 
-import com.artkostm.posters.interfaces.schedule.Category
+import com.artkostm.posters.interfaces.dialog.{Periodical, ResponsePayload}
 
-final case class Period(endDate: LocalDate, startDate: LocalDate)
+final case class Period(endDate: LocalDate, startDate: LocalDate) extends Periodical
 
 final case class Datetime(date: Option[LocalDate], period: Option[Period])
 
@@ -38,6 +38,4 @@ final case class Status(code: Int, errorType: String, webhookTimedOut: Option[Bo
 
 final case class DialogflowRequest(id: String, lang: String, result: Result, status: Status, sessionId: String)
 
-final case class ResponseData(categories: Seq[Category])
-
-final case class DialogflowResponse(speech: String, data: ResponseData, source: String)
+final case class DialogflowResponse(speech: String, data: ResponsePayload, source: String)
