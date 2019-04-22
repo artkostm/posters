@@ -11,4 +11,5 @@ object ValidationError {
   final case class RoleDoesNotExistError(role: String)                         extends ValidationError
   final case class IntentDoesNotExistError(eventName: String, date: LocalDate) extends ValidationError
   final case object LeaveEventError                                            extends ValidationError
+  final case class DfWebhookError(msg: String)                                 extends ValidationError
 }

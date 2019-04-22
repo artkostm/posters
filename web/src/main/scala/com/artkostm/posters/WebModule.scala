@@ -2,7 +2,7 @@ package com.artkostm.posters
 
 import cats.effect._
 import com.artkostm.posters.config.{AppConfig, WebConfiguration}
-import com.artkostm.posters.endpoint.{CategoryEndpoint, InfoEndpoint, VisitorEndpoint}
+import com.artkostm.posters.endpoint.{CategoryEndpoint, DfWebhookEndpoint, InfoEndpoint, VisitorEndpoint}
 import com.artkostm.posters.interpreter.{
   EventStoreInterpreter,
   InfoStoreInterpreter,
@@ -18,7 +18,7 @@ import com.artkostm.posters.Configuration.DatabaseConfig
 import com.artkostm.posters.endpoint.auth.JwtTokenAuthMiddleware
 import com.artkostm.posters.endpoint.error.HttpErrorHandler
 import com.artkostm.posters.interfaces.auth.User
-import com.artkostm.posters.service.VisitorsService
+import com.artkostm.posters.service.{DfWebhookService, VisitorsService}
 import org.http4s.server.AuthMiddleware
 import org.http4s.server.middleware.Throttle
 
@@ -33,6 +33,7 @@ class WebModule[F[_]: Effect](val config: AppConfig, val xa: HikariTransactor[F]
   private lazy val visitorValidator = new VisitorValidationInterpreter[F](visitorStore)
   private lazy val visitorService   = new VisitorsService[F](visitorStore, visitorValidator)
   private implicit val errorHandler = new HttpErrorHandler[F]
+  private lazy val webhookService   = new DfWebhookService[F](eventStore)
 
   lazy val scraper: Scraper[F] = new AfishaScraper[F](config.scraper)
 
@@ -40,10 +41,13 @@ class WebModule[F[_]: Effect](val config: AppConfig, val xa: HikariTransactor[F]
 
   implicit val throttlerClock = Clock.create[F]
 
-  lazy val endpoints = Throttle(10, 5 minutes)(auth(visitorEndpoint.throttled)).map { throttled =>
+  lazy val endpoints = Throttle(10, 5 minutes)(
+    auth(visitorEndpoint.throttled)
+  ).map { throttled =>
     auth(
-      InfoEndpoint[F](infoStore) <+>
-        CategoryEndpoint[F](eventStore, scraper) <+>
+      InfoEndpoint[F](infoStore).endpoints <+>
+        DfWebhookEndpoint[F](webhookService).endpoints <+>
+        CategoryEndpoint[F](eventStore, scraper).endpoints <+>
         visitorEndpoint.endpoints) <+> throttled
   }
 }

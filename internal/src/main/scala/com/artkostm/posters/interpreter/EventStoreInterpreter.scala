@@ -35,8 +35,8 @@ class EventStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends EventStore[F] {
   override def findByNamesAndPeriod(names: NonEmptyList[String], start: LocalDate, end: LocalDate): F[List[Category]] =
     T(findCategoriesByNamesAndPeriod(names, start, end).to[List])
 
-  override def findByNameAndDate(name: String, date: LocalDate): F[Option[Category]] =
-    T(findCategoryByNameAndDate(name, date).option)
+  override def findByNamesAndDate(names: NonEmptyList[String], date: LocalDate): F[List[Category]] =
+    T(findCategoriesByNamesAndDate(names, date).to[List])
 
   override def deleteOld(today: LocalDate): F[Int] =
     T(deleteOldEvents(today).run)
@@ -66,8 +66,8 @@ object EventStoreInterpreter {
   def findCategoriesByNamesAndPeriod(names: NonEmptyList[String], start: LocalDate, end: LocalDate): Query0[Category] =
     findCategories(fr"t.eventdate > $start AND t.eventdate < $end AND" ++ fragments.in(fr"""j->>'name'""", names))
 
-  def findCategoryByNameAndDate(name: String, date: LocalDate): Query0[Category] =
-    findCategories(fr"j->>'name' = $name AND t.eventdate = $date")
+  def findCategoriesByNamesAndDate(names: NonEmptyList[String], date: LocalDate): Query0[Category] =
+    findCategories(fr"t.eventdate = $date AND" ++ fragments.in(fr"""j->>'name'""", names))
 
   def deleteOldEvents(today: LocalDate): Update0 =
     sql"""DELETE FROM events WHERE events.eventdate < $today""".update

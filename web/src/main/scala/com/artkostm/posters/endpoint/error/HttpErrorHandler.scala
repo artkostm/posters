@@ -18,5 +18,6 @@ class HttpErrorHandler[F[_]: Monad] extends Http4sDsl[F] {
     case RoleDoesNotExistError(role)         => BadRequest(ApiError(s"There is no $role.", 400))
     case IntentDoesNotExistError(name, date) => NotFound(ApiError(s"Can't find '$name' event on $date", 404))
     case LeaveEventError                     => Forbidden(ApiError("You cannot leave the event!", 403))
+    case DfWebhookError(msg)                 => BadRequest(ApiError(msg, 404))
   }
 }
