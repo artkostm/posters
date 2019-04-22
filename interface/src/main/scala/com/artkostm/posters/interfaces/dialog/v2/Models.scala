@@ -2,10 +2,10 @@ package com.artkostm.posters.interfaces.dialog.v2
 
 import java.time.LocalDate
 
-import com.artkostm.posters.interfaces.dialog.{Periodical, ResponsePayload}
+import com.artkostm.posters.interfaces.dialog.{DateRange, ResponsePayload}
 
 // for request
-final case class Period(endDate: LocalDate, startDate: LocalDate) extends Periodical
+final case class Period(endDate: LocalDate, startDate: LocalDate) extends DateRange
 
 final case class Datetime(date: Option[LocalDate], period: Option[Period])
 
