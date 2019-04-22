@@ -22,7 +22,7 @@ object sqlchecker extends IOApp {
     for {
       _ <- ES.deleteOldEvents(now()).check
       _ <- ES.findByDay(now()).check
-      _ <- ES.findCategoryByNameAndDate("Party", now()).check
+      _ <- ES.findCategoriesByNamesAndDate(NonEmptyList.of("Party"), now()).check
       _ <- ES.findCategoriesByNames(NonEmptyList.of("Party")).check
       _ <- ES.findCategoriesByNamesAndPeriod(NonEmptyList.of("Party"), now(), now.plusDays(1)).check
       _ <- ES.saveEvents(Day(now, List())).check
