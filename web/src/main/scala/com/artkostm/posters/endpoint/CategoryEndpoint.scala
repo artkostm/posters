@@ -1,6 +1,6 @@
 package com.artkostm.posters.endpoint
 
-import cats.data.EitherT
+import cats.data.{EitherT, NonEmptyList}
 import cats.implicits._
 import cats.effect.Effect
 import com.artkostm.posters.ValidationError.{CategoriesNotFoundError, CategoryNotFoundError}
@@ -22,8 +22,9 @@ class CategoryEndpoint[F[_]: Effect](repository: EventStore[F], scraper: Scraper
     case GET -> Root / ApiVersion / "categories" / CategoryVar(categoryName) :? DateMatcher(date) as _ =>
       for {
         category <- EitherT
-                     .fromOptionF(repository.findByNameAndDate(categoryName.entryName, date),
-                                  CategoryNotFoundError(categoryName.entryName, date))
+                     .fromOptionF(
+                       repository.findByNamesAndDate(NonEmptyList.of(categoryName.entryName), date).map(_.headOption),
+                       CategoryNotFoundError(categoryName.entryName, date))
                      .value
         resp <- category.fold(H.handle, Ok(_))
       } yield resp
