@@ -47,6 +47,14 @@ object Dependencies {
     "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core"   % versions.jsoniter % Compile,
     "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % versions.jsoniter % Provided
   )
+  
+  lazy val kamon = Seq(
+    "io.kamon" %% "kamon-core" % "1.1.6",
+    "io.kamon" %% "kamon-http4s" % "1.0.11",
+    "io.kamon" %% "kamon-prometheus" % "1.1.1",
+    "io.kamon" %% "kamon-system-metrics" % "1.0.1",
+    "io.kamon" %% "kamon-zipkin" % "1.0.0"
+  )
 
   lazy val workerSpecific = Seq(
     "org.flywaydb"   % "flyway-core" % versions.flyway,
@@ -68,7 +76,7 @@ object Dependencies {
     "com.github.julien-truffaut" %% "monocle-core"  % versions.monocle,
     "org.typelevel"              %% "cats-mtl-core" % versions.cats_mtl,
     "com.olegpy"                 %% "meow-mtl"      % versions.catsMeowMtl
-  )
+  ) ++ kamon
 
   lazy val logging = Seq(
     "org.slf4j" % "slf4j-api"    % versions.slf4j,
