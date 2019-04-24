@@ -53,7 +53,7 @@ object Dependencies {
     "io.kamon" %% "kamon-http4s" % "1.0.11",
     "io.kamon" %% "kamon-prometheus" % "1.1.1",
     "io.kamon" %% "kamon-system-metrics" % "1.0.1",
-    "io.kamon" %% "kamon-zipkin" % "1.0.0"
+    "io.kamon" %% "kamon-jdbc" % "1.0.2"
   )
 
   lazy val workerSpecific = Seq(
