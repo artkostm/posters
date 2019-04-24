@@ -4,22 +4,13 @@ import cats.effect._
 import org.http4s.server.blaze._
 import org.http4s.implicits._
 import cats.implicits._
-import com.typesafe.config.Config
-import kamon.{Kamon, MetricReporter}
+import kamon.Kamon
 import kamon.http4s.middleware.server.KamonSupport
-import kamon.metric.PeriodSnapshot
+import kamon.prometheus.PrometheusReporter
 import org.http4s.server.{Router, Server}
 
 object Main extends IOApp {
-  Kamon.addReporter(new MetricReporter {
-    override def reportPeriodSnapshot(snapshot: PeriodSnapshot): Unit = println(s"Report: $snapshot")
-
-    override def start(): Unit = println("Start gathering metrics")
-
-    override def stop(): Unit = println("Stop gathering metrics")
-
-    override def reconfigure(config: Config): Unit = println(s"Reconfiguration using $config")
-  })
+  Kamon.addReporter(new PrometheusReporter())
 
   override def run(args: List[String]): IO[ExitCode] =
     server.use(_ => IO.never).as(ExitCode.Success)
