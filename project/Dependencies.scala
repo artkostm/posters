@@ -98,6 +98,7 @@ object Dependencies {
 
   lazy val integTests = commonTest ++ Seq(
     "com.dimafeng"       %% "testcontainers-scala" % versions.testcontainers,
-    "org.testcontainers" % "postgresql"            % versions.postgresContainer
+    "org.testcontainers" % "postgresql"            % versions.postgresContainer,
+    "org.tpolecat"       %% "doobie-scalatest"     % versions.doobie
   )
 }

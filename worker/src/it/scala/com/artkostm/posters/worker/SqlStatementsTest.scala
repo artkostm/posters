@@ -4,9 +4,8 @@ import java.time.LocalDate.now
 
 import cats.Monad
 import cats.data.NonEmptyList
-import cats.effect.{Clock, Concurrent, ContextShift, IO}
+import cats.effect.IO
 import cats.implicits._
-import cats.instances.option._
 import com.artkostm.posters.interfaces.event.{EventData, EventInfo}
 import com.artkostm.posters.interfaces.intent.Intent
 import com.artkostm.posters.interfaces.schedule.Day
@@ -17,7 +16,8 @@ import org.scalatest.FlatSpec
 
 import scala.concurrent.ExecutionContext
 
-class SqlStatementsTest extends FlatSpec with ForAllTestContainer{
+
+class SqlStatementsTest extends FlatSpec with ForAllTestContainer {
 
   override val container: Container = PostgreSQLContainer().configure { provider =>
     provider.withUsername("test")
@@ -25,8 +25,12 @@ class SqlStatementsTest extends FlatSpec with ForAllTestContainer{
     provider.withDatabaseName("postgres")
   }
 
+  implicit val testCs = IO.contextShift(ExecutionContext.Implicits.global)
 
-  "" should "" in {
+  implicit val testTimer = IO.timer(ExecutionContext.Implicits.global)
+
+
+  "Sql statements" should "succeed" in {
     WorkerModule.init[IO].map(_.xa.yolo).use { implicit yolo =>
       for {
         _ <- SqlStatementsTest.checkEventStore[IO]
