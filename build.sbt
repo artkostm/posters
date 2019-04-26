@@ -15,10 +15,9 @@ lazy val commonSettings = Seq(
     "-Xmacro-settings:print-codecs"
   ),
   resolvers ++= Seq(
-    "Twitter Maven" at "https://maven.twttr.com",
     Resolver.bintrayRepo("jmcardon", "tsec"),
     "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
-    "krasserm at bintray" at "http://dl.bintray.com/krasserm/maven"
+//    "krasserm at bintray" at "http://dl.bintray.com/krasserm/maven"
   )
 )
 
@@ -36,8 +35,10 @@ lazy val internal = (project in file("internal"))
   .dependsOn(interface)
 
 lazy val web = (project in file("web"))
+  .configs(IntegrationTest)
   .settings(
     commonSettings,
+    Defaults.itSettings,
     libraryDependencies ++= Dependencies.jsoniter,
     libraryDependencies ++= Dependencies.doobie,
     libraryDependencies ++= Dependencies.ciris,
@@ -49,16 +50,26 @@ lazy val web = (project in file("web"))
     addCompilerPlugin(Dependencies.betterMonadicFor)
   )
   .dependsOn(internal)
-  .enablePlugins(JavaAppPackaging)
+  .enablePlugins(JavaAgent, JavaAppPackaging)
+  .settings(
+    javaAgents += "org.aspectj" % "aspectjweaver" % "1.9.2"
+  )
 
 lazy val worker = (project in file("worker"))
+  .configs(IntegrationTest)
   .settings(
     commonSettings,
+    Defaults.itSettings,
     libraryDependencies ++= Dependencies.jsoniter,
     libraryDependencies ++= Dependencies.doobie,
     libraryDependencies ++= Dependencies.ciris,
     libraryDependencies ++= Dependencies.workerSpecific,
-    libraryDependencies ++= Dependencies.logging
+    libraryDependencies ++= Dependencies.logging,
+    libraryDependencies ++= integTesting(Dependencies.integTests)
   )
   .dependsOn(internal)
   .enablePlugins(JavaAppPackaging)
+
+
+def unitTesting(tests: Seq[ModuleID]) = tests.map(_ % Test)
+def integTesting(tests: Seq[ModuleID]) = tests.map(_ % IntegrationTest)
