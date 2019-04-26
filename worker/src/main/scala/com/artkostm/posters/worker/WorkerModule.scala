@@ -25,18 +25,3 @@ object WorkerModule {
       xa     <- DatabaseConfig.transactor[F](config.db): Resource[F, HikariTransactor[F]]
     } yield new WorkerModule[F](config, xa)
 }
-
-//class ISI[F[_]: Sync] extends InfoStore[F] {
-//  override def deleteOld(): F[Int] = Sync[F].delay {
-//    println("deleting old event info")
-//    0
-//  }
-//  override def save(info: EventInfo): F[EventInfo] = Sync[F].delay {
-//    println(s"saving event info $info")
-//    info
-//  }
-//  override def find(link: String): F[Option[EventInfo]] = Sync[F].delay {
-//    println(s"searching event info using $link")
-//    None
-//  }
-//}
