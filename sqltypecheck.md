@@ -1,6 +1,6 @@
-To check all the queries using Doobie, just run com.artkostm.posters.worker.sqlchecker class.
+To check all the queries using Doobie, just run com.artkostm.posters.worker.SqlStatementsTest.
 
-Here is the result (please note that you required to be connected to the real Postgres instance):
+Here is the result (please note that this required Docker to be installed on your machine):
 ```shell
 [scala-execution-context-global-11] INFO org.flywaydb.core.internal.util.VersionPrinter - Flyway Community Edition 5.1.4 by Boxfuse
 [scala-execution-context-global-11] INFO org.flywaydb.core.internal.database.DatabaseFactory - Database: jdbc:postgresql://192.168.99.100:5432/postgres (PostgreSQL 9.6)
