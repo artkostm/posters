@@ -46,6 +46,8 @@ lazy val web = (project in file("web"))
     libraryDependencies ++= Dependencies.webSpecific,
     libraryDependencies ++= Dependencies.logging,
     libraryDependencies += "io.higherkindness" %% "droste-core" % "0.6.0",
+    libraryDependencies ++= unitTesting(Dependencies.commonTest),
+    libraryDependencies ++= integTesting(Dependencies.integTests),
     addCompilerPlugin(Dependencies.kindProjector),
     addCompilerPlugin(Dependencies.betterMonadicFor)
   )
