@@ -26,7 +26,6 @@ class SqlStatementsTest extends FlatSpec with ForAllTestContainer {
   }
 
   implicit val testCs = IO.contextShift(ExecutionContext.Implicits.global)
-
   implicit val testTimer = IO.timer(ExecutionContext.Implicits.global)
 
 
