@@ -7,6 +7,10 @@ import com.artkostm.posters.interfaces.dialog.DateRange
 import com.artkostm.posters.interfaces.dialog.v1.{DialogflowRequest => DFR1, Period => P1}
 import com.artkostm.posters.interfaces.dialog.v2.{DialogflowRequest => DFR2, Period => P2}
 
+/**
+  * A type class to extract data from Dialogflow requests for both V1 and V2
+  * @tparam DfRequest
+  */
 trait DfKeyData[DfRequest] {
   type Period <: DateRange
   def categories(request: DfRequest): List[String]

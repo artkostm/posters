@@ -4,19 +4,44 @@ import java.time.LocalDate.now
 
 import cats.Monad
 import cats.data.NonEmptyList
-import cats.effect.{ExitCode, IO, IOApp}
+import cats.effect.IO
 import cats.implicits._
 import com.artkostm.posters.interfaces.event.{EventData, EventInfo}
 import com.artkostm.posters.interfaces.intent.Intent
 import com.artkostm.posters.interfaces.schedule.Day
-import com.artkostm.posters.interpreter.{
-  EventStoreInterpreter => ES,
-  InfoStoreInterpreter => IS,
-  VisitorStoreInterpreter => VS
-}
+import com.dimafeng.testcontainers.{Container, ForAllTestContainer, PostgreSQLContainer}
+import com.artkostm.posters.interpreter.{EventStoreInterpreter => ES, InfoStoreInterpreter => IS, VisitorStoreInterpreter => VS}
 import doobie.util.yolo.Yolo
+import org.scalatest.FlatSpec
 
-object sqlchecker extends IOApp {
+import scala.concurrent.ExecutionContext
+
+
+class SqlStatementsTest extends FlatSpec with ForAllTestContainer {
+
+  override val container: Container = PostgreSQLContainer().configure { provider =>
+    provider.withUsername("test")
+    provider.withPassword("12345")
+    provider.withDatabaseName("postgres")
+  }
+
+  implicit val testCs = IO.contextShift(ExecutionContext.Implicits.global)
+  implicit val testTimer = IO.timer(ExecutionContext.Implicits.global)
+
+
+  "Sql statements" should "succeed" in {
+    WorkerModule.init[IO].map(_.xa.yolo).use { implicit yolo =>
+      for {
+        _ <- SqlStatementsTest.checkEventStore[IO]
+        _ <- SqlStatementsTest.checkInfoStore[IO]
+        _ <- SqlStatementsTest.checkVisitorStore[IO]
+      } yield ()
+    }.unsafeRunSync()
+  }
+
+}
+
+object SqlStatementsTest {
   def checkEventStore[F[_]: Monad](implicit y: Yolo[F]): F[Unit] = {
     import y._
     for {
@@ -50,13 +75,4 @@ object sqlchecker extends IOApp {
       _ <- VS.plainUser(Intent(now().minusDays(4), "testEvent", "12")).check
     } yield ()
   }
-
-  override def run(args: List[String]): IO[ExitCode] =
-    WorkerModule.init[IO].map(_.xa.yolo).use { implicit yolo =>
-      for {
-        _ <- checkEventStore[IO]
-        _ <- checkInfoStore[IO]
-        _ <- checkVisitorStore[IO]
-      } yield ExitCode.Success
-    }
 }

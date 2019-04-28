@@ -12,12 +12,17 @@ object Dependencies {
     val flyway           = "5.1.4"
     val tsec             = "0.1.0-M2"
     val fs2              = "1.0.3"
-    val monocle          = "1.5.0" // is it really needed???
     val slf4j            = "1.7.25"
     val cats_mtl         = "0.4.0"
     val kindProjector    = "0.9.9"
     val betterMonadicFor = "0.3.0-M4"
     val catsMeowMtl      = "0.2.0"
+
+    val scalaTest         = "3.0.7"
+    val scalaCheck        = "1.14.0"
+    val scalaMock         = "4.1.0"
+    val testcontainers    = "0.25.0"
+    val postgresContainer = "1.11.2"
   }
 
   val scraper  = "net.ruippeixotog"   %% "scala-scraper"  % versions.scraper
@@ -48,6 +53,14 @@ object Dependencies {
     "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % versions.jsoniter % Provided
   )
 
+  lazy val kamon = Seq(
+    "io.kamon" %% "kamon-core"           % "1.1.6",
+    "io.kamon" %% "kamon-http4s"         % "1.0.11",
+    "io.kamon" %% "kamon-prometheus"     % "1.1.1",
+    "io.kamon" %% "kamon-system-metrics" % "1.0.1",
+    "io.kamon" %% "kamon-jdbc"           % "1.0.2"
+  )
+
   lazy val workerSpecific = Seq(
     "org.flywaydb"   % "flyway-core" % versions.flyway,
     "co.fs2"         %% "fs2-core"   % versions.fs2,
@@ -63,12 +76,11 @@ object Dependencies {
   ) ++ ciris.map(_                          % Provided) ++ doobie.map(_ % Provided) ++ http4s.map(_ % Provided)
 
   lazy val webSpecific = Seq(
-    "io.github.jmcardon"         %% "tsec-jwt-mac"  % versions.tsec,
-    "org.postgresql"             % "postgresql"     % versions.postgres,
-    "com.github.julien-truffaut" %% "monocle-core"  % versions.monocle,
-    "org.typelevel"              %% "cats-mtl-core" % versions.cats_mtl,
-    "com.olegpy"                 %% "meow-mtl"      % versions.catsMeowMtl
-  )
+    "io.github.jmcardon" %% "tsec-jwt-mac"  % versions.tsec,
+    "org.postgresql"     % "postgresql"     % versions.postgres,
+    "org.typelevel"      %% "cats-mtl-core" % versions.cats_mtl, // TODO: remove
+    "com.olegpy"         %% "meow-mtl"      % versions.catsMeowMtl // TODO: remove
+  ) ++ kamon
 
   lazy val logging = Seq(
     "org.slf4j" % "slf4j-api"    % versions.slf4j,
@@ -77,4 +89,16 @@ object Dependencies {
 
   lazy val kindProjector    = "org.spire-math" %% "kind-projector"     % versions.kindProjector
   lazy val betterMonadicFor = "com.olegpy"     %% "better-monadic-for" % versions.betterMonadicFor
+
+  lazy val commonTest = Seq(
+    "org.scalatest"  %% "scalatest"  % versions.scalaTest,
+    "org.scalacheck" %% "scalacheck" % versions.scalaCheck,
+    "org.scalamock"  %% "scalamock"  % versions.scalaMock
+  )
+
+  lazy val integTests = commonTest ++ Seq(
+    "com.dimafeng"       %% "testcontainers-scala" % versions.testcontainers,
+    "org.testcontainers" % "postgresql"            % versions.postgresContainer,
+    "org.tpolecat"       %% "doobie-scalatest"     % versions.doobie
+  )
 }
