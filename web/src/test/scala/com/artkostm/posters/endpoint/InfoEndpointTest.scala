@@ -52,8 +52,32 @@ class InfoEndpointTest
     }
   }
 
+  "InfoEndpoint" should "return error for the link that does not exist" in {
+    val infoRepo = mock[InfoStore[IO]]
+
+    val infoEndpoint = new InfoEndpoint[IO](infoRepo)
+
+    forAll { (link: Link, user: User) =>
+      givenInfoStoreReturnsNone(infoRepo)
+      (
+        for {
+          response <- infoEndpoint.endpoints.orNotFound(
+            AuthedRequest(user,
+              Request[IO](Method.GET, Uri.unsafeFromString(s"/v1/events?link=${link.value}"))))
+        } yield {
+          response.status shouldEqual NotFound
+        }
+        ).unsafeRunSync()
+    }
+  }
+
   def givenInfoStoreReturnsEventInfo(store: InfoStore[IO]) =
     (store.find _) expects (*) onCall { l: String =>
       IO.pure(Some(EventInfo(l, EventData("description", List(), List()))))
+    }
+
+  def givenInfoStoreReturnsNone(store: InfoStore[IO]) =
+    (store.find _) expects (*) onCall { _: String =>
+      IO.pure(None)
     }
 }
