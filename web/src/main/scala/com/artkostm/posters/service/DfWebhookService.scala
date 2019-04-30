@@ -17,7 +17,7 @@ import com.artkostm.posters.service.DfKeyData._
 class DfWebhookService[F[_]: Monad](repository: EventStore[F]) {
 
   def processRequest[DfRequest: DfKeyData](request: DfRequest): ET[F, DfWebhookError, ResponsePayload] =
-    if (request.incomplete) {
+    if (!request.incomplete) {
       (request.date, request.period) match {
         case (Some(date), _) =>
           if (request.hasAllCategory) {
@@ -37,7 +37,7 @@ class DfWebhookService[F[_]: Monad](repository: EventStore[F]) {
                 .map(days => ResponsePayload(days.flatMap(_.categories))))
           } else {
             ET.liftF(
-              repository
+              repository             // TODO: fix unsafe call
                 .findByNamesAndPeriod(NonEmptyList.fromListUnsafe(request.categories), period.startDate, period.endDate)
                 .map(ResponsePayload(_)))
           }
