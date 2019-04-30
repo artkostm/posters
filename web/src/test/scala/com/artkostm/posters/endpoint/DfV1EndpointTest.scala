@@ -2,7 +2,6 @@ package com.artkostm.posters.endpoint
 
 import java.time.LocalDate
 
-import cats.data.NonEmptyList
 import cats.effect.IO
 import com.artkostm.posters.algebra.EventStore
 import com.artkostm.posters.endpoint.error.HttpErrorHandler
@@ -62,6 +61,18 @@ class DfV1EndpointTest
       val request = dfRequest.copy(
         result = dfRequest.result.copy(parameters =
           dfRequest.result.parameters.copy(datetime = dfRequest.result.parameters.datetime.copy(None, None))))
+      callEndpoint(endpoint, request, user).map(_.status shouldEqual BadRequest).unsafeRunSync()
+    }
+  }
+
+  "Dialogflow Endpoint V1" should "return error on empty category list" in {
+    val eventStore     = mock[EventStore[IO]]
+    val webhookService = new DfWebhookService[IO](eventStore)
+    val endpoint       = new DfWebhookEndpoint[IO](webhookService)
+
+    forAll { (dfRequest: DialogflowRequest, user: User) =>
+      givenEventStoreReturnsCorrectData(eventStore)
+      val request = dfRequest.copy(result = dfRequest.result.copy(parameters = dfRequest.result.parameters.copy(category = List())))
       callEndpoint(endpoint, request, user).map(_.status shouldEqual BadRequest).unsafeRunSync()
     }
   }
