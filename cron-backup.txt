@@ -1,0 +1,2 @@
+# run worker every day at 2am
+00 2 * * *   java -jar target/universal/stage/bin/worker
