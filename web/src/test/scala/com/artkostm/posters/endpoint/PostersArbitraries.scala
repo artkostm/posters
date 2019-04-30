@@ -22,7 +22,7 @@ import com.artkostm.posters.interfaces.event.{Comment, EventData, EventInfo}
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary.arbitrary
 
-trait PostersArbitraries {
+trait PostersArbitraries extends BaseArbitraries with DialogflowV1Arbitraries {
   case class Link(value: String)
 
   implicit val link = Arbitrary[Link] {
@@ -35,14 +35,14 @@ trait PostersArbitraries {
     for {
       author <- Gen.alphaStr
       date   <- Gen.alphaNumStr
-      text   <- Gen.asciiPrintableStr
+      text   <- Gen.alphaNumStr
       rating <- Gen.option(Gen.alphaStr)
     } yield Comment(author, date, text, rating)
   }
 
   implicit val eventData = Arbitrary[EventData] {
     for {
-      description <- Gen.asciiPrintableStr
+      description <- Gen.alphaNumStr
       numPhotos   <- Gen.choose(1, 10)
       photos      <- Gen.listOfN(numPhotos, Gen.alphaStr).map(_.map(x => s"https://$x.jpg"))
       numComments <- Gen.choose(1, 10)
@@ -77,15 +77,15 @@ trait DialogflowV1Arbitraries { this: BaseArbitraries =>
 
   implicit val datetime1 = Arbitrary[Datetime] {
     for {
-      date   <- Gen.option(arbitrary[LocalDate](this.localDate))
-      p      <- Gen.option(arbitrary[Period])
-      period = if (date.isDefined) None else p
-    } yield Datetime(date, period)
+      date   <- arbitrary[LocalDate](this.localDate)
+      p      <- arbitrary[Period]
+      isDate <- Gen.oneOf(true, false)
+    } yield Datetime(if (isDate) Some(date) else None, if (isDate) None else Some(p))
   }
 
   implicit val parameters = Arbitrary[Parameters] {
     for {
-      numCategories <- Gen.choose(0, 8)
+      numCategories <- Gen.choose(1, 8)
       category      <- Gen.containerOfN[List, categories.Category](numCategories, Gen.oneOf(categories.Category.values))
       datetime      <- arbitrary[Datetime]
     } yield Parameters(category.map(_.entryName), datetime)
@@ -95,7 +95,7 @@ trait DialogflowV1Arbitraries { this: BaseArbitraries =>
     for {
       datetime         <- Gen.alphaNumStr
       datetimeOriginal <- Gen.alphaNumStr
-      numCategories    <- Gen.choose(0, 8)
+      numCategories    <- Gen.choose(1, 8)
       category         <- Gen.containerOfN[List, categories.Category](numCategories, Gen.oneOf(categories.Category.values))
     } yield
       ContextParams(datetime, datetimeOriginal, category.map(_.entryName), category.map(_.entryName).mkString(","))
@@ -105,7 +105,7 @@ trait DialogflowV1Arbitraries { this: BaseArbitraries =>
     for {
       name       <- Gen.alphaStr
       parameters <- arbitrary[ContextParams]
-      lifespan   <- Gen.posNum
+      lifespan   <- Gen.posNum[Int]
     } yield Context(name, parameters, lifespan)
   }
 
@@ -120,7 +120,7 @@ trait DialogflowV1Arbitraries { this: BaseArbitraries =>
 
   implicit val message = Arbitrary[Message] {
     for {
-      tpe    <- Gen.posNum
+      tpe    <- Gen.posNum[Int]
       speech <- Gen.alphaStr
     } yield Message(tpe, speech)
   }
@@ -139,7 +139,7 @@ trait DialogflowV1Arbitraries { this: BaseArbitraries =>
       resolvedQuery    <- Gen.alphaUpperStr
       speech           <- Gen.option(Gen.alphaStr)
       action           <- Gen.alphaStr
-      actionIncomplete <- Gen.oneOf(true, false)
+      actionIncomplete <- Gen.const(true)
       parameters       <- arbitrary[Parameters]
       numContexts      <- Gen.choose(0, 10)
       contexts         <- Gen.listOfN(numContexts, arbitrary[Context])
@@ -161,7 +161,7 @@ trait DialogflowV1Arbitraries { this: BaseArbitraries =>
 
   implicit val status = Arbitrary[Status] {
     for {
-      code            <- Gen.posNum
+      code            <- Gen.posNum[Int]
       errorType       <- Gen.alphaStr
       webhookTimedOut <- Gen.option(Gen.oneOf(true, false))
     } yield Status(code, errorType, webhookTimedOut)
