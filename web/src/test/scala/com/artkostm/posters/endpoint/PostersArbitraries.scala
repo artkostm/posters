@@ -139,7 +139,7 @@ trait DialogflowV1Arbitraries { this: BaseArbitraries =>
       resolvedQuery    <- Gen.alphaUpperStr
       speech           <- Gen.option(Gen.alphaStr)
       action           <- Gen.alphaStr
-      actionIncomplete <- Gen.const(true)
+      actionIncomplete <- Gen.const(false)
       parameters       <- arbitrary[Parameters]
       numContexts      <- Gen.choose(0, 10)
       contexts         <- Gen.listOfN(numContexts, arbitrary[Context])
