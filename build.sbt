@@ -16,8 +16,7 @@ lazy val commonSettings = Seq(
   ),
   resolvers ++= Seq(
     Resolver.bintrayRepo("jmcardon", "tsec"),
-    "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
-//    "krasserm at bintray" at "http://dl.bintray.com/krasserm/maven"
+    "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
   )
 )
 
@@ -45,7 +44,6 @@ lazy val web = (project in file("web"))
     libraryDependencies ++= Dependencies.http4s,
     libraryDependencies ++= Dependencies.webSpecific,
     libraryDependencies ++= Dependencies.logging,
-    libraryDependencies += "io.higherkindness" %% "droste-core" % "0.6.0",
     libraryDependencies ++= unitTesting(Dependencies.commonTest),
     libraryDependencies ++= integTesting(Dependencies.integTests),
     addCompilerPlugin(Dependencies.kindProjector),

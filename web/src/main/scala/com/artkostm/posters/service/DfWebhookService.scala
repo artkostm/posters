@@ -17,17 +17,18 @@ import com.artkostm.posters.service.DfKeyData._
 class DfWebhookService[F[_]: Monad](repository: EventStore[F]) {
 
   def processRequest[DfRequest: DfKeyData](request: DfRequest): ET[F, DfWebhookError, ResponsePayload] =
-    if (request.incomplete) {
+    if (!request.incomplete) {
       (request.date, request.period) match {
         case (Some(date), _) =>
           if (request.hasAllCategory) {
             ET.fromOptionF(repository.findByDate(date).map(o => o.map(day => ResponsePayload(day.categories))),
                            DfWebhookError(s"Cannot find event day using date=$date"))
           } else {
-            ET.liftF(
-              repository
-                .findByNamesAndDate(NonEmptyList.fromListUnsafe(request.categories), date)
-                .map(ResponsePayload(_)))
+            ET.fromOption[F](NonEmptyList.fromList(request.categories),
+                             DfWebhookError(s"List of categories cannot be empty!"))
+              .flatMap { categories =>
+                ET.liftF(repository.findByNamesAndDate(categories, date).map(ResponsePayload(_)))
+              }
           }
         case (_, Some(period)) =>
           if (request.hasAllCategory) {
@@ -36,10 +37,12 @@ class DfWebhookService[F[_]: Monad](repository: EventStore[F]) {
                 .findByPeriod(period.startDate, period.endDate)
                 .map(days => ResponsePayload(days.flatMap(_.categories))))
           } else {
-            ET.liftF(
-              repository
-                .findByNamesAndPeriod(NonEmptyList.fromListUnsafe(request.categories), period.startDate, period.endDate)
-                .map(ResponsePayload(_)))
+            ET.fromOption[F](NonEmptyList.fromList(request.categories),
+                             DfWebhookError(s"List of categories cannot be empty!"))
+              .flatMap { categories =>
+                ET.liftF(
+                  repository.findByNamesAndPeriod(categories, period.startDate, period.endDate).map(ResponsePayload(_)))
+              }
           }
         case _ => ET.leftT(DfWebhookError("Cannot extract date or period!"))
       }
