@@ -25,7 +25,7 @@ class DfWebhookService[F[_]: Monad](repository: EventStore[F]) {
                            DfWebhookError(s"Cannot find event day using date=$date"))
           } else {
             ET.fromOption[F](NonEmptyList.fromList(request.categories),
-                             DfWebhookError(s"List of categories cannot be empty!"))
+                             DfWebhookError("List of categories cannot be empty!"))
               .flatMap { categories =>
                 ET.liftF(repository.findByNamesAndDate(categories, date).map(ResponsePayload(_)))
               }
@@ -38,7 +38,7 @@ class DfWebhookService[F[_]: Monad](repository: EventStore[F]) {
                 .map(days => ResponsePayload(days.flatMap(_.categories))))
           } else {
             ET.fromOption[F](NonEmptyList.fromList(request.categories),
-                             DfWebhookError(s"List of categories cannot be empty!"))
+                             DfWebhookError("List of categories cannot be empty!"))
               .flatMap { categories =>
                 ET.liftF(
                   repository.findByNamesAndPeriod(categories, period.startDate, period.endDate).map(ResponsePayload(_)))
