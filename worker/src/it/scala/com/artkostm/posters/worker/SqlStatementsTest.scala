@@ -1,6 +1,7 @@
 package com.artkostm.posters.worker
 
 import java.time.LocalDate.now
+import java.util
 
 import cats.Monad
 import cats.data.NonEmptyList
@@ -9,7 +10,7 @@ import cats.implicits._
 import com.artkostm.posters.interfaces.event.{EventData, EventInfo}
 import com.artkostm.posters.interfaces.intent.Intent
 import com.artkostm.posters.interfaces.schedule.Day
-import com.dimafeng.testcontainers.{Container, ForAllTestContainer, PostgreSQLContainer}
+import com.dimafeng.testcontainers.{Container, ForAllTestContainer, GenericContainer}
 import com.artkostm.posters.interpreter.{EventStoreInterpreter => ES, InfoStoreInterpreter => IS, VisitorStoreInterpreter => VS}
 import doobie.util.yolo.Yolo
 import org.scalatest.FlatSpec
@@ -19,10 +20,10 @@ import scala.concurrent.ExecutionContext
 
 class SqlStatementsTest extends FlatSpec with ForAllTestContainer {
 
-  override val container: Container = PostgreSQLContainer().configure { provider =>
-    provider.withUsername("test")
-    provider.withPassword("12345")
-    provider.withDatabaseName("postgres")
+  override val container: Container = GenericContainer("postgres:9.6-alpine").configure { provider =>
+    provider.addEnv("POSTGRES_USER", "test")
+    provider.addEnv("POSTGRES_PASSWORD", "12345")
+    provider.setPortBindings(util.Arrays.asList("5432:5432"))
   }
 
   implicit val testCs = IO.contextShift(ExecutionContext.Implicits.global)
