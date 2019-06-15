@@ -47,6 +47,6 @@ class DfWebhookService[F[_]: Monad](repository: EventStore[F]) {
 
   private def fromCategoryList(categories: List[String])(
       payloadf: NonEmptyList[String] => F[ResponsePayload]): ET[F, DfWebhookError, ResponsePayload] =
-    ET.fromOption[F](NonEmptyList.fromList(categories), DfWebhookError(s"List of categories cannot be empty!"))
+    ET.fromOption[F](NonEmptyList.fromList(categories), DfWebhookError("List of categories cannot be empty!"))
       .flatMap(categories => ET.liftF(payloadf(categories)))
 }

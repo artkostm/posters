@@ -12,8 +12,6 @@ import com.artkostm.posters.interpreter.{
 import com.artkostm.posters.scraper.{AfishaScraper, Scraper}
 import doobie.hikari.HikariTransactor
 import cats.syntax.semigroupk._
-import cats.syntax.functor._
-import com.olegpy.meow.hierarchy._
 import com.artkostm.posters.Configuration.DatabaseConfig
 import com.artkostm.posters.endpoint.auth.JwtTokenAuthMiddleware
 import com.artkostm.posters.endpoint.error.HttpErrorHandler
