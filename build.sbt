@@ -9,7 +9,7 @@ lazy val commonSettings = Seq(
     "-language:existentials",
     "-language:implicitConversions",
     "-Ypartial-unification",
-    "-Xmacro-settings:print-codecs"
+    //"-Xmacro-settings:print-codecs" // to debug jsoniter codecs
   ),
   resolvers ++= Seq(
     Resolver.bintrayRepo("jmcardon", "tsec"),

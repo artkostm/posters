@@ -51,7 +51,7 @@ object Dependencies {
 
   lazy val kamon = Seq(
     "io.kamon" %% "kamon-core"           % "1.1.6",
-    "io.kamon" %% "kamon-http4s"         % "1.0.11",
+    "io.kamon" %% "kamon-http4s"         % "1.0.12",
     "io.kamon" %% "kamon-prometheus"     % "1.1.1",
     "io.kamon" %% "kamon-system-metrics" % "1.0.1",
     "io.kamon" %% "kamon-jdbc"           % "1.0.2"
