@@ -9,6 +9,7 @@ import kamon.http4s.middleware.server.KamonSupport
 import kamon.prometheus.PrometheusReporter
 import org.http4s.server.{Router, Server}
 
+
 object Main extends IOApp {
   Kamon.addReporter(new PrometheusReporter())
 
