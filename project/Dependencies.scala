@@ -4,30 +4,26 @@ object Dependencies {
   val versions = new {
     val scraper          = "2.1.0"
     val hikaricp         = "3.2.3"
-    val postgres         = "9.4.1208"
+    val postgres         = "42.2.5"
     val ciris            = "0.12.1"
-    val doobie           = "0.6.0"
-    val http4s           = "0.20.0-M6"
+    val doobie           = "0.7.0"
+    val http4s           = "0.20.3"
     val jsoniter         = "0.41.0"
     val flyway           = "5.1.4"
     val tsec             = "0.1.0-M2"
-    val fs2              = "1.0.3"
+    val fs2              = "1.0.5"
     val slf4j            = "1.7.25"
-    val cats_mtl         = "0.4.0"
     val kindProjector    = "0.9.9"
     val betterMonadicFor = "0.3.0-M4"
-    val catsMeowMtl      = "0.2.0"
+    val catsCommon       = "1.6.1"
+    val catsEffect       = "1.3.1"
 
     val scalaTest         = "3.0.7"
     val scalaCheck        = "1.14.0"
     val scalaMock         = "4.1.0"
-    val testcontainers    = "0.25.0"
+    val testcontainers    = "0.26.0"
     val postgresContainer = "1.11.2"
   }
-
-  val scraper  = "net.ruippeixotog"   %% "scala-scraper"  % versions.scraper
-  val hikaricp = "com.typesafe.slick" %% "slick-hikaricp" % versions.hikaricp
-  val postgres = "org.postgresql"     % "postgresql"      % versions.postgres
 
   lazy val ciris = Seq(
     "is.cir" %% "ciris-core",
@@ -55,7 +51,7 @@ object Dependencies {
 
   lazy val kamon = Seq(
     "io.kamon" %% "kamon-core"           % "1.1.6",
-    "io.kamon" %% "kamon-http4s"         % "1.0.11",
+    "io.kamon" %% "kamon-http4s"         % "1.0.12",
     "io.kamon" %% "kamon-prometheus"     % "1.1.1",
     "io.kamon" %% "kamon-system-metrics" % "1.0.1",
     "io.kamon" %% "kamon-jdbc"           % "1.0.2"
@@ -71,15 +67,12 @@ object Dependencies {
     "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core"    % versions.jsoniter % Provided,
     "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros"  % versions.jsoniter % Provided,
     "org.postgresql"                        % "postgresql"              % versions.postgres % Provided,
-    "net.ruippeixotog"                      %% "scala-scraper"          % versions.scraper,
-    "com.lihaoyi"                           %% "fastparse"              % "2.1.0"
+    "net.ruippeixotog"                      %% "scala-scraper"          % versions.scraper
   ) ++ ciris.map(_                          % Provided) ++ doobie.map(_ % Provided) ++ http4s.map(_ % Provided)
 
   lazy val webSpecific = Seq(
-    "io.github.jmcardon" %% "tsec-jwt-mac"  % versions.tsec,
-    "org.postgresql"     % "postgresql"     % versions.postgres,
-    "org.typelevel"      %% "cats-mtl-core" % versions.cats_mtl, // TODO: remove
-    "com.olegpy"         %% "meow-mtl"      % versions.catsMeowMtl // TODO: remove
+    "io.github.jmcardon" %% "tsec-jwt-mac" % versions.tsec,
+    "org.postgresql"     % "postgresql"    % versions.postgres
   ) ++ kamon
 
   lazy val logging = Seq(
@@ -93,12 +86,19 @@ object Dependencies {
   lazy val commonTest = Seq(
     "org.scalatest"  %% "scalatest"  % versions.scalaTest,
     "org.scalacheck" %% "scalacheck" % versions.scalaCheck,
-    "org.scalamock"  %% "scalamock"  % versions.scalaMock
+    "org.scalamock"  %% "scalamock"  % versions.scalaMock,
   )
 
   lazy val integTests = commonTest ++ Seq(
     "com.dimafeng"       %% "testcontainers-scala" % versions.testcontainers,
     "org.testcontainers" % "postgresql"            % versions.postgresContainer,
-    "org.tpolecat"       %% "doobie-scalatest"     % versions.doobie
+    "org.tpolecat"       %% "doobie-scalatest"     % versions.doobie,
+  )
+
+  lazy val commonOverrides = Seq(
+    "org.typelevel" %% "cats-effect" % versions.catsEffect,
+    "org.typelevel" %% "cats-core"   % versions.catsCommon,
+    "org.typelevel" %% "cats-macros" % versions.catsCommon,
+    "co.fs2"        %% "fs2-core"    % versions.fs2,
   )
 }

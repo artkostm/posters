@@ -36,6 +36,7 @@ object DoobieMigration {
 
     flyway.setDataSource(config.db.url, config.db.user, config.db.password)
     flyway.setLocations(location)
+    flyway.setBaselineOnMigrate(true)
     flyway.migrate()
   }
 }

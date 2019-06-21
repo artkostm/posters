@@ -24,11 +24,9 @@ class DfWebhookService[F[_]: Monad](repository: EventStore[F]) {
             ET.fromOptionF(repository.findByDate(date).map(o => o.map(day => ResponsePayload(day.categories))),
                            DfWebhookError(s"Cannot find event day using date=$date"))
           } else {
-            ET.fromOption[F](NonEmptyList.fromList(request.categories),
-                             DfWebhookError(s"List of categories cannot be empty!"))
-              .flatMap { categories =>
-                ET.liftF(repository.findByNamesAndDate(categories, date).map(ResponsePayload(_)))
-              }
+            fromCategoryList(request.categories) { categories =>
+              repository.findByNamesAndDate(categories, date).map(ResponsePayload(_))
+            }
           }
         case (_, Some(period)) =>
           if (request.hasAllCategory) {
@@ -37,12 +35,9 @@ class DfWebhookService[F[_]: Monad](repository: EventStore[F]) {
                 .findByPeriod(period.startDate, period.endDate)
                 .map(days => ResponsePayload(days.flatMap(_.categories))))
           } else {
-            ET.fromOption[F](NonEmptyList.fromList(request.categories),
-                             DfWebhookError(s"List of categories cannot be empty!"))
-              .flatMap { categories =>
-                ET.liftF(
-                  repository.findByNamesAndPeriod(categories, period.startDate, period.endDate).map(ResponsePayload(_)))
-              }
+            fromCategoryList(request.categories) { categories =>
+              repository.findByNamesAndPeriod(categories, period.startDate, period.endDate).map(ResponsePayload(_))
+            }
           }
         case _ => ET.leftT(DfWebhookError("Cannot extract date or period!"))
       }
@@ -50,4 +45,8 @@ class DfWebhookService[F[_]: Monad](repository: EventStore[F]) {
       ET.leftT(DfWebhookError("Action is incomplete!"))
     }
 
+  private def fromCategoryList(categories: List[String])(
+      payloadf: NonEmptyList[String] => F[ResponsePayload]): ET[F, DfWebhookError, ResponsePayload] =
+    ET.fromOption[F](NonEmptyList.fromList(categories), DfWebhookError("List of categories cannot be empty!"))
+      .flatMap(categories => ET.liftF(payloadf(categories)))
 }

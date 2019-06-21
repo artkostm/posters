@@ -16,7 +16,7 @@ class VisitorsService[F[_]: Monad](repository: VisitorStore[F], validator: Visit
 
   def findIntent(eventName: String, date: LocalDate): EitherT[F, IntentDoesNotExistError, Intents] =
     EitherT.fromOptionF(repository.find(date, eventName), IntentDoesNotExistError(eventName, date))
-  
+
   def saveOrUpdateIntent(role: String, intent: Intent): EitherT[F, RoleDoesNotExistError, Intents] =
     on[RoleDoesNotExistError, Intents](role) {
       EitherT.liftF(repository.asPlainUser(intent))
@@ -28,6 +28,7 @@ class VisitorsService[F[_]: Monad](repository: VisitorStore[F], validator: Visit
 
   def leaveEvent(intent: Intent, user: User): EitherT[F, ValidationError, Intents] =
     for {
+      // TODO: try to do this in the same transaction
       intents <- validator.exists(intent)
       role    = user.role
       userId  = user.id
