@@ -11,14 +11,14 @@ import com.artkostm.posters.jsoniter._
 import com.artkostm.posters.jsoniter.codecs._
 import com.artkostm.posters.interfaces.auth.User
 import com.artkostm.posters.scraper.Scraper
-import org.http4s.AuthedService
+import org.http4s.AuthedRoutes
 import org.http4s.dsl.Http4sDsl
 
 class CategoryEndpoint[F[_]: Sync](repository: EventStore[F], scraper: Scraper[F])(implicit H: HttpErrorHandler[F])
     extends Http4sDsl[F]
     with EndpointsAware[F] {
 
-  private def getCategoryByName(): AuthedService[User, F] = AuthedService {
+  private def getCategoryByName(): AuthedRoutes[User, F] = AuthedRoutes.of {
     case GET -> Root / ApiVersion / "categories" / CategoryVar(categoryName) :? DateMatcher(date) as _ =>
       for {
         category <- EitherT
@@ -30,7 +30,7 @@ class CategoryEndpoint[F[_]: Sync](repository: EventStore[F], scraper: Scraper[F
       } yield resp
   }
 
-  private def getDay(): AuthedService[User, F] = AuthedService {
+  private def getDay(): AuthedRoutes[User, F] = AuthedRoutes.of {
     case GET -> Root / ApiVersion / "categories" :? DateMatcher(date) as _ =>
       for {
         category <- EitherT
@@ -40,7 +40,7 @@ class CategoryEndpoint[F[_]: Sync](repository: EventStore[F], scraper: Scraper[F
       } yield resp
   }
 
-  override def endpoints: AuthedService[User, F] = getCategoryByName() <+> getDay()
+  override def endpoints: AuthedRoutes[User, F] = getCategoryByName() <+> getDay()
 }
 
 object CategoryEndpoint {

@@ -8,14 +8,14 @@ import com.artkostm.posters.jsoniter.codecs._
 import com.artkostm.posters.interfaces.auth.User
 import com.artkostm.posters.interfaces.intent.Intent
 import com.artkostm.posters.service.VisitorsService
-import org.http4s.AuthedService
+import org.http4s.AuthedRoutes
 import org.http4s.dsl.Http4sDsl
 
 class VisitorEndpoint[F[_]: Sync](service: VisitorsService[F])(implicit H: HttpErrorHandler[F])
     extends Http4sDsl[F]
     with EndpointsAware[F] {
 
-  private def saveVisitors(): AuthedService[User, F] = AuthedService {
+  private def saveVisitors(): AuthedRoutes[User, F] = AuthedRoutes.of {
     case authed @ POST -> Root / ApiVersion / "visitors" as User(_, role, _) =>
       for {
         intent  <- authed.req.as[Intent]
@@ -24,7 +24,7 @@ class VisitorEndpoint[F[_]: Sync](service: VisitorsService[F])(implicit H: HttpE
       } yield resp
   }
 
-  private def leaveEvent(): AuthedService[User, F] = AuthedService {
+  private def leaveEvent(): AuthedRoutes[User, F] = AuthedRoutes.of {
     case authed @ DELETE -> Root / ApiVersion / "visitors" as user =>
       for {
         intent  <- authed.req.as[Intent]
@@ -33,7 +33,7 @@ class VisitorEndpoint[F[_]: Sync](service: VisitorsService[F])(implicit H: HttpE
       } yield resp
   }
 
-  private def findEvent(): AuthedService[User, F] = AuthedService {
+  private def findEvent(): AuthedRoutes[User, F] = AuthedRoutes.of {
     case GET -> Root / ApiVersion / "visitors" :? EventNameMatcher(eventName) +& DateMatcher(date) as _ =>
       for {
         intents <- service.findIntent(eventName, date).value
@@ -41,9 +41,9 @@ class VisitorEndpoint[F[_]: Sync](service: VisitorsService[F])(implicit H: HttpE
       } yield resp
   }
 
-  override def endpoints: AuthedService[User, F] = findEvent()
+  override def endpoints: AuthedRoutes[User, F] = findEvent()
 
-  def throttled: AuthedService[User, F] = saveVisitors() <+> leaveEvent()
+  def throttled: AuthedRoutes[User, F] = saveVisitors() <+> leaveEvent()
 }
 
 object VisitorEndpoint {

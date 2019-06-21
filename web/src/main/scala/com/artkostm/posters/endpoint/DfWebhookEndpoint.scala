@@ -11,7 +11,7 @@ import com.artkostm.posters.interfaces.dialog.v1.{DialogflowRequest => Request1,
 import com.artkostm.posters.interfaces.dialog.v2.{DialogflowRequest => Request2, DialogflowResponse => Response2}
 import com.artkostm.posters.service.{DfKeyData, DfWebhookService}
 import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
-import org.http4s.AuthedService
+import org.http4s.AuthedRoutes
 import org.http4s.dsl.Http4sDsl
 
 class DfWebhookEndpoint[F[_]: Sync](service: DfWebhookService[F])(implicit H: HttpErrorHandler[F])
@@ -20,7 +20,7 @@ class DfWebhookEndpoint[F[_]: Sync](service: DfWebhookService[F])(implicit H: Ht
 
   private def versioned[Req: DfKeyData: JsonValueCodec, Resp: JsonValueCodec](
       version: String,
-      responseBuilder: ResponsePayload => Resp): AuthedService[User, F] = AuthedService {
+      responseBuilder: ResponsePayload => Resp): AuthedRoutes[User, F] = AuthedRoutes.of {
     case authed @ POST -> Root / `version` / "webhook" as _ =>
       for {
         dfRequest <- authed.req.as[Req]
@@ -29,7 +29,7 @@ class DfWebhookEndpoint[F[_]: Sync](service: DfWebhookService[F])(implicit H: Ht
       } yield resp
   }
 
-  override def endpoints: AuthedService[User, F] =
+  override def endpoints: AuthedRoutes[User, F] =
     versioned[Request1, Response1](
       "v1",
       payload => Response1("", payload, "posters")
