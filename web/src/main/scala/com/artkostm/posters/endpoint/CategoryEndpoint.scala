@@ -2,7 +2,7 @@ package com.artkostm.posters.endpoint
 
 import cats.data.{EitherT, NonEmptyList}
 import cats.implicits._
-import cats.effect.Effect
+import cats.effect.Sync
 import com.artkostm.posters.ValidationError.{CategoriesNotFoundError, CategoryNotFoundError}
 import com.artkostm.posters.algebra.EventStore
 import com.artkostm.posters.categories.CategoryVar
@@ -14,7 +14,7 @@ import com.artkostm.posters.scraper.Scraper
 import org.http4s.AuthedService
 import org.http4s.dsl.Http4sDsl
 
-class CategoryEndpoint[F[_]: Effect](repository: EventStore[F], scraper: Scraper[F])(implicit H: HttpErrorHandler[F])
+class CategoryEndpoint[F[_]: Sync](repository: EventStore[F], scraper: Scraper[F])(implicit H: HttpErrorHandler[F])
     extends Http4sDsl[F]
     with EndpointsAware[F] {
 
@@ -44,6 +44,6 @@ class CategoryEndpoint[F[_]: Effect](repository: EventStore[F], scraper: Scraper
 }
 
 object CategoryEndpoint {
-  def apply[F[_]: Effect: HttpErrorHandler](repository: EventStore[F], scraper: Scraper[F]): CategoryEndpoint[F] =
+  def apply[F[_]: Sync: HttpErrorHandler](repository: EventStore[F], scraper: Scraper[F]): CategoryEndpoint[F] =
     new CategoryEndpoint(repository, scraper)
 }

@@ -1,7 +1,7 @@
 package com.artkostm.posters.endpoint
 
 import cats.implicits._
-import cats.effect.Effect
+import cats.effect.Sync
 import com.artkostm.posters.endpoint.error.HttpErrorHandler
 import com.artkostm.posters.jsoniter._
 import com.artkostm.posters.jsoniter.codecs._
@@ -14,7 +14,7 @@ import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
 import org.http4s.AuthedService
 import org.http4s.dsl.Http4sDsl
 
-class DfWebhookEndpoint[F[_]: Effect](service: DfWebhookService[F])(implicit H: HttpErrorHandler[F])
+class DfWebhookEndpoint[F[_]: Sync](service: DfWebhookService[F])(implicit H: HttpErrorHandler[F])
     extends Http4sDsl[F]
     with EndpointsAware[F] {
 
@@ -40,6 +40,6 @@ class DfWebhookEndpoint[F[_]: Effect](service: DfWebhookService[F])(implicit H: 
 }
 
 object DfWebhookEndpoint {
-  def apply[F[_]: Effect: HttpErrorHandler](service: DfWebhookService[F]): DfWebhookEndpoint[F] =
+  def apply[F[_]: Sync: HttpErrorHandler](service: DfWebhookService[F]): DfWebhookEndpoint[F] =
     new DfWebhookEndpoint(service)
 }

@@ -2,7 +2,7 @@ package com.artkostm.posters.endpoint
 
 import cats.data.EitherT
 import cats.implicits._
-import cats.effect.Effect
+import cats.effect.Sync
 import com.artkostm.posters.ValidationError.EventInfoNotFoundError
 import com.artkostm.posters.algebra.InfoStore
 import com.artkostm.posters.endpoint.error.HttpErrorHandler
@@ -12,7 +12,7 @@ import com.artkostm.posters.interfaces.auth.User
 import org.http4s.AuthedService
 import org.http4s.dsl.Http4sDsl
 
-class InfoEndpoint[F[_]: Effect](repository: InfoStore[F])(implicit H: HttpErrorHandler[F])
+class InfoEndpoint[F[_]: Sync](repository: InfoStore[F])(implicit H: HttpErrorHandler[F])
     extends Http4sDsl[F]
     with EndpointsAware[F] {
 
@@ -28,6 +28,6 @@ class InfoEndpoint[F[_]: Effect](repository: InfoStore[F])(implicit H: HttpError
 }
 
 object InfoEndpoint {
-  def apply[F[_]: Effect: HttpErrorHandler](repository: InfoStore[F]): InfoEndpoint[F] =
+  def apply[F[_]: Sync: HttpErrorHandler](repository: InfoStore[F]): InfoEndpoint[F] =
     new InfoEndpoint(repository)
 }
