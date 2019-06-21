@@ -28,6 +28,7 @@ class VisitorsService[F[_]: Monad](repository: VisitorStore[F], validator: Visit
 
   def leaveEvent(intent: Intent, user: User): EitherT[F, ValidationError, Intents] =
     for {
+      // TODO: try to do this in the same transaction
       intents <- validator.exists(intent)
       role    = user.role
       userId  = user.id

@@ -1,7 +1,7 @@
 package com.artkostm.posters.endpoint
 
 import cats.implicits._
-import cats.effect.Effect
+import cats.effect.Sync
 import com.artkostm.posters.endpoint.error.HttpErrorHandler
 import com.artkostm.posters.jsoniter._
 import com.artkostm.posters.jsoniter.codecs._
@@ -11,7 +11,7 @@ import com.artkostm.posters.service.VisitorsService
 import org.http4s.AuthedService
 import org.http4s.dsl.Http4sDsl
 
-class VisitorEndpoint[F[_]: Effect](service: VisitorsService[F])(implicit H: HttpErrorHandler[F])
+class VisitorEndpoint[F[_]: Sync](service: VisitorsService[F])(implicit H: HttpErrorHandler[F])
     extends Http4sDsl[F]
     with EndpointsAware[F] {
 
@@ -47,6 +47,6 @@ class VisitorEndpoint[F[_]: Effect](service: VisitorsService[F])(implicit H: Htt
 }
 
 object VisitorEndpoint {
-  def apply[F[_]: Effect: HttpErrorHandler](service: VisitorsService[F]): VisitorEndpoint[F] =
+  def apply[F[_]: Sync: HttpErrorHandler](service: VisitorsService[F]): VisitorEndpoint[F] =
     new VisitorEndpoint(service)
 }
