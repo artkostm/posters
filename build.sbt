@@ -1,13 +1,10 @@
-name := "posters"
-
 lazy val commonSettings = Seq(
   version := "3.0.0",
   scalaVersion := "2.12.7",
   scalacOptions := Seq(
     "-feature",
-    "-encoding",
+    "-encoding", "UTF-8",
     "-deprecation",
-    "UTF-8",
     "-language:higherKinds",
     "-language:existentials",
     "-language:implicitConversions",
@@ -29,7 +26,8 @@ lazy val interface = (project in file("interface")).settings(
 lazy val internal = (project in file("internal"))
   .settings(
     commonSettings,
-    libraryDependencies ++= Dependencies.internalM
+    libraryDependencies ++= Dependencies.internalM,
+    dependencyOverrides ++= Dependencies.commonOverrides
   )
   .dependsOn(interface)
 
@@ -46,6 +44,7 @@ lazy val web = (project in file("web"))
     libraryDependencies ++= Dependencies.logging,
     libraryDependencies ++= unitTesting(Dependencies.commonTest),
     libraryDependencies ++= integTesting(Dependencies.integTests),
+    dependencyOverrides ++= Dependencies.commonOverrides,
     addCompilerPlugin(Dependencies.kindProjector),
     addCompilerPlugin(Dependencies.betterMonadicFor)
   )
@@ -65,7 +64,8 @@ lazy val worker = (project in file("worker"))
     libraryDependencies ++= Dependencies.ciris,
     libraryDependencies ++= Dependencies.workerSpecific,
     libraryDependencies ++= Dependencies.logging,
-    libraryDependencies ++= integTesting(Dependencies.integTests)
+    libraryDependencies ++= integTesting(Dependencies.integTests),
+    dependencyOverrides ++= Dependencies.commonOverrides
   )
   .dependsOn(internal)
   .enablePlugins(JavaAppPackaging)
