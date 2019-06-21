@@ -16,7 +16,7 @@ class VisitorsService[F[_]: Monad](repository: VisitorStore[F], validator: Visit
 
   def findIntent(eventName: String, date: LocalDate): EitherT[F, IntentDoesNotExistError, Intents] =
     EitherT.fromOptionF(repository.find(date, eventName), IntentDoesNotExistError(eventName, date))
-  
+
   def saveOrUpdateIntent(role: String, intent: Intent): EitherT[F, RoleDoesNotExistError, Intents] =
     on[RoleDoesNotExistError, Intents](role) {
       EitherT.liftF(repository.asPlainUser(intent))
