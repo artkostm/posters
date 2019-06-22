@@ -8,7 +8,7 @@ import com.artkostm.posters.interfaces.event.EventInfo
 import com.artkostm.posters.interfaces.schedule.Day
 import fs2._
 
-trait Scraper[F[_]] {
+trait EventScraper[F[_]] {
   def event(day: LocalDate): F[Day]
   def eventInfo(link: String): F[Option[EventInfo]]
 
