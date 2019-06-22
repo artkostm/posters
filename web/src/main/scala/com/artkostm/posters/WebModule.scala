@@ -9,7 +9,7 @@ import com.artkostm.posters.interpreter.{
   VisitorStoreInterpreter,
   VisitorValidationInterpreter
 }
-import com.artkostm.posters.scraper.{AfishaScraper, Scraper}
+import com.artkostm.posters.scraper.{AfishaEventScraper, EventScraper}
 import doobie.hikari.HikariTransactor
 import cats.syntax.semigroupk._
 import com.artkostm.posters.Configuration.DatabaseConfig
@@ -33,7 +33,7 @@ class WebModule[F[_]: Concurrent](val config: AppConfig, val xa: HikariTransacto
   private implicit val errorHandler = new HttpErrorHandler[F]
   private lazy val webhookService   = new DfWebhookService[F](eventStore)
 
-  lazy val scraper: Scraper[F] = new AfishaScraper[F](config.scraper)
+  lazy val scraper: EventScraper[F] = new AfishaEventScraper[F](config.scraper)
 
   lazy val visitorEndpoint = VisitorEndpoint[F](visitorService)
 
