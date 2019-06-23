@@ -5,9 +5,11 @@ import java.time.temporal.ChronoUnit
 
 import cats.data.NonEmptyList
 import cats.effect.{Concurrent, Timer}
+import cats.implicits._
 import com.artkostm.posters.algebra.{EventStore, InfoStore, VisitorStore}
 import com.artkostm.posters.interfaces.event.EventInfo
 import com.artkostm.posters.scraper.EventScraper
+import com.artkostm.posters.worker.logging.Logger
 import fs2._
 import org.log4s.getLogger
 
@@ -15,7 +17,7 @@ class EventCollector[F[_]: Timer](scrapers: NonEmptyList[EventScraper[F]],
                                   eventStore: EventStore[F],
                                   infoStore: InfoStore[F],
                                   visitorStore: VisitorStore[F])(implicit F: Concurrent[F]) {
-  private[this] val logger = getLogger
+  private[this] val logger = new Logger[F]
 
   // TODO: move all magic numbers to config
   // TODO: add logging
@@ -27,7 +29,7 @@ class EventCollector[F[_]: Timer](scrapers: NonEmptyList[EventScraper[F]],
         .range(-2, 31)
         .covary[F]
         .map(LocalDate.now().plus(_, ChronoUnit.DAYS))
-        .mapAsyncUnordered(4)(scraper.event)
+        .mapAsyncUnordered(4)(scraper.event(_) <* logger.info("hello"))
 
       val insertDays = dayStream.mapAsyncUnordered(4)(eventStore.save)
       val saveEvents = dayStream
