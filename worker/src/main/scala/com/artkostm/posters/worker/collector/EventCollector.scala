@@ -1,15 +1,13 @@
 package com.artkostm.posters.worker.collector
 
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 
 import cats.data.NonEmptyList
 import cats.effect.{Concurrent, Timer}
 import cats.implicits._
 import com.artkostm.posters.algebra.{EventStore, InfoStore, VisitorStore}
-import com.artkostm.posters.worker.logging.mdcF
+import com.artkostm.posters.logging.mdcF
 import com.artkostm.posters.interfaces.event.EventInfo
-import com.artkostm.posters.interfaces.schedule.Day
 import com.artkostm.posters.scraper.EventScraper
 import fs2._
 import org.log4s.getLogger
@@ -24,25 +22,25 @@ class EventCollector[F[_]: Timer](scrapers: NonEmptyList[EventScraper[F]],
   // TODO: add logging
   def collect(days: Seq[LocalDate]) = {
 
-    def collectWith(scraper: EventScraper[F]): Stream[F, Any] = {
-      println("Scrapping for: " + scraper)
+    def collectWith(scraper: EventScraper[F], days: Seq[LocalDate]): Stream[F, Any] = {
       val dayStream = Stream
-        .range(-2, 31)
+        .emits(days)
         .covary[F]
-        .map(LocalDate.now().plus(_, ChronoUnit.DAYS))
         .mapAsyncUnordered(4)(scraper.event(_))
 
-      val insertDays = dayStream.mapAsyncUnordered(4) { day =>
-        eventStore.save(day) <* mdcF[F](
-          "Day" -> s"""{"date":"${day.eventDate}", "categories":[${day.categories
-            .map(_.name)
-            .mkString("\"", "\",\"", "\"")}]}"""
-        )(logger.info("Saving day."))
-      }.handleErrorWith { error =>
-        Stream.eval(mdcF[F]() {
-          logger.error(error)("")
-        }) >> Stream.empty[F, Day]
-      }
+      val insertDays = dayStream
+        .mapAsyncUnordered(4) { day =>
+          eventStore.save(day) <* mdcF[F](
+            "Day" -> s"""{"date":"${day.eventDate}", "categories":[${day.categories
+              .map(_.name)
+              .mkString("\"", "\",\"", "\"")}]}"""
+          )(logger.info("Saving day."))
+        }
+        .handleErrorWith { error =>
+          Stream.eval[F, Unit](mdcF[F]() {
+            logger.error(error)("")
+          }) >> Stream.empty
+        }
       val saveEvents = dayStream
         .flatMap(day => Stream.emits(day.categories.flatMap(_.events)))
         .mapAsyncUnordered(4)(event => scraper.eventInfo(event.media.link))
@@ -60,7 +58,7 @@ class EventCollector[F[_]: Timer](scrapers: NonEmptyList[EventScraper[F]],
 
     for {
       scraper <- Stream.emits[F, EventScraper[F]](scrapers.toList)
-      _       <- collectWith(scraper)
+      _       <- collectWith(scraper, days)
     } yield ()
   }
 }
