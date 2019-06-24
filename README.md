@@ -1,8 +1,7 @@
 # Posters
 Design notes:
- - [First](https://github.com/artkostm/posters/blob/master/FIRST_DN.md)
- - [GraphQL](https://github.com/artkostm/posters/blob/master/GRAPHQL.md)
- - [Second](https://github.com/artkostm/posters/blob/master/SECOND.md)
+ - [First](https://github.com/artkostm/posters/blob/master/docs/FIRST_DN.md)
+ - [GraphQL](https://github.com/artkostm/posters/blob/master/docs/GRAPHQL.md)
  
 
 ...To be continued

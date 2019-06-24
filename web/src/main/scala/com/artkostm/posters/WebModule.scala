@@ -39,9 +39,8 @@ class WebModule[F[_]: Concurrent](val config: AppConfig, val xa: HikariTransacto
 
   implicit val throttlerClock = Clock.create[F]
 
-  lazy val endpoints = Throttle(10, 5 minutes)(
-    auth(visitorEndpoint.throttled)
-  ).map { throttled =>
+  lazy val endpoints = Throttle(10, 5 minutes)(auth(visitorEndpoint.throttled))
+    .map { throttled =>
       auth(
         InfoEndpoint[F](infoStore).endpoints <+>
           DfWebhookEndpoint[F](webhookService).endpoints <+>
