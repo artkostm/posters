@@ -7,9 +7,10 @@ import cats.data.NonEmptyList
 import cats.effect.{Concurrent, Timer}
 import cats.implicits._
 import com.artkostm.posters.algebra.{EventStore, InfoStore, VisitorStore}
+import com.artkostm.posters.worker.logging.mdcF
 import com.artkostm.posters.interfaces.event.EventInfo
+import com.artkostm.posters.interfaces.schedule.Day
 import com.artkostm.posters.scraper.EventScraper
-import com.artkostm.posters.worker.logging.Logger
 import fs2._
 import org.log4s.getLogger
 
@@ -17,7 +18,7 @@ class EventCollector[F[_]: Timer](scrapers: NonEmptyList[EventScraper[F]],
                                   eventStore: EventStore[F],
                                   infoStore: InfoStore[F],
                                   visitorStore: VisitorStore[F])(implicit F: Concurrent[F]) {
-  private[this] val logger = new Logger[F]
+  private[this] val logger = getLogger("Collector")
 
   // TODO: move all magic numbers to config
   // TODO: add logging
@@ -29,9 +30,19 @@ class EventCollector[F[_]: Timer](scrapers: NonEmptyList[EventScraper[F]],
         .range(-2, 31)
         .covary[F]
         .map(LocalDate.now().plus(_, ChronoUnit.DAYS))
-        .mapAsyncUnordered(4)(scraper.event(_) <* logger.info("hello"))
+        .mapAsyncUnordered(4)(scraper.event(_))
 
-      val insertDays = dayStream.mapAsyncUnordered(4)(eventStore.save)
+      val insertDays = dayStream.mapAsyncUnordered(4) { day =>
+        eventStore.save(day) <* mdcF[F](
+          "Day" -> s"""{"date":"${day.eventDate}", "categories":[${day.categories
+            .map(_.name)
+            .mkString("\"", "\",\"", "\"")}]}"""
+        )(logger.info("Saving day."))
+      }.handleErrorWith { error =>
+        Stream.eval(mdcF[F]() {
+          logger.error(error)("")
+        }) >> Stream.empty[F, Day]
+      }
       val saveEvents = dayStream
         .flatMap(day => Stream.emits(day.categories.flatMap(_.events)))
         .mapAsyncUnordered(4)(event => scraper.eventInfo(event.media.link))
