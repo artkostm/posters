@@ -17,8 +17,8 @@ object Dependencies {
     val betterMonadicFor = "0.3.0-M4"
     val catsCommon       = "1.6.1"
     val catsEffect       = "1.3.1"
-    val logback            = "1.2.3"
-    val scalalogging = "3.9.2"
+    val logback          = "1.2.3"
+    val log4s            = "1.7.0"
 
     val scalaTest         = "3.0.7"
     val scalaCheck        = "1.14.0"
@@ -60,11 +60,11 @@ object Dependencies {
   )
 
   lazy val workerSpecific = Seq(
-    "org.flywaydb"   % "flyway-core" % versions.flyway,
-    "co.fs2"         %% "fs2-core"   % versions.fs2,
-    "org.postgresql" % "postgresql"  % versions.postgres,
+    "org.flywaydb"   % "flyway-core"     % versions.flyway,
+    "co.fs2"         %% "fs2-core"       % versions.fs2,
+    "org.postgresql" % "postgresql"      % versions.postgres,
     "ch.qos.logback" % "logback-classic" % versions.logback,
-    "com.typesafe.scala-logging" %% "scala-logging" % versions.scalalogging
+    "org.log4s"      %% "log4s"          % versions.log4s
   )
 
   lazy val internalM = Seq(
