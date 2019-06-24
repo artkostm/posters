@@ -4,6 +4,7 @@ import java.time.LocalDate
 
 import cats.~>
 import com.artkostm.posters.algebra.VisitorStore
+import com.artkostm.posters.logging
 import com.artkostm.posters.interfaces.intent.{Intent, Intents}
 import doobie._
 import doobie.implicits._
@@ -32,7 +33,7 @@ class VisitorStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends VisitorStore[F
 }
 
 object VisitorStoreInterpreter {
-  implicit val han = LogHandler.jdkLogHandler
+  implicit val han = logging.doobieLogHandler
 
   def findByDateAndName(date: LocalDate, eventName: String): Query0[Intents] =
     sql"""SELECT "eventdate", eventname, vids, uids FROM visitors WHERE eventdate = $date AND eventname = $eventName"""

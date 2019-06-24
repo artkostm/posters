@@ -8,6 +8,7 @@ import com.artkostm.posters.doobiemeta._
 import com.artkostm.posters.jsoniter.codecs._
 import com.artkostm.posters.algebra.EventStore
 import com.artkostm.posters.interfaces.schedule.{Category, Day}
+import com.artkostm.posters.logging
 import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
 import doobie._
 import doobie.implicits._
@@ -49,7 +50,7 @@ class EventStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends EventStore[F] {
   * Companion object with sql staff
   */
 object EventStoreInterpreter {
-  implicit val han = LogHandler.jdkLogHandler
+  implicit val han = logging.doobieLogHandler
 
   implicit val readDay = Read[(LocalDate, List[Category])].map { case (date, categories) => Day(date, categories) }
 

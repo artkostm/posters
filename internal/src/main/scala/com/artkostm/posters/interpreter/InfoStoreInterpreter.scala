@@ -5,6 +5,7 @@ import com.artkostm.posters.doobiemeta._
 import com.artkostm.posters.jsoniter.codecs._
 import com.artkostm.posters.algebra.InfoStore
 import com.artkostm.posters.interfaces.event.{EventData, EventInfo}
+import com.artkostm.posters.logging
 import doobie._
 import doobie.implicits._
 
@@ -25,7 +26,7 @@ class InfoStoreInterpreter[F[_]](T: ConnectionIO ~> F) extends InfoStore[F] {
 }
 
 object InfoStoreInterpreter {
-  implicit val han = LogHandler.jdkLogHandler
+  implicit val han = logging.doobieLogHandler
 
   implicit val eventInfoJsonValueCodec = eventInfoCodec
 
