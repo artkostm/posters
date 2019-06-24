@@ -10,11 +10,11 @@ import com.artkostm.posters.endpoint.error.HttpErrorHandler
 import com.artkostm.posters.jsoniter._
 import com.artkostm.posters.jsoniter.codecs._
 import com.artkostm.posters.interfaces.auth.User
-import com.artkostm.posters.scraper.Scraper
+import com.artkostm.posters.scraper.EventScraper
 import org.http4s.AuthedRoutes
 import org.http4s.dsl.Http4sDsl
 
-class CategoryEndpoint[F[_]: Sync](repository: EventStore[F], scraper: Scraper[F])(implicit H: HttpErrorHandler[F])
+class CategoryEndpoint[F[_]: Sync](repository: EventStore[F], scraper: EventScraper[F])(implicit H: HttpErrorHandler[F])
     extends Http4sDsl[F]
     with EndpointsAware[F] {
 
@@ -44,6 +44,6 @@ class CategoryEndpoint[F[_]: Sync](repository: EventStore[F], scraper: Scraper[F
 }
 
 object CategoryEndpoint {
-  def apply[F[_]: Sync: HttpErrorHandler](repository: EventStore[F], scraper: Scraper[F]): CategoryEndpoint[F] =
+  def apply[F[_]: Sync: HttpErrorHandler](repository: EventStore[F], scraper: EventScraper[F]): CategoryEndpoint[F] =
     new CategoryEndpoint(repository, scraper)
 }

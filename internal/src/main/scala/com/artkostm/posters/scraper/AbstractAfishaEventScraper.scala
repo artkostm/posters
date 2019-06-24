@@ -12,7 +12,7 @@ import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
 import net.ruippeixotog.scalascraper.model._
 import net.ruippeixotog.scalascraper.scraper.HtmlExtractor
 
-abstract class AbstractAfishaScraper[F[_]: Sync](config: ScraperConfig) extends Scraper[F] {
+abstract class AbstractAfishaEventScraper[F[_]: Sync](config: ScraperConfig) extends EventScraper[F] {
   private lazy val commentExtractor: HtmlExtractor[Element, List[Comment]] =
     _.map { comment =>
       Comment(
