@@ -8,6 +8,7 @@ lazy val commonSettings = Seq(
     "-language:higherKinds",
     "-language:existentials",
     "-language:implicitConversions",
+    "-language:postfixOps",
     "-Ypartial-unification",
     //"-Xmacro-settings:print-codecs" // to debug jsoniter codecs
   ),
