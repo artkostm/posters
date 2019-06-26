@@ -1,0 +1,23 @@
+language: scala
+scala:
+  - 2.12.7
+jdk:
+  - oraclejdk8
+cache:
+  directories:
+    - "$HOME/.ivy2/cache"
+    - "$HOME/.sbt/boot/"
+before_cache:
+  - rm -fv $HOME/.ivy2/.sbt.ivy.lock
+  - find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete
+  - find $HOME/.sbt        -name "*.lock"               -print -delete
+notifications:
+  slack:
+    secure: ik/N+BPGDVkQsl+gA0nDaTFXTZNNRCcon/ifh4wdMT38q6pZgiZPW9PA7MNX0uPFGCW3Ry4s3K9H7LidBI01gp4xMJK1MuECk+9rXSD73+fq5vLiyBz6+K0nV4eAwrcf3EXA1G3HdQydYVwGNiV4F3ae+3R4KhegIObQQGrUletWqoUt0DlxKrk0u6RROlxsFZ3y5NSYrF1YEJcxgRNltwbJFGZ0kDXSp6DekC+l9B/jtBm0c2zGLEkOKWy6Vl1xkAcHnHfN/KW75lQ4sXgAjOq0ioBo4YSgEftScqhaS5ddoydwF4MDUePLojvpwPvXfl2c90puA6HkAQpdYP955C3aewYESpE3x/WzKVu4HItiFddV+6C8X+Cduwol3CZWtv4DwbEOzI/BwRE/QuZd8pz8j8vuuSncW3GHdry6T5FslKMxPpSzqKeJCmm0mTzUGxVMdd+mTXCY3ZNphux2KFLjMpWmlmrqPSxes9A5MjWf0zK1VSuRJ8jZf4ar9rU7yQ/Z+/xMfFOc7Mekj9G/iVZByDqzhQeDLAiyID8ZqlL5Lq0V2kDsTxD0UnX72v0Yd6ErKOZB0CpaV0jWSIMy99yVScKrLcVPwjbMymo3JXRH0+2OmZ3y1kdLR1N948X5yddxeLGz69oHswbXFY4cWT5Mo0YTJWWqF6Vy2a4CyCs=
+  email:
+    on_success: always
+deploy:
+  provider: heroku
+  api_key:
+    secure: UZ/MV7/EWZLnUlYcn8zLQJdPdAAB5qBDrI3D8o3Xwh5XJfn9CzqbWN4De14xO9/7ljxKCILIJvC4N7q78xQ+bzZRpMD4HVY643dqIaVfSJn/RZCklDw/R7T66s2fjRKeaCqpdKAUlcOm222ZhSDxRk+yBnwN7c8u2m7IM4F5vskORp8r7BmmFTdCyx21SMR4Ejsxthqt9ZCSih4OgzFaI062T07Q6PPrZzHGv5tg56inOO1RJBjxKkgjOzYTAWDYlDEJeGCS/kApOJn6o/8f/YA+VgmHQbTlcWqs80PhqvR4jS5D9ZZYDZvekC6AmXIjiM2KShgTuD8DDDR0sntYkVoI+egepMNVX4NbTWOy0KHXJ26OoG/9yruX4IC1QM5aFm2dommtaOq45puBq2UNsqQhnRFGvRqK1MAJEePi9I1dZ3CxHZFWo0gyef4fEKC1dmtGHHZuZdN2OLvU3Eg9p6iPPFyzdE8ptasHOjTxoh/ksVsU+zd6e6mkLUy0cUnaDyeecDZmKJZgxbfaOZd4vuh8UclF1/980+PrsoMNKsQTJNYL0Qhy1kP9zLqfv/mtqpeo9hwbZpUYirEzmrTH2IL0yTLTsMzHcjtQ5/9X5qMjLSPeT01eDdrDMdHazW8lQbCRq/Ik/I+ppeCcjzVPDkMQFcaJQQcpA/VhmhqK1Ns=
+app: posters

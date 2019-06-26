@@ -30,13 +30,8 @@ class DfWebhookEndpoint[F[_]: Sync](service: DfWebhookService[F])(implicit H: Ht
   }
 
   override def endpoints: AuthedRoutes[User, F] =
-    versioned[Request1, Response1](
-      "v1",
-      payload => Response1("", payload, "posters")
-    ) <+> versioned[Request2, Response2](
-      "v2",
-      payload => Response2("", payload, "posters")
-    )
+    versioned[Request1, Response1]("v1", payload => Response1("", payload, "posters")) <+>
+      versioned[Request2, Response2]("v2", payload => Response2("", payload, "posters"))
 }
 
 object DfWebhookEndpoint {

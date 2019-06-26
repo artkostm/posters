@@ -19,7 +19,6 @@ class EventCollector[F[_]: Timer](scrapers: NonEmptyList[EventScraper[F]],
   private[this] val logger = getLogger("Collector")
 
   // TODO: move all magic numbers to config
-  // TODO: add logging
   def collect(days: Seq[LocalDate]) = {
 
     def collectWith(scraper: EventScraper[F], days: Seq[LocalDate]): Stream[F, Any] = {
@@ -30,25 +29,32 @@ class EventCollector[F[_]: Timer](scrapers: NonEmptyList[EventScraper[F]],
 
       val insertDays = dayStream
         .mapAsyncUnordered(4) { day =>
-          eventStore.save(day) <* mdcF[F](
+          eventStore.save(day) <* mdcF(
             "Day" -> s"""{"date":"${day.eventDate}", "categories":[${day.categories
               .map(_.name)
               .mkString("\"", "\",\"", "\"")}]}"""
           )(logger.info("Saving day."))
         }
         .handleErrorWith { error =>
-          Stream.eval[F, Unit](mdcF[F]() {
-            logger.error(error)("")
+          Stream.eval[F, Unit](mdcF() {
+            logger.error(error)("Error while saving days.")
           }) >> Stream.empty
         }
       val saveEvents = dayStream
         .flatMap(day => Stream.emits(day.categories.flatMap(_.events)))
         .mapAsyncUnordered(4)(event => scraper.eventInfo(event.media.link))
-        .chunkN(10)
+        .chunkN(50)
         .mapAsync(4)(chunk =>
           infoStore.save(chunk.map {
             case Some(EventInfo(link, eventInfo)) => (link, eventInfo, eventInfo)
-          }))
+          }) <* mdcF(
+            "EventChunk" -> s"""{"chunk_size":"${chunk.size}"}"""
+          )(logger.info("Saving event info chunk.")))
+        .handleErrorWith { error =>
+          Stream.eval[F, Unit](mdcF() {
+            logger.error(error)("Error while saving event info.")
+          }) >> Stream.empty
+        }
 
       Stream.eval(eventStore.deleteOld(LocalDate.now())) >>
         Stream.eval(infoStore.deleteOld()) >>

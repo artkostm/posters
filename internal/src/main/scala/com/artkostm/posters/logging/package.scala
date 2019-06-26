@@ -23,7 +23,7 @@ package object logging {
           """.stripMargin)
 
       case ProcessingFailure(s, a, e1, e2, t) =>
-        logger.error(s"""Failed Resultset Processing:
+        logger.error(s"""Failed ResultSet Processing:
                             |
                             |  ${s.linesIterator.dropWhile(_.trim.isEmpty).mkString("\n  ")}
                             |
