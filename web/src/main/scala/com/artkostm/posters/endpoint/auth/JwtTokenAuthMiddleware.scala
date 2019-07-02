@@ -10,7 +10,7 @@ import com.artkostm.posters.endpoint.auth.JwtTokenAuthMiddleware.AuthConfig
 import com.artkostm.posters.endpoint.auth.role.Role
 import com.artkostm.posters.interfaces.auth.User
 import org.http4s.Credentials.Token
-import org.http4s.{AuthScheme, AuthedService, Request}
+import org.http4s.{AuthScheme, AuthedRoutes, Request}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.headers.Authorization
 import org.http4s.server.AuthMiddleware
@@ -44,7 +44,7 @@ class Middleware[F[_]](api: ApiConfig)(implicit F: Sync[F]) {
 class JwtTokenAuthMiddleware[F[_]: Sync](config: AuthConfig, apiKey: String) extends Http4sDsl[F] {
   import com.artkostm.posters.jsoniter._
 
-  private val onFailure: AuthedService[String, F] =
+  private val onFailure: AuthedRoutes[String, F] =
     Kleisli(_ => OptionT.liftF(Forbidden(ApiError("Forbidden! You don't have enough permissions!", 403))))
 
   private def bearerTokenFromRequest(request: Request[F]): OptionT[F, String] =

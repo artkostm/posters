@@ -43,6 +43,7 @@ class EventCollector[F[_]: Timer](scrapers: NonEmptyList[EventScraper[F]],
       val saveEvents = dayStream
         .flatMap(day => Stream.emits(day.categories.flatMap(_.events)))
         .mapAsyncUnordered(4)(event => scraper.eventInfo(event.media.link))
+        .filter(_.isDefined)
         .chunkN(50)
         .mapAsync(4)(chunk =>
           infoStore.save(chunk.map {
