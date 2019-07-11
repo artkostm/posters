@@ -31,13 +31,13 @@ class TokenGenerator[F[_]](implicit F: Sync[F]) {
 
   private val ifEmpty: F[String] = F.raiseError(new Exception("Api Token not found"))
 
-  val tokenGenerator: F[String] = ApiToken.fold(ifEmpty) { apiToken =>
+  val tokenGenerator: F[String] = ApiKey.fold(ifEmpty) { apiKey =>
     for {
-      jwtKey <- generateJwtKey(apiToken)
-      claims = JWTClaims(issuer = Some("User"),
-                         subject = ApiKey,
+      jwtKey <- HMACSHA256.buildKey[F](apiKey.getBytes)
+      claims = JWTClaims(issuer = Some("2"),
+                         subject = Some("User"),
                          expiration = None,
-                         customFields = Seq(("id", Json.fromString("2"))))
+                         customFields = Seq(("atk", Json.fromString(ApiToken.getOrElse("")))))
       token <- generateToken(claims, jwtKey)
     } yield token
   }
