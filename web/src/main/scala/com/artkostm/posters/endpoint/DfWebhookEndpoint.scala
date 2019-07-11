@@ -30,6 +30,7 @@ class DfWebhookEndpoint[F[_]: Sync](service: DfWebhookService[F])(implicit H: Ht
   }
 
   override def endpoints: AuthedRoutes[User, F] =
+    // Dialogflow API V1 is no longer supported (it will be deprecated on October 23, 2019)
     versioned[Request1, Response1]("v1", Response1("", _, "posters")) <+>
       versioned[Request2, Response2]("v2", Response2("", _, "posters"))
 }
